@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.project.basis.dao.SysWarehouseDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.dc.project.basis.entity.SysWarehouse">
+        <id column="warehouse_id" property="warehouseId"/>
+        <result column="warehouse_num" property="warehouseNum"/>
+        <result column="warehouse_name" property="warehouseName"/>
+        <result column="dept_id" property="deptId"/>
+        <result column="status" property="status"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+        <association property="dept" column="dept_id" javaType="com.dc.project.system.entity.SysDept"
+                     resultMap="deptResult"/>
+    </resultMap>
+
+    <resultMap id="deptResult" type="com.dc.project.system.entity.SysDept">
+        <id property="deptId" column="dept_id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="deptNum" column="dept_num"/>
+        <result property="deptName" column="dept_name"/>
+        <result property="deptType" column="dept_type"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        warehouse_id, warehouse_num, warehouse_name, dept_id, status,  create_by, create_time, update_by, update_time, remark
+    </sql>
+
+    <sql id="warehouse_dept_sql">
+        select
+        w.warehouse_id, w.warehouse_num, w.warehouse_name, w.status, w.del_flag, w.create_by, w.create_time, w.update_by, w.update_time, w.remark,
+        d.dept_id,d.dept_num,d.dept_name,d.parent_id,d.dept_type
+        from sys_warehouse w
+        left join sys_dept d on d.dept_id = w.dept_id
+    </sql>
+    <select id="list" resultMap="BaseResultMap">
+        <include refid="warehouse_dept_sql"/>
+        <where>
+            <if test="ware.warehouseNum!=null and ware.warehouseNum!=''">w.warehouse_num like
+                concat(concat('%',#{ware.warehouseNum}),'%')
+            </if>
+            <if test="ware.warehouseName!=null and ware.warehouseName!=''">or w.warehouse_name like
+                concat(concat('%',#{ware.warehouseName}),'%')
+            </if>
+            <if test="ware.status!=null and ware.status!=''">and w.status=#{ware.status}</if>
+            and w.del_flag = '0'
+        </where>
+        order by w.create_time desc
+    </select>
+    <select id="getByWarehouseId" resultMap="BaseResultMap">
+        select
+        w.warehouse_id, w.warehouse_num, w.warehouse_name, w.status, w.remark,
+        d.dept_id,d.dept_num,d.dept_name,d.parent_id,d.dept_type
+        from sys_warehouse w
+        left join sys_dept d on d.dept_id = w.dept_id
+        where w.warehouse_id=#{warehouseId}
+    </select>
+    <select id="initPage" resultMap="BaseResultMap">
+        <include refid="warehouse_dept_sql"/>
+        <where>
+            <if test="ware.warehouseNum!=null and ware.warehouseNum!=''">w.warehouse_num like
+                concat(concat('%',#{ware.warehouseNum}),'%')
+            </if>
+            <if test="ware.warehouseName!=null and ware.warehouseName!=''">or w.warehouse_name like
+                concat(concat('%',#{ware.warehouseName}),'%')
+            </if>
+            <if test="ware.status!=null and ware.status!=''">and w.status=#{ware.status}</if>
+            and w.del_flag = '0'
+            and warehouse_id not in (select warehouse_id from sys_warehouse_init)
+        </where>
+        order by w.create_time desc
+    </select>
+
+</mapper>

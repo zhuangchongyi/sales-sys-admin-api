@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.project.sales.dao.SysOrderDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.dc.project.sales.entity.SysOrder">
+        <id column="order_id" property="orderId"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="order_num" property="orderNum"/>
+        <result column="delivery_time" property="deliveryTime"/>
+        <result column="order_time" property="orderTime"/>
+        <result column="clientele_id" property="clienteleId"/>
+        <result column="clientele_num" property="clienteleNum"/>
+        <result column="clientele_name" property="clienteleName"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="personnel_id" property="personnelId"/>
+        <result column="pay_condition" property="payCondition"/>
+        <result column="status" property="status"/>
+        <result column="remark" property="remark"/>
+        <result column="legal_person" property="legalPerson"/>
+        <result column="leader" property="leader"/>
+        <result column="email" property="email"/>
+        <result column="phone" property="phone"/>
+        <result column="mobilephone" property="mobilephone"/>
+        <result column="abbreviation" property="abbreviation"/>
+        <result column="certificate_num" property="certificateNum"/>
+        <result column="address" property="address"/>
+        <result column="audit_by" property="auditBy"/>
+        <result column="audit_time" property="auditTime"/>
+        <result column="taxrate" property="taxrate"/>
+        <result column="taxamount" property="taxamount"/>
+        <result column="personnel_name" property="personnelName"/>
+        <result column="personnel_num" property="personnelNum"/>
+        <result column="dept_id" property="deptId"/>
+        <result column="total_price" property="totalPrice"/>
+        <result column="dept_name" property="deptName"/>
+        <result column="dept_num" property="deptNum"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <!--<sql id="Base_Column_List">
+        so.order_id, so.order_num, so.delivery_time, so.order_time, so.clientele_id, so.clientele_num, so.clientele_name, so.category_id, so.personnel_id, so.pay_condition, so.status, so.remark, so.legal_person, so.leader, so.email, so.phone, so.mobilephone, so.abbreviation, so.certificate_num, so.address, so.audit_by, so.audit_time, so.taxrate, so.taxamount,create_by, so.create_time, so.update_by, so.update_time
+    </sql>-->
+    <sql id="Base_Column_List">
+        select
+        so.order_id, so.order_num, so.delivery_time, so.order_time, so.clientele_id, so.clientele_num, so.clientele_name, so.category_id, so.personnel_id, so.pay_condition, so.status, so.remark, so.legal_person, so.leader, so.email, so.phone, so.mobilephone, so.abbreviation, so.certificate_num, so.address, so.audit_by, so.audit_time, so.taxrate, so.taxamount,so.create_by, so.create_time, so.update_by, so.update_time
+        ,u.user_num personnel_num,u.nickname personnel_name,d.dept_id,d.dept_num,d.dept_name, so.total_price
+        from sys_order so
+        left join sys_user u on u.user_id = so.personnel_id
+        left join sys_dept d on d.dept_id = u.dept_id
+        /*left join sys_order_sub sos on sos.order_id = so.order_id*/
+    </sql>
+    <sql id="orderSql">
+        select
+        so.order_id, so.order_num, so.delivery_time, so.order_time, so.clientele_id, so.clientele_num, so.clientele_name, so.category_id, so.personnel_id, so.pay_condition, so.status, so.remark, so.legal_person, so.leader, so.email, so.phone, so.mobilephone, so.abbreviation, so.certificate_num, so.address, so.taxrate, so.taxamount
+        ,u.user_num personnel_num,u.nickname personnel_name,d.dept_id,d.dept_num,d.dept_name
+        from sys_order so
+        left join sys_user u on u.user_id = so.personnel_id
+        left join sys_dept d on d.dept_id = u.dept_id
+    </sql>
+    <select id="page" resultMap="BaseResultMap">
+        <include refid="Base_Column_List"/>
+        <where>
+            <if test="so.orderNum!=null and so.orderNum!=''">so.order_num like
+                concat(concat('%',#{so.orderNum}),'%')
+            </if>
+            <if test="so.clienteleNum!=null and so.clienteleNum!=''">or so.clientele_num like
+                concat(concat('%',#{so.clienteleNum}),'%')
+            </if>
+            <if test="so.clienteleName!=null and so.clienteleName!=''">or so.clientele_name like
+                concat(concat('%',#{so.clienteleNum}),'%')
+            </if>
+            <if test="so.status!=null and so.status!=''">
+                and so.status=#{so.status}
+            </if>
+        </where>
+        group by so.order_id order by so.create_time desc
+    </select>
+
+    <select id="get" resultMap="BaseResultMap">
+        <include refid="orderSql"/>
+        where so.order_id=#{orderId}
+    </select>
+    <select id="list" resultMap="BaseResultMap">
+        <include refid="orderSql"/>
+        <where>
+            <if test="so.orderNum!=null and so.orderNum!=''">so.order_num like
+                concat(concat('%',#{so.orderNum}),'%')
+            </if>
+            <if test="so.clienteleNum!=null and so.clienteleNum!=''">or so.clientele_num like
+                concat(concat('%',#{so.clienteleNum}),'%')
+            </if>
+            <if test="so.clienteleName!=null and so.clienteleName!=''">or so.clientele_name like
+                concat(concat('%',#{so.clienteleNum}),'%')
+            </if>
+            <if test="so.status!=null and so.status!=''">
+                and so.status=#{so.status}
+            </if>
+        </where>
+        order by so.create_time desc
+    </select>
+
+</mapper>

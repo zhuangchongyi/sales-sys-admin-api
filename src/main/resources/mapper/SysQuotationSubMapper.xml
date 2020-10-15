@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.project.sales.dao.SysQuotationSubDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.dc.project.sales.entity.SysQuotationSub">
+        <id column="sub_id" property="subId"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="quotation_id" property="quotationId"/>
+        <result column="materiel_id" property="materielId"/>
+        <result column="materiel_num" property="materielNum"/>
+        <result column="materiel_name" property="materielName"/>
+        <result column="specification" property="specification"/>
+        <result column="model_name" property="modelName"/>
+        <result column="need_torque" property="needTorque"/>
+        <result column="out_torque" property="outTorque"/>
+        <result column="units_id" property="unitsId"/>
+        <result column="units_name" property="unitsName"/>
+        <result column="price" property="price"/>
+        <result column="number" property="number"/>
+        <result column="total_price" property="totalPrice"/>
+        <result column="demand" property="demand"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+            create_by,
+            create_time,
+            update_by,
+            update_time,
+        sub_id, quotation_id, materiel_id, materiel_num, materiel_name, specification, model_name, need_torque, out_torque, units_id, units_name, price, number, total_price, demand
+    </sql>
+    <select id="page" resultType="com.dc.common.vo.QuotationSubVo">
+        select
+        sqs.materiel_id, sqs.materiel_num, sqs.materiel_name, sqs.specification, sqs.model_name, sqs.need_torque,
+        sqs.out_torque, sqs.units_id, sqs.units_name, sqs.price, sqs.category_id, sq.quotation_num, sq.quotation_time
+        from sys_quotation_sub sqs
+        left join sys_quotation sq on sq.quotation_id=sqs.quotation_id
+        <where>
+            <if test="sqs.materielName!=null and sqs.materielNum!=''">sqs.materiel_num like
+                concat(concat('%',#{sqs.materielName}),'%')
+            </if>
+            <if test="sqs.materielName!=null and sqs.materielName!=''">or sqs.materiel_name like
+                concat(concat('%',#{sqs.materielName}),'%')
+            </if>
+            <if test="sqs.materielName!=null and sqs.materielName!=''">or sqs.specification like
+                concat(concat('%',#{sqs.materielName}),'%')
+            </if>
+            <if test="sqs.materielName!=null and sqs.materielName!=''">or sqs.model_name like
+                concat(concat('%',#{sqs.materielName}),'%')
+            </if>
+            <if test="sqs.materielName!=null and sqs.materielName!=''">or sqs.need_torque like
+                concat(concat('%',#{sqs.materielName}),'%')
+            </if>
+            <if test="sqs.materielName!=null and sqs.materielName!=''">or sqs.out_torque like
+                concat(concat('%',#{sqs.materielName}),'%')
+            </if>
+            <if test="sqs.materielName!=null and sqs.materielName!=''">or sqs.units_name like
+                concat(concat('%',#{sqs.materielName}),'%')
+            </if>
+            <if test="sqs.quotationNum!=null and sqs.quotationNum!=''">and sq.quotation_num like
+                concat(concat('%',#{sqs.quotationNum}),'%')
+            </if>
+        </where>
+        order by sqs.create_time desc
+    </select>
+
+</mapper>

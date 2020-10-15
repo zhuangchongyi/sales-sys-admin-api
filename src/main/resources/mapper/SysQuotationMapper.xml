@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.project.sales.dao.SysQuotationDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.dc.project.sales.entity.SysQuotation">
+        <id column="quotation_id" property="quotationId"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="quotation_num" property="quotationNum"/>
+        <result column="quotation_time" property="quotationTime"/>
+        <result column="clientele_id" property="clienteleId"/>
+        <result column="clientele_num" property="clienteleNum"/>
+        <result column="clientele_name" property="clienteleName"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="personnel_id" property="personnelId"/>
+        <result column="pay_condition" property="payCondition"/>
+        <result column="status" property="status"/>
+        <result column="remark" property="remark"/>
+        <result column="effective_time" property="effectiveTime"/>
+        <result column="legal_person" property="legalPerson"/>
+        <result column="leader" property="leader"/>
+        <result column="email" property="email"/>
+        <result column="phone" property="phone"/>
+        <result column="mobilephone" property="mobilephone"/>
+        <result column="abbreviation" property="abbreviation"/>
+        <result column="certificate_num" property="certificateNum"/>
+        <result column="address" property="address"/>
+        <result column="audit_by" property="auditBy"/>
+        <result column="audit_time" property="auditTime"/>
+        <result column="total_price" property="totalPrice"/>
+        <result column="personnel_name" property="personnelName"/>
+        <result column="personnel_num" property="personnelNum"/>
+        <result column="dept_id" property="deptId"/>
+        <result column="dept_name" property="deptName"/>
+        <result column="dept_num" property="deptNum"/>
+    </resultMap>
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        select
+        sq.create_by,sq.create_time,sq.update_by,sq.update_time,sq.quotation_id,sq.quotation_num,sq.quotation_time,sq.clientele_id,sq.clientele_num,sq.clientele_name,sq.category_id,sq.personnel_id,sq.pay_condition,sq.status,sq.remark,sq.effective_time,sq.legal_person,sq.leader,sq.email,sq.phone,sq.mobilephone,sq.abbreviation,sq.certificate_num,sq.address,sq.audit_by,sq.audit_time
+        ,u.user_num personnel_num,u.nickname personnel_name,d.dept_id,d.dept_num,d.dept_name,sq.total_price
+        from sys_quotation sq
+        left join sys_user u on u.user_id = sq.personnel_id
+        left join sys_dept d on d.dept_id = u.dept_id
+        /*left join sys_quotation_sub sqs on sqs.quotation_id = sq.quotation_id*/
+    </sql>
+
+    <select id="page" resultMap="BaseResultMap">
+        <include refid="Base_Column_List"/>
+        <where>
+            <if test="sq.quotationNum!=null and sq.quotationNum!=''">sq.quotation_num=#{sq.quotationNum}</if>
+            <if test="sq.clienteleNum!=null and sq.clienteleNum!=''">or sq.clientele_num like
+                concat(concat('%',#{sq.clienteleNum}),'%')
+            </if>
+            <if test="sq.clienteleName!=null and sq.clienteleName!=''">or sq.clientele_name like
+                concat(concat('%',#{sq.clienteleNum}),'%')
+            </if>
+            <if test="sq.status!=null and sq.status!=''">
+                and sq.status=#{sq.status}
+            </if>
+        </where>
+        group by sq.quotation_id order by sq.quotation_id desc
+    </select>
+
+    <select id="get" resultMap="BaseResultMap">
+        select
+        sq.quotation_id,sq.quotation_num,sq.quotation_time,sq.clientele_id,sq.clientele_num,sq.clientele_name,sq.category_id,sq.personnel_id,sq.pay_condition,sq.status,sq.remark,sq.effective_time,sq.legal_person,sq.leader,sq.email,sq.phone,sq.mobilephone,sq.abbreviation,sq.certificate_num,sq.address,sq.audit_by,sq.audit_time
+        ,u.user_num personnel_num,u.nickname personnel_name,d.dept_id,d.dept_num,d.dept_name,sq.total_price
+        from sys_quotation sq
+        left join sys_user u on u.user_id = sq.personnel_id
+        left join sys_dept d on d.dept_id = u.dept_id
+        where sq.quotation_id=#{quotationId}
+    </select>
+</mapper>

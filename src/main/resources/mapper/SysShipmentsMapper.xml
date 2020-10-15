@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.project.sales.dao.SysShipmentsDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.dc.project.sales.entity.SysShipments">
+        <id column="shipments_id" property="shipmentsId"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="order_id" property="orderId"/>
+        <result column="shipments_num" property="shipmentsNum"/>
+        <result column="order_num" property="orderNum"/>
+        <result column="shipments_time" property="shipmentsTime"/>
+        <result column="outbound_time" property="outboundTime"/>
+        <result column="clientele_id" property="clienteleId"/>
+        <result column="clientele_num" property="clienteleNum"/>
+        <result column="clientele_name" property="clienteleName"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="personnel_id" property="personnelId"/>
+        <result column="status" property="status"/>
+        <result column="audit_status" property="auditStatus"/>
+        <result column="shipments_status" property="shipmentsStatus"/>
+        <result column="outbound_status" property="outboundStatus"/>
+        <result column="leader" property="leader"/>
+        <result column="email" property="email"/>
+        <result column="phone" property="phone"/>
+        <result column="mobilephone" property="mobilephone"/>
+        <result column="address" property="address"/>
+        <result column="warehouse_id" property="warehouseId"/>
+        <result column="warehouse_num" property="warehouseNum"/>
+        <result column="warehouse_name" property="warehouseName"/>
+        <result column="audit_by" property="auditBy"/>
+        <result column="audit_time" property="auditTime"/>
+        <result column="remark" property="remark"/>
+        <result column="personnel_name" property="personnelName"/>
+        <result column="personnel_num" property="personnelNum"/>
+        <result column="dept_id" property="deptId"/>
+        <result column="dept_name" property="deptName"/>
+        <result column="dept_num" property="deptNum"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        create_by, create_time,  update_by, update_time,audit_status, shipments_id, order_id, shipments_num, order_num, shipments_time, outbound_time, clientele_id, clientele_num, clientele_name, category_id, personnel_id, status, shipments_status, outbound_status, leader, email, phone, mobilephone, address, warehouse_id, warehouse_num, warehouse_name, audit_by, audit_time, remark
+    </sql>
+
+    <sql id="shipmentSql">
+        select
+        ss.create_by, ss.create_time, ss. update_by, ss.update_time, ss.shipments_id, ss.order_id,audit_status, ss.shipments_num, ss.order_num, ss.shipments_time, ss.outbound_time, ss.clientele_id, ss.clientele_num, ss.clientele_name, ss.category_id, ss.personnel_id, ss.status, ss.shipments_status, ss.outbound_status, ss.leader, ss.email, ss.phone, ss.mobilephone, ss.address, ss.warehouse_id, ss.warehouse_num, ss.warehouse_name, ss.audit_by, ss.audit_time, ss.remark
+        ,u.user_num personnel_num,u.nickname personnel_name,d.dept_id,d.dept_num,d.dept_name
+        from sys_shipments ss
+        left join sys_user u on u.user_id = ss.personnel_id
+        left join sys_dept d on d.dept_id = u.dept_id
+    </sql>
+    <select id="page" resultMap="BaseResultMap">
+        <include refid="shipmentSql"/>
+        <where>
+            <if test="ss.orderNum!=null and ss.orderNum!=''">ss.order_num like
+                concat(concat('%',#{ss.orderNum}),'%')
+            </if>
+            <if test="ss.shipmentsNum!=null and ss.shipmentsNum!=''">or ss.shipments_num like
+                concat(concat('%',#{ss.shipmentsNum}),'%')
+            </if>
+            <if test="ss.clienteleNum!=null and ss.clienteleNum!=''">or ss.clientele_num like
+                concat(concat('%',#{ss.clienteleNum}),'%')
+            </if>
+            <if test="ss.clienteleName!=null and ss.clienteleName!=''">or ss.clientele_name like
+                concat(concat('%',#{ss.clienteleName}),'%')
+            </if>
+            <if test="ss.status!=null and ss.status!=''">
+                and ss.status=#{ss.status}
+            </if>
+            <if test="ss.shipmentsStatus!=null and ss.shipmentsStatus!=''">
+                and ss.shipments_status=#{ss.shipmentsStatus}
+            </if>
+            <if test="ss.outboundStatus!=null and ss.outboundStatus!=''">
+            and ss.outbound_status=#{ss.outboundStatus}
+        </if>
+        </where>
+        order by ss.create_time desc
+    </select>
+
+    <select id="get" resultMap="BaseResultMap">
+        select
+        ss.shipments_id, ss.order_id,audit_status, ss.shipments_num, ss.order_num, ss.shipments_time, ss.outbound_time, ss.clientele_id, ss.clientele_num, ss.clientele_name, ss.category_id, ss.personnel_id, ss.status, ss.shipments_status, ss.outbound_status, ss.leader, ss.email, ss.phone, ss.mobilephone, ss.address, ss.warehouse_id, ss.warehouse_num, ss.warehouse_name, ss.audit_by, ss.audit_time, ss.remark
+        ,u.user_num personnel_num,u.nickname personnel_name,d.dept_id,d.dept_num,d.dept_name
+        from sys_shipments ss
+        left join sys_user u on u.user_id = ss.personnel_id
+        left join sys_dept d on d.dept_id = u.dept_id
+        where ss.shipments_id=#{shipmentsId}
+    </select>
+
+</mapper>

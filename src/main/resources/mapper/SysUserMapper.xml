@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.project.system.dao.SysUserDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.dc.project.system.entity.SysUser">
+        <id column="user_id" property="userId"/>
+        <result column="username" property="username"/>
+        <result column="password" property="password"/>
+        <result column="salt" property="salt"/>
+        <result column="user_num" property="userNum"/>
+        <result column="nickname" property="nickname"/>
+        <result column="gender" property="gender"/>
+        <result column="phone" property="phone"/>
+        <result column="email" property="email"/>
+        <result column="qq" property="qq"/>
+        <result column="deptId" property="dept_id"/>
+        <result column="identity_no" property="identityNo"/>
+        <result column="birthday" property="birthday"/>
+        <result column="now_address" property="nowAddress"/>
+        <result column="home_address" property="homeAddress"/>
+        <result column="avatar" property="avatar"/>
+        <result column="job_status" property="jobStatus"/>
+        <result column="user_type" property="userType"/>
+        <result column="start_status" property="startStatus"/>
+        <result column="entry_time" property="entryTime"/>
+        <result column="resignation_time" property="resignationTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="dept_id" property="deptId"/>
+        <association property="dept" column="dept_id" javaType="com.dc.project.system.entity.SysDept"
+                     resultMap="deptResult"/>
+        <collection property="roles" javaType="java.util.List" resultMap="RoleResult"/>
+    </resultMap>
+
+    <resultMap id="deptResult" type="com.dc.project.system.entity.SysDept">
+        <id property="deptId" column="dept_id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="deptNum" column="dept_num"/>
+        <result property="deptName" column="dept_name"/>
+        <result property="deptType" column="dept_type"/>
+    </resultMap>
+
+    <resultMap id="RoleResult" type="com.dc.project.system.entity.SysRole">
+        <id property="roleId" column="role_id"/>
+        <result property="roleNum" column="role_num"/>
+        <result property="roleName" column="role_name"/>
+        <result property="dataScope" column="data_scope"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        user_id, username, password, user_num, nickname, gender, phone, email, qq, identity_no, birthday, now_address, home_address, avatar, job_status, user_type, start_status, entry_time, resignation_time, create_time, create_by, update_time, update_by, del_flag
+    </sql>
+
+    <select id="findByUsername" resultMap="BaseResultMap">
+        select
+            u.user_id, u.username, u.password, u.salt, u.user_num, u.nickname, u.gender, u.phone, u.email, u.qq, u.identity_no, u.birthday, u.now_address, u.home_address, u.avatar, u.job_status, u.user_type, u.start_status, u.entry_time, u.resignation_time, u.create_time, u.create_by, u.update_time, u.update_by, u.del_flag,
+            d.dept_id,d.dept_num,d.dept_name,d.parent_id,
+            r.role_id,r.role_num,r.role_name
+        from sys_user u
+        	left join sys_dept d on u.dept_id = d.dept_id
+		    left join sys_user_role ur on u.user_id = ur.user_id
+		    left join sys_role r on r.role_id = ur.role_id
+        where u.username=#{username}
+        order by u.create_time desc
+    </select>
+
+    <select id="list" resultMap="BaseResultMap">
+        select
+        u.user_id, u.username, u.password, u.salt, u.user_num, u.nickname, u.gender, u.phone, u.email, u.qq,
+        u.identity_no, u.birthday, u.now_address, u.home_address, u.avatar, u.job_status, u.user_type, u.start_status,
+        u.entry_time, u.resignation_time, u.create_time, u.create_by, u.update_time, u.update_by, u.del_flag,
+        d.dept_id,d.dept_num,d.dept_name,d.parent_id
+        from sys_user u
+        left join sys_dept d on u.dept_id = d.dept_id
+        <where>
+            <if test="user.username!=null and user.username!=''">and u.username like
+                concat(concat('%',#{user.username}),'%')
+            </if>
+            <if test="user.userNum!=null and user.userNum!=''">and u.user_num like
+                concat(concat('%',#{user.userNum}),'%')
+            </if>
+            <if test="user.nickname!=null and user.nickname!=''">and u.nickname like
+                concat(concat('%',#{user.nickname}),'%')
+            </if>
+            <if test="user.deptId!=null">and u.dept_id=#{user.deptId}</if>
+            <if test="user.jobStatus!=null and user.jobStatus!=''">and u.job_status=#{user.jobStatus}</if>
+            <if test="user.startStatus!=null and user.startStatus!=''">and u.start_status=#{user.startStatus}</if>
+            <if test="user.userType!=null and user.userType!=''">and u.user_type=#{user.userType}</if>
+            and u.del_flag='0' and u.user_id!=1
+        </where>
+        order by u.create_time desc
+    </select>
+    <select id="findRoleByUsername" resultMap="BaseResultMap">
+        select
+            u.user_id, u.username, u.password, u.salt, u.user_num, u.nickname, u.gender, u.phone, u.email, u.qq, u.identity_no, u.birthday, u.now_address, u.home_address, u.avatar, u.job_status, u.user_type, u.start_status, u.entry_time, u.resignation_time, u.create_time, u.create_by, u.update_time, u.update_by, u.del_flag,
+            r.role_id,r.role_num,r.role_name
+        from sys_user u
+		    left join sys_user_role ur on u.user_id = ur.user_id
+		    left join sys_role r on r.role_id = ur.role_id
+        where u.username=#{username}
+    </select>
+    <select id="getUserByUsername" resultType="com.dc.project.system.entity.SysUser">
+        select
+        user_id, username, password, salt, user_num, nickname, job_status, user_type, start_status,del_flag
+        from sys_user
+        where username=#{username}
+    </select>
+
+</mapper>

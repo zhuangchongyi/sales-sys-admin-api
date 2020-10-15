@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.project.system.dao.SysUserRoleDao">
+
+    <resultMap id="userResultMap" type="com.dc.project.system.entity.SysUser">
+        <id column="user_id" property="userId"/>
+        <result column="username" property="username"/>
+        <result column="user_num" property="userNum"/>
+        <result column="nickname" property="nickname"/>
+        <association property="dept" column="dept_id" javaType="com.dc.project.system.entity.SysDept"
+                     resultMap="deptResult"/>
+    </resultMap>
+    <resultMap id="deptResult" type="com.dc.project.system.entity.SysDept">
+        <id property="deptId" column="dept_id"/>
+        <result property="deptNum" column="dept_num"/>
+        <result property="deptName" column="dept_name"/>
+    </resultMap>
+    <select id="roleUserListPage" resultMap="userResultMap">
+        select
+            u.user_id, u.username, u.user_num, u.nickname,
+            d.dept_id,d.dept_num,d.dept_name
+        from sys_user u
+        	left join sys_dept d on u.dept_id = d.dept_id
+		    left join sys_user_role ur on u.user_id = ur.user_id
+        where ur.role_id = #{roleId} and u.start_status='0' and u.del_flag='0' and u.user_type='1'
+    </select>
+    <select id="findUserRoleByUserId" resultType="java.lang.Integer">
+        select role_id from sys_user_role where user_id=#{userId}
+    </select>
+
+</mapper>

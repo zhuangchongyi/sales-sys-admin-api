@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.project.sales.dao.SysReturnsDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.dc.project.sales.entity.SysReturns">
+        <id column="returns_id" property="returnsId"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="order_id" property="orderId"/>
+        <result column="shipments_id" property="shipmentsId"/>
+        <result column="returns_num" property="returnsNum"/>
+        <result column="order_num" property="orderNum"/>
+        <result column="shipments_num" property="shipmentsNum"/>
+        <result column="returns_time" property="returnsTime"/>
+        <result column="clientele_id" property="clienteleId"/>
+        <result column="clientele_num" property="clienteleNum"/>
+        <result column="clientele_name" property="clienteleName"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="personnel_id" property="personnelId"/>
+        <result column="personnel_name" property="personnelName"/>
+        <result column="status" property="status"/>
+        <result column="leader" property="leader"/>
+        <result column="email" property="email"/>
+        <result column="phone" property="phone"/>
+        <result column="mobilephone" property="mobilephone"/>
+        <result column="address" property="address"/>
+        <result column="warehouse_id" property="warehouseId"/>
+        <result column="warehouse_num" property="warehouseNum"/>
+        <result column="warehouse_name" property="warehouseName"/>
+        <result column="audit_by" property="auditBy"/>
+        <result column="audit_time" property="auditTime"/>
+        <result column="remark" property="remark"/>
+        <result column="total_price" property="totalPrice"/>
+        <result column="audit_status" property="auditStatus"/>
+        <result column="storage_status" property="storageStatus"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+            create_by, create_time, update_by, update_time, returns_id, order_id, shipments_id, returns_num, order_num, shipments_num, returns_time, clientele_id, clientele_num, clientele_name, category_id, personnel_id,personnel_name, status, audit_status,storage_status, leader, email, phone, mobilephone, address, warehouse_id, warehouse_num, warehouse_name, audit_by, audit_time, remark, total_price,storage_id,storage_By,storage_time
+    </sql>
+    <select id="page" resultType="com.dc.project.sales.entity.SysReturns">
+        select
+        sr.create_by,sr.create_time,sr.update_by,sr.update_time,sr.returns_id,sr.order_id,sr.shipments_id,sr.returns_num,sr.order_num,sr.shipments_num,sr.returns_time,sr.clientele_id,sr.clientele_num,sr.clientele_name,sr.category_id,sr.personnel_id,sr.personnel_name,sr.status,sr.audit_status,sr.storage_status,sr.leader,sr.email,sr.phone,sr.mobilephone,sr.address,sr.warehouse_id,sr.warehouse_num,sr.warehouse_name,sr.audit_by,sr.audit_time,sr.remark,sr.total_price,sr.storage_id,sr.storage_By,sr.storage_time
+        from sys_returns sr
+        left join sys_user u on u.user_id = sr.personnel_id
+        /*left join sys_dept d on d.dept_id = u.dept_id*/
+        <where>
+            <if test="sr.returnsNum!=null and sr.returnsNum!=''">sr.returns_num like
+                concat(concat('%',#{sr.returnsNum}),'%')
+            </if>
+            <if test="sr.orderNum!=null and sr.orderNum!=''">or sr.order_num like
+                concat(concat('%',#{sr.orderNum}),'%')
+            </if>
+            <if test="sr.shipmentsNum!=null and sr.shipmentsNum!=''">or sr.shipments_num like
+                concat(concat('%',#{sr.shipmentsNum}),'%')
+            </if>
+            <if test="sr.clienteleNum!=null and sr.clienteleNum!=''">or sr.clientele_num like
+                concat(concat('%',#{sr.clienteleNum}),'%')
+            </if>
+            <if test="sr.clienteleName!=null and sr.clienteleName!=''">or sr.clientele_name like
+                concat(concat('%',#{sr.clienteleName}),'%')
+            </if>
+            <if test="sr.status!=null and sr.status!=''">
+                and sr.status=#{sr.status}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+    <select id="get" resultType="com.dc.project.sales.entity.SysReturns">
+        select
+        sr.returns_id,sr.order_id,sr.shipments_id,sr.returns_num,sr.order_num,sr.shipments_num,sr.returns_time,sr.clientele_id,sr.clientele_num,sr.clientele_name,sr.category_id,sr.personnel_id,sr.personnel_name,sr.status,sr.audit_status,sr.storage_status,sr.leader,sr.email,sr.phone,sr.mobilephone,sr.address,sr.warehouse_id,sr.warehouse_num,sr.warehouse_name,sr.remark,sr.total_price,sr.storage_id,sr.storage_By,sr.storage_time
+        from sys_returns sr
+        left join sys_user u on u.user_id = sr.personnel_id
+        /*left join sys_dept d on d.dept_id = u.dept_id*/
+        where sr.returns_id=#{id}
+    </select>
+
+</mapper>

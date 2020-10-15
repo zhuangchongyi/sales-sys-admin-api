@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.project.basis.dao.SysClienteleDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.dc.project.basis.entity.SysClientele">
+        <id column="clientele_id" property="clienteleId"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="clientele_num" property="clienteleNum"/>
+        <result column="clientele_name" property="clienteleName"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="corporation_time" property="corporationTime"/>
+        <result column="legal_person" property="legalPerson"/>
+        <result column="leader" property="leader"/>
+        <result column="email" property="email"/>
+        <result column="phone" property="phone"/>
+        <result column="mobilephone" property="mobilephone"/>
+        <result column="abbreviation" property="abbreviation"/>
+        <result column="certificate_num" property="certificateNum"/>
+        <result column="level" property="level"/>
+        <result column="address" property="address"/>
+        <result column="user_id" property="userId"/>
+        <result column="status" property="status"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="remark" property="remark"/>
+        <association property="personnel" column="user_id" javaType="com.dc.project.system.entity.SysUser"
+                     resultMap="personnelResult"/>
+        <association property="category" column="category_id" javaType="com.dc.project.basis.entity.SysCategory"
+                     resultMap="categoryResult"/>
+    </resultMap>
+
+    <resultMap id="personnelResult" type="com.dc.project.system.entity.SysUser">
+        <id property="userId" column="user_id"/>
+        <result property="userNum" column="user_num"/>
+        <result property="nickname" column="nickname"/>
+        <association property="dept" column="dept_id" javaType="com.dc.project.system.entity.SysDept"
+                     resultMap="deptResult"/>
+    </resultMap>
+    <resultMap id="deptResult" type="com.dc.project.system.entity.SysDept">
+        <id property="deptId" column="dept_id"/>
+        <result property="deptNum" column="dept_num"/>
+        <result property="deptName" column="dept_name"/>
+    </resultMap>
+    <resultMap id="categoryResult" type="com.dc.project.basis.entity.SysCategory">
+        <id property="categoryId" column="category_id"/>
+        <result property="categoryNum" column="category_num"/>
+        <result property="categoryName" column="category_name"/>
+    </resultMap>
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        clientele_id, clientele_num, clientele_name, category_id, corporation_time,legal_person, leader, email, phone, mobilephone, abbreviation, certificate_num, level, address, user_id, status, del_flag, create_by, create_time, update_by, update_time,remark
+    </sql>
+
+    <select id="list" resultMap="BaseResultMap">
+        select
+        cli.clientele_id, cli.clientele_num, cli.clientele_name, cli.corporation_time,cli.legal_person, cli.leader,
+        cli.email, cli.phone, cli.mobilephone, cli.abbreviation, cli.certificate_num, cli.level, cli.address,
+        cli.status, cli.del_flag, cli.create_by, cli.create_time, cli.update_by, cli.update_time, cli.remark,
+        cat.category_id,cat.category_num,cat.category_name,
+        u.user_id,u.user_num,u.nickname,
+        d.dept_id,d.dept_num,d.dept_name
+        from sys_clientele cli
+        left join sys_category cat on cat.category_id=cli.category_id and cat.category='1'
+        left join sys_user u on u.user_id=cli.user_id
+        left join sys_dept d on d.dept_id=u.dept_id
+        <where>
+            <if test="cli.clienteleNum!=null and cli.clienteleNum!=''">cli.clientele_num like
+                concat(concat('%',#{cli.clienteleNum}),'%')
+            </if>
+            <if test="cli.clienteleName!=null and cli.clienteleName!=''">or cli.clientele_name like
+                concat(concat('%',#{cli.clienteleName}),'%')
+            </if>
+            <if test="cli.status!=null and cli.status!=''">and cli.status = #{cli.status}</if>
+            <if test="cli.userId!=null and cli.userId!=''">and cli.user_id = #{cli.userId}</if>
+            <if test="cli.categoryId!=null and cli.categoryId!=''">and cli.category_id = #{cli.categoryId}</if>
+            and cli.del_flag='0'
+        </where>
+        order by cli.create_time desc
+    </select>
+    <select id="get" resultMap="BaseResultMap">
+        select
+        cli.clientele_id, cli.clientele_num, cli.clientele_name, cli.corporation_time,cli.legal_person, cli.leader, cli.email, cli.phone, cli.mobilephone, cli.abbreviation, cli.certificate_num, cli.level, cli.address, cli.status,  cli.remark,
+        cat.category_id,cat.category_num,cat.category_name,
+        u.user_id,u.user_num,u.nickname,
+        d.dept_id,d.dept_num,d.dept_name
+        from sys_clientele cli
+            left join sys_category cat on cat.category_id=cli.category_id and cat.category='1'
+            left join sys_user u on u.user_id=cli.user_id
+            left join sys_dept d on d.dept_id=u.dept_id        where cli.clientele_id = #{clienteleId}
+    </select>
+
+</mapper>
