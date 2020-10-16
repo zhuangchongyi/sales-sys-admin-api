@@ -2,6 +2,8 @@ package com.dc.project.warehouse.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dc.common.exception.ServiceException;
 import com.dc.common.utils.BigDecimalUtil;
@@ -22,6 +24,16 @@ import java.util.List;
  */
 @Service
 public class SysRepertoryServiceImpl extends ServiceImpl<SysRepertoryDao, SysRepertory> implements ISysRepertoryService {
+
+    @Override
+    public IPage<SysRepertory> page(Page page, SysRepertory sysRepertory) {
+        return baseMapper.page(page,sysRepertory);
+    }
+
+    @Override
+    public List<SysRepertory> list(SysRepertory sysRepertory) {
+        return baseMapper.list(sysRepertory);
+    }
 
     @Override
     public boolean saveAndUpdate(List<SysRepertory> list) {

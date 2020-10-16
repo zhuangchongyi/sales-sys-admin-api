@@ -50,7 +50,7 @@ public class SysAdjustmentServiceImpl extends ServiceImpl<SysAdjustmentDao, SysA
         if (null == sysAdjustment.getWarehouseId())
             throw new ServiceException("保存失败，未选择仓库");
         if (null == sysAdjustment.getAdjustmentId()) { //主表不存在
-            if (this.save(sysAdjustment))
+            if (!this.save(sysAdjustment))
                 throw new ServiceException("保存失败");
         } else {
             update(sysAdjustment);

@@ -52,6 +52,7 @@ public class SysReturnsServiceImpl extends ServiceImpl<SysReturnsDao, SysReturns
     @Override
     public boolean delete(Integer id) {
         SysReturns returns = this.getById(id);
+        if (null == returns) throw new ServiceException("已删除");
         SalesConstant.verifyDeleteStatus(returns.getStatus());
         if (!this.removeById(id))
             throw new ServiceException(String.format("%s,删除失败", returns.getReturnsNum()));

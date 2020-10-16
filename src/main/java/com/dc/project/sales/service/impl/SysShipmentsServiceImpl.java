@@ -133,6 +133,7 @@ public class SysShipmentsServiceImpl extends ServiceImpl<SysShipmentsDao, SysShi
     @Override
     public boolean delete(Integer shipmentsId) {
         SysShipments shipments = this.getById(shipmentsId);
+        if (null == shipments) throw new ServiceException("已删除删除");
         SalesConstant.verifyDeleteStatus(shipments.getStatus());
         if (!this.removeById(shipmentsId))
             throw new ServiceException(String.format("%s,删除失败", shipments.getShipmentsNum()));

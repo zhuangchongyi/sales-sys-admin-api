@@ -113,6 +113,7 @@ public class SysOrderServiceImpl extends ServiceImpl<SysOrderDao, SysOrder> impl
     @Override
     public boolean delete(Integer orderId) {
         SysOrder order = this.getOne(new QueryWrapper<SysOrder>().select("status").eq("order_id", orderId));
+        if (null == order) throw new ServiceException("已删除");
         String status = order.getStatus();
         if (SalesConstant.AUDIT.equals(status)
                 || SalesConstant.RATIFY.equals(status)

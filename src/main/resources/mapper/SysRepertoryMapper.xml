@@ -28,11 +28,64 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-            create_by,
-            create_time,
-            update_by,
-            update_time,
-        pk_id, warehouse_id, warehouse_num, warehouse_name, materiel_id, materiel_num, materiel_name, specification, model_name, need_torque, out_torque, units_id, units_name, price, number, total_price
+        create_by, create_time, update_by, update_time,  pk_id, warehouse_id, warehouse_num, warehouse_name, materiel_id, materiel_num, materiel_name, specification, model_name, need_torque, out_torque, units_id, units_name, price, number, total_price
     </sql>
+    <sql id="commonSql">
+        select
+        sr.pk_id,sr.warehouse_id,sr.warehouse_num,sr.warehouse_name,sr.materiel_id,sr.materiel_num,sr.materiel_name,sr.specification,sr.model_name,sr.need_torque,sr.out_torque,sr.units_id,sr.units_name,sr.price,sr.number,sr.total_price
+        from sys_repertory sr
+    </sql>
+    <select id="page" resultType="com.dc.project.warehouse.entity.SysRepertory">
+        <include refid="commonSql"/>
+        <where>
+            sr.warehouse_id=#{sr.warehouseId}
+            and ( 1=1
+            <if test="sr.materielName!=null and sr.materielName!=''">or sr.materiel_name like
+                concat(concat('%',#{sr.materielName}),'%')
+            </if>
+            <if test="sr.materielNum!=null and sr.materielNum!=''">or sr.materiel_num like
+                concat(concat('%',#{sr.materielNum}),'%')
+            </if>
+            <if test="sr.specification!=null and sr.specification!=''">or sr.specification like
+                concat(concat('%',#{sr.materielName}),'%')
+            </if>
+            <if test="sr.modelName!=null and sr.modelName!=''">or sr.model_name like
+                concat(concat('%',#{sr.modelName}),'%')
+            </if>
+            <if test="sr.needTorque!=null and sr.needTorque!=''">or sr.need_torque like
+                concat(concat('%',#{sr.outtorque}),'%')
+            </if>
+            <if test="sr.outTorque!=null and sr.outTorque!=''">or sr.out_torque like
+                concat(concat('%',#{sr.outTorque}),'%')
+            </if>
+            )
+        </where>
+    </select>
+    <select id="list" resultType="com.dc.project.warehouse.entity.SysRepertory">
+        <include refid="commonSql"/>
+        <where>
+            sr.warehouse_id=#warehouseId}
+            and ( 1=1
+            <if test="materielName!=null and materielName!=''">or sr.materiel_name like
+                concat(concat('%',#{materielName}),'%')
+            </if>
+            <if test="materielNum!=null and materielNum!=''">or sr.materiel_num like
+                concat(concat('%',#{materielNum}),'%')
+            </if>
+            <if test="specification!=null and specification!=''">or sr.specification like
+                concat(concat('%',#{materielName}),'%')
+            </if>
+            <if test="modelName!=null and modelName!=''">or sr.model_name like
+                concat(concat('%',#{modelName}),'%')
+            </if>
+            <if test="needTorque!=null and needTorque!=''">or sr.need_torque like
+                concat(concat('%',#{outtorque}),'%')
+            </if>
+            <if test="outTorque!=null and outTorque!=''">or sr.out_torque like
+                concat(concat('%',#{outTorque}),'%')
+            </if>
+            )
+        </where>
+    </select>
 
 </mapper>

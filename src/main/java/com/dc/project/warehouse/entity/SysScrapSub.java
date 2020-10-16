@@ -86,6 +86,10 @@ public class SysScrapSub extends BaseEntity {
     private Integer scrapNum;
 
     /**
+     * 现存数量
+     */
+    private Integer number;
+    /**
      * 报废原因
      */
     private String remark;
@@ -94,6 +98,14 @@ public class SysScrapSub extends BaseEntity {
      * 金额
      */
     private BigDecimal totalPrice;
+
+    public Integer getNumber() {
+        return number;
+    }
+
+    public void setNumber(Integer number) {
+        this.number = number;
+    }
 
     public Long getSubId() {
         return subId;
