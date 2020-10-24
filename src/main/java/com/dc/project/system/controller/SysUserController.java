@@ -1,6 +1,7 @@
 package com.dc.project.system.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc.common.vo.R;
 import com.dc.project.system.entity.SysUser;
@@ -39,16 +40,18 @@ public class SysUserController {
 
     @GetMapping("/{userId}")
     public R get(@PathVariable(value = "userId", required = false) Integer userId) {
-        return R.success().data(userService.getById(userId));
+        QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("user_id, username, password, user_num, nickname, gender, phone, email, qq, identity_no, birthday, now_address, home_address, avatar,dept_id, job_status, user_type, start_status, entry_time, resignation_time").eq("user_id", userId);
+        return R.success().data(userService.getOne(queryWrapper));
     }
 
-    @RequiresPermissions(value = {"basis:personnel:edit"}, logical = Logical.OR)
+    @RequiresPermissions(value = {"basis:personnel:edit"})
     @PutMapping
     public R update(@RequestBody @Validated SysUser sysUser) {
         return R.success().data(userService.update(sysUser));
     }
 
-    @RequiresPermissions(value = {"basis:personnel:delete"}, logical = Logical.OR)
+    @RequiresPermissions(value = {"basis:personnel:delete"})
     @DeleteMapping("/{userId}")
     public R delete(@PathVariable(value = "userId", required = false) Integer userId) {
         return R.success().data(userService.removeById(userId));

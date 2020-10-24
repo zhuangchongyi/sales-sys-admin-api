@@ -67,16 +67,18 @@
         left join sys_user u on u.user_id=cli.user_id
         left join sys_dept d on d.dept_id=u.dept_id
         <where>
-            <if test="cli.clienteleNum!=null and cli.clienteleNum!=''">cli.clientele_num like
+            cli.del_flag='0'
+            <if test="cli.categoryId!=null and cli.categoryId!=''">and cli.category_id = #{cli.categoryId}</if>
+            <if test="cli.status!=null and cli.status!=''">and cli.status = #{cli.status}</if>
+            <if test="cli.userId!=null and cli.userId!=''">and cli.user_id = #{cli.userId}</if>
+            and (1=1
+            <if test="cli.clienteleNum!=null and cli.clienteleNum!=''">and cli.clientele_num like
                 concat(concat('%',#{cli.clienteleNum}),'%')
             </if>
             <if test="cli.clienteleName!=null and cli.clienteleName!=''">or cli.clientele_name like
                 concat(concat('%',#{cli.clienteleName}),'%')
             </if>
-            <if test="cli.status!=null and cli.status!=''">and cli.status = #{cli.status}</if>
-            <if test="cli.userId!=null and cli.userId!=''">and cli.user_id = #{cli.userId}</if>
-            <if test="cli.categoryId!=null and cli.categoryId!=''">and cli.category_id = #{cli.categoryId}</if>
-            and cli.del_flag='0'
+            )
         </where>
         order by cli.create_time desc
     </select>
@@ -89,7 +91,8 @@
         from sys_clientele cli
             left join sys_category cat on cat.category_id=cli.category_id and cat.category='1'
             left join sys_user u on u.user_id=cli.user_id
-            left join sys_dept d on d.dept_id=u.dept_id        where cli.clientele_id = #{clienteleId}
+            left join sys_dept d on d.dept_id=u.dept_id
+            where cli.clientele_id = #{clienteleId}
     </select>
 
 </mapper>

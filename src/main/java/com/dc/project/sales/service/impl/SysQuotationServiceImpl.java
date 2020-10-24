@@ -7,13 +7,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dc.common.constant.SalesConstant;
 import com.dc.common.exception.ServiceException;
-import com.dc.common.utils.BeanUtil;
-import com.dc.common.utils.CodeUtil;
-import com.dc.common.utils.ObjectMapperUtil;
-import com.dc.common.utils.UserSecurityUtils;
+import com.dc.common.utils.*;
 import com.dc.common.vo.MaterielVo;
-import com.dc.project.basis.entity.SysClientele;
-import com.dc.project.basis.entity.SysMaterielFile;
 import com.dc.project.basis.service.ISysClienteleService;
 import com.dc.project.basis.service.ISysMaterielFileService;
 import com.dc.project.basis.service.ISysMaterielService;
@@ -118,19 +113,19 @@ public class SysQuotationServiceImpl extends ServiceImpl<SysQuotationDao, SysQuo
             if (!quotationSubService.saveBatch(addList))
                 throw new ServiceException("保存失败");
             // 带出产品的图片另外做保存
-            for (SysQuotationSub sub : addList) {
-                if (null != sub.getMaterielId()) {
-                    List<SysMaterielFile> fileList = materielFileService.list(new QueryWrapper<SysMaterielFile>().eq("materiel_id", sub.getMaterielId()));
-                    if (null == fileList || fileList.isEmpty()) continue;
-                    for (SysMaterielFile materielFile : fileList) {
-                        SysAccessory sysAccessory = new SysAccessory();
-                        BeanUtil.copyBeanProp(sysAccessory, materielFile);
-                        sysAccessory.setPkId(null);
-                        sysAccessory.setSubId(sub.getSubId());
-                        accessoryService.save(sysAccessory);
-                    }
-                }
-            }
+//            for (SysQuotationSub sub : addList) {
+//                if (null != sub.getMaterielId()) {
+//                    List<SysMaterielFile> fileList = materielFileService.list(new QueryWrapper<SysMaterielFile>().eq("materiel_id", sub.getMaterielId()));
+//                    if (null == fileList || fileList.isEmpty()) continue;
+//                    for (SysMaterielFile materielFile : fileList) {
+//                        SysAccessory sysAccessory = new SysAccessory();
+//                        BeanUtil.copyBeanProp(sysAccessory, materielFile);
+//                        sysAccessory.setPkId(null);
+//                        sysAccessory.setSubId(sub.getSubId());
+//                        accessoryService.save(sysAccessory);
+//                    }
+//                }
+//            }
         }
     }
 
@@ -205,26 +200,29 @@ public class SysQuotationServiceImpl extends ServiceImpl<SysQuotationDao, SysQuo
         Object materielListForm = formMap.get("materielList");
         if (null == clienteleForm || null == materielListForm)
             throw new ServiceException("生成订单失败");
+        Map objMap = ObjectMapperUtil.toObject(clienteleForm.toString(), Map.class);
+        Date effectiveTime = (Date) objMap.get("effectiveTime");
+        if (null == effectiveTime || !DateUtil.compareToYYYYMMDD(effectiveTime, new Date())) {
+            throw new ServiceException("已过期，无法生成订单");
+        }
         SysOrder sysOrder = new SysOrder();
         BeanUtil.register();
-        BeanUtils.populate(sysOrder, ObjectMapperUtil.toObject(clienteleForm.toString(), Map.class));
+        BeanUtils.populate(sysOrder, objMap);
         String clienteleNum = sysOrder.getClienteleNum();
         String clienteleName = sysOrder.getClienteleName();
         if (StringUtils.isEmpty(clienteleNum) || StringUtils.isEmpty(clienteleName)) {
-            throw new ServiceException(String.format("客户档案不存在该客户(编码%s,名称%s)", clienteleNum, clienteleName));
+            throw new ServiceException("客户编码或名称不能为空");
         } else {
-            SysClientele clientele = clienteleService.getOne(new QueryWrapper<SysClientele>()
-                    .eq("clientele_num", clienteleNum).eq("clientele_name", clienteleName));
-            if (null == clientele) {
-                throw new ServiceException(String.format("客户档案不存在该客户(编码%s,名称%s)", clienteleNum, clienteleName));
-            } else {
-                sysOrder.setClienteleId(clientele.getClienteleId());
-                sysOrder.setOrderTime(new Date());
-                sysOrder.setAuditBy(null);
-                sysOrder.setAuditTime(null);
-                sysOrder.setStatus(SalesConstant.SAVE);
-                sysOrder.setRemark(null);
-            }
+//            SysClientele clientele = clienteleService.getOne(new QueryWrapper<SysClientele>()
+//                    .eq("clientele_num", clienteleNum).eq("clientele_name", clienteleName));
+//            if (null == clientele) {
+//                throw new ServiceException(String.format("客户档案不存在该客户(编码%s,名称%s)", clienteleNum, clienteleName));
+//            }
+//           sysOrder.setClienteleId(clientele.getClienteleId());
+            sysOrder.setOrderTime(new Date());
+            sysOrder.setAuditBy(null);
+            sysOrder.setAuditTime(null);
+            sysOrder.setStatus(SalesConstant.SAVE);
         }
         String code = CodeUtil.getCode(SalesConstant.SALES_ORDER_NO);
         sysOrder.setOrderNum(code);
@@ -239,13 +237,13 @@ public class SysQuotationServiceImpl extends ServiceImpl<SysQuotationDao, SysQuo
             String materielName = orderSub.getMaterielName();
             String modelName = orderSub.getModelName();
             if (StringUtils.isEmpty(materielNum) || StringUtils.isEmpty(modelName)) {
-                throw new ServiceException(String.format("产品档案不存在该产品(编码%s,名称%s,型号%s)", materielNum, materielName, modelName));
+                throw new ServiceException(String.format("产品档案不存在该产品(编码:%s,名称:%s,型号:%s)", materielNum, materielName, modelName));
             } else {
                 MaterielVo materielVo = new MaterielVo();
                 BeanUtil.copyBeanProp(materielVo, orderSub);
                 MaterielVo materiel = materielService.findMateriel(materielVo);
                 if (null == materiel) {
-                    throw new ServiceException(String.format("产品档案不存在该产品(编码%s,名称%s,型号%s)", materielNum, materielName, modelName));
+                    throw new ServiceException(String.format("产品档案不存在该产品(编码:%s,名称:%s,型号:%s)", materielNum, materielName, modelName));
                 } else {
                     orderSub.setOrderId(sysOrder.getOrderId());
                     orderSub.setMaterielId(materiel.getMaterielId());

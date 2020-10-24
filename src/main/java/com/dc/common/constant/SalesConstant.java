@@ -29,8 +29,15 @@ public class SalesConstant {
     /**
      * 销售发货单号前缀
      */
-    public static final String SALES_RETUENS_NO = "RN";
-
+    public static final String SALES_RETURNS_NO = "RN";
+    /**
+     * 应收款单号前缀
+     */
+    public static final String FINANCE_RECEIVABLE_NO = "AR";
+    /**
+     * 应收款单号前缀
+     */
+    public static final String FINANCE_RECEIPT_NO = "CN";
     /**
      * 保存状态
      */

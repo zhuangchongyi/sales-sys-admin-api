@@ -35,4 +35,21 @@ public class DateUtil {
             throw new RuntimeException(e);
         }
     }
+
+    /**
+     * 根据yyyyMMdd格式比较时间大小
+     *
+     * @param source
+     * @param target
+     * @return source>=target
+     */
+    public static boolean compareToYYYYMMDD(Date source, Date target) {
+        SimpleDateFormat sdf = new SimpleDateFormat(YYYYMMDD);
+        String sd = sdf.format(source);
+        String td = sdf.format(target);
+        if (Integer.valueOf(sd) >= Integer.valueOf(td)) {
+            return true;
+        }
+        return false;
+    }
 }

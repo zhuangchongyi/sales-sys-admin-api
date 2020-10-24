@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc.common.vo.R;
 import com.dc.project.warehouse.entity.SysRepertory;
 import com.dc.project.warehouse.service.ISysRepertoryService;
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +24,7 @@ public class SysRepertoryController {
     @Autowired
     private ISysRepertoryService repertoryService;
 
+    @RequiresPermissions(value = {"warehouse:repertory:list", "warehouse:repertory:list2"}, logical = Logical.OR)
     @GetMapping
     public R page(Page page, SysRepertory repertory) {
         return R.success().data(repertoryService.page(page, repertory));

@@ -7,6 +7,8 @@ import com.dc.common.vo.R;
 import com.dc.project.warehouse.entity.SysScrap;
 import com.dc.project.warehouse.service.ISysScrapService;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +26,7 @@ public class SysScrapController {
     @Autowired
     private ISysScrapService scrapService;
 
+    @RequiresPermissions(value = {"warehouse:scrap:list"})
     @GetMapping
     public R page(Page page, SysScrap scrap) {
         QueryWrapper<SysScrap> queryWrapper = new QueryWrapper<>();
@@ -33,11 +36,13 @@ public class SysScrapController {
         return R.success().data(scrapService.page(page, queryWrapper));
     }
 
+    @RequiresPermissions(value = {"warehouse:scrap:add", "warehouse:scrap:edit"}, logical = Logical.OR)
     @PostMapping
     public R addAndUpdate(@RequestBody Map formMap) throws Exception {
         return R.success().data(scrapService.addAndUpdate(formMap));
     }
 
+    @RequiresPermissions(value = {"warehouse:scrap:delete"})
     @DeleteMapping("/{id}")
     public R delete(@PathVariable Integer id) {
         return R.success().data(scrapService.delete(id));
@@ -48,11 +53,13 @@ public class SysScrapController {
         return R.success().data(scrapService.getById(id));
     }
 
+    @RequiresPermissions(value = {"warehouse:scrap:submit"})
     @PutMapping("/submit/{status}")
     public R submit(@RequestBody Integer[] ids, @PathVariable String status) {
         return R.success().data(scrapService.submit(ids, status));
     }
 
+    @RequiresPermissions(value = {"warehouse:scrap:audit"})
     @PutMapping("/audit")
     public R audit(@RequestBody SysScrap scrap) {
         return R.success().data(scrapService.audit(scrap));

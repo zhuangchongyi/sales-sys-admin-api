@@ -33,7 +33,9 @@ public class SysCategoryController {
 
     @GetMapping("/{categoryId}")
     public R get(@PathVariable Integer categoryId) {
-        return R.success().data(categoryService.getById(categoryId));
+        QueryWrapper<SysCategory> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("category_id, category_num, category_name, parent_id, category, status, remark").eq("category_id", categoryId);
+        return R.success().data(categoryService.getOne(queryWrapper));
     }
 
     @RequiresPermissions(value = {"basis:materielType:add", "basis:clienteleType:add"}, logical = Logical.OR)

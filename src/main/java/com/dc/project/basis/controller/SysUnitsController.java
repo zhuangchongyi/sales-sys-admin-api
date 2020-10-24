@@ -32,7 +32,9 @@ public class SysUnitsController {
 
     @GetMapping("/{unitsId}")
     public R get(@PathVariable Integer unitsId) {
-        return R.success().data(unitsService.getById(unitsId));
+        QueryWrapper<SysUnits> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("units_id, units_num, units_name,status, units_type, remark").eq("units_id", unitsId);
+        return R.success().data(unitsService.getOne(queryWrapper));
     }
 
     @RequiresPermissions("basis:units:add")

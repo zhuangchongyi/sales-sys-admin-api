@@ -5,6 +5,7 @@ import com.dc.framework.handler.CustomSessionManager;
 import com.dc.framework.realm.LoginUserRealm;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
+import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
@@ -53,7 +54,15 @@ public class ShiroConfig {
         DefaultWebSecurityManager manager = new DefaultWebSecurityManager();
         manager.setRealm(loginUserRealm());
         manager.setSessionManager(sessionManager());
+        manager.setCacheManager(getEhCacheManager());
         return manager;
+    }
+
+    @Bean
+    public EhCacheManager getEhCacheManager() {
+        EhCacheManager ehcacheManager = new EhCacheManager();
+        ehcacheManager.setCacheManagerConfigFile("classpath:ehcache-shiro.xml");
+        return ehcacheManager;
     }
 
     /**

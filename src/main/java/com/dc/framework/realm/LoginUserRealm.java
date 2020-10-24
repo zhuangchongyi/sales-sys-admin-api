@@ -2,8 +2,9 @@ package com.dc.framework.realm;
 
 import com.dc.common.constant.CustomConstant;
 import com.dc.common.utils.UserSecurityUtils;
-import com.dc.project.system.entity.SysUser;
+import com.dc.common.vo.UserInfo;
 import com.dc.project.common.service.ILoginService;
+import com.dc.project.system.entity.SysUser;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
@@ -13,7 +14,6 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -33,14 +33,14 @@ public class LoginUserRealm extends AuthorizingRealm {
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
         log.info("ShiroRealm 开始角色认证------------");
         // 查询用户权限明细
-        Map<String, Object> map = loginService.getInfo();
+        UserInfo info = loginService.getInfo();
         // 添加角色权限
         SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
-        if (map.isEmpty()) {
+        if (null == info) {
             throw new AuthenticationException("用户角色权限认证失败");
         }
-        Set<String> roles = (Set<String>) map.get("roles");
-        Set<String> permissions = (Set<String>) map.get("permissions");
+        Set<String> roles = info.getRoles();
+        Set<String> permissions = info.getPermissions();
         authorizationInfo.addRoles(roles);
         authorizationInfo.addStringPermissions(permissions);
         return authorizationInfo;

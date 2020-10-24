@@ -29,8 +29,6 @@
         <result column="shipment_num" property="shipmentNum"/>
         <result column="outbound_num" property="outboundNum"/>
         <result column="singback_num" property="singbackNum"/>
-        <result column="not_shipment_num" property="notShipmentNum"/>
-        <result column="not_signback_num" property="notSignbackNum"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->

@@ -28,6 +28,7 @@
         <include refid="Base_Column_List"/>
         from sys_category
         <where>
+            category=#{category} and del_flag = '0'
             <if test="categoryNum!=null and categoryNum!=''">and category_num like
                 concat(concat('%',#{categoryNum}),'%')
             </if>
@@ -35,7 +36,6 @@
                 concat(concat('%',#{categoryName}),'%')
             </if>
             <if test="status!=null and status!=''">and status=#{status}</if>
-            and category=#{category} and del_flag = '0'
         </where>
     </select>
 

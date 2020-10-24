@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.project.finance.dao.SysReceivableDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.dc.project.finance.entity.SysReceivable">
+        <id column="receivable_id" property="receivableId"/>
+        <result column="create_id" property="createId"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="receivable_num" property="receivableNum"/>
+        <result column="clientele_id" property="clienteleId"/>
+        <result column="clientele_num" property="clienteleNum"/>
+        <result column="clientele_name" property="clienteleName"/>
+        <result column="status" property="status"/>
+        <result column="total_price" property="totalPrice"/>
+        <result column="receive_price" property="receivePrice"/>
+        <result column="finance_time" property="financeTime"/>
+        <result column="taxamount" property="taxamount"/>
+        <result column="taxrate" property="taxrate"/>
+        <result column="invoice" property="invoice"/>
+        <result column="order_num" property="orderNum"/>
+        <result column="order_time" property="orderTime"/>
+        <result column="shipments_num" property="shipmentsNum"/>
+        <result column="shipments_time" property="shipmentsTime"/>
+        <result column="signback_num" property="signbackNum"/>
+        <result column="signback_time" property="signbackTime"/>
+        <result column="audit_by" property="auditBy"/>
+        <result column="audit_time" property="auditTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+            create_id,
+            create_by,
+            create_time,
+            update_by,
+            update_time,
+        receivable_id, receivable_num, clientele_id, clientele_num, clientele_name, status, total_price, receive_price, finance_time, taxamount, taxrate, invoice, order_num, order_time, shipments_num, shipments_time, signback_num, signback_time, audit_by, audit_time
+    </sql>
+
+</mapper>

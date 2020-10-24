@@ -2,8 +2,8 @@ package com.dc.project.system.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.dc.common.vo.R;
 import com.dc.common.exception.ServiceException;
+import com.dc.common.vo.R;
 import com.dc.project.system.entity.SysDept;
 import com.dc.project.system.entity.SysUser;
 import com.dc.project.system.service.ISysDeptService;
@@ -34,7 +34,9 @@ public class SysDeptController {
 
     @GetMapping("/{deptId}")
     public R get(@PathVariable Integer deptId) {
-        return R.success().data(deptService.getById(deptId));
+//        return R.success().data(deptService.getById(deptId));
+        return R.success().data(deptService.getOne(new QueryWrapper<SysDept>()
+                .select("dept_id, dept_num, dept_name, parent_id, dept_type, leader, phone, email, status, address").eq("dept_id", deptId)));
     }
 
     @RequiresPermissions("system:dept:add")
@@ -59,13 +61,13 @@ public class SysDeptController {
     @DeleteMapping("/{deptId}")
     public R delete(@PathVariable Integer deptId) {
         //部门下面有子部门不能删除
-        int count = deptService.count(new QueryWrapper<SysDept>().select("dept_id").eq("parent_id", deptId));
-        if (count > 0) {
+        SysDept one = deptService.getOne(new QueryWrapper<SysDept>().select("dept_id").eq("parent_id", deptId));
+        if (null != one) {
             throw new ServiceException("存在下级部门不允许删除");
         }
         //部门被员工应用不能删除
-        int count1 = userService.count(new QueryWrapper<SysUser>().select("user_id").eq("dept_id", deptId));
-        if (count1 > 0) {
+        SysUser user = userService.getOne(new QueryWrapper<SysUser>().select("user_id").eq("dept_id", deptId));
+        if (null != user) {
             throw new ServiceException("部门已使用不允许删除");
         }
         return R.success().data(deptService.removeById(deptId));

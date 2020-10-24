@@ -320,7 +320,8 @@ public class FTPUtil {
                 // 通过提供的文件路径获取FTPFile对象列表
                 FTPFile[] files = ftpClient.listFiles(ftpDirPath);
                 // 遍历文件列表，打印出文件名称
-                for (int i = 0; i < files.length; i++) {
+                int length = files.length;
+                for (int i = 0; i < length; i++) {
                     FTPFile ftpFile = files[i];
                     // 此处只打印文件，未遍历子目录（如果需要遍历，加上递归逻辑即可）
                     if (ftpFile.isFile()) {

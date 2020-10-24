@@ -87,7 +87,85 @@ public class SysStorage extends BaseEntity {
     /**
      * 审核时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss HH:mm:ss")
-    @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
     private Date auditTime;
+
+    /**
+     * 0：产品入库，1：其他出库
+     */
+    private String inoutType;
+    /**
+     * 出库类型
+     */
+    private String outboundType;
+    /**
+     * 出库日期
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date outboundTime;
+
+    public void setStorageId(Integer storageId) {
+        this.storageId = storageId;
+    }
+
+    public void setWarehouseId(Integer warehouseId) {
+        this.warehouseId = warehouseId;
+    }
+
+    public void setWarehouseNum(String warehouseNum) {
+        this.warehouseNum = warehouseNum;
+    }
+
+    public void setWarehouseName(String warehouseName) {
+        this.warehouseName = warehouseName;
+    }
+
+    public void setSourceType(String sourceType) {
+        this.sourceType = sourceType;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public void setSourceCompany(String sourceCompany) {
+        this.sourceCompany = sourceCompany;
+    }
+
+    public void setStorageTime(Date storageTime) {
+        this.storageTime = storageTime;
+    }
+
+    public void setPersonnelId(Integer personnelId) {
+        this.personnelId = personnelId;
+    }
+
+    public void setPersonnelName(String personnelName) {
+        this.personnelName = personnelName;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public void setAuditBy(String auditBy) {
+        this.auditBy = auditBy;
+    }
+
+    public void setAuditTime(Date auditTime) {
+        this.auditTime = auditTime;
+    }
+
+    public void setInoutType(String inoutType) {
+        this.inoutType = inoutType;
+    }
+
+    public void setOutboundType(String outboundType) {
+        this.outboundType = outboundType;
+    }
+
+    public void setOutboundTime(Date outboundTime) {
+        this.outboundTime = outboundTime;
+    }
 }

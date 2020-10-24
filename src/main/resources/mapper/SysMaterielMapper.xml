@@ -12,10 +12,14 @@
         <result column="materiel_num" property="materielNum"/>
         <result column="materiel_name" property="materielName"/>
         <result column="category_id" property="categoryId"/>
+        <result column="category_num" property="categoryNum"/>
+        <result column="category_name" property="categoryName"/>
         <result column="specification" property="specification"/>
         <result column="need_torque" property="needTorque"/>
         <result column="out_torque" property="outTorque"/>
         <result column="units_id" property="unitsId"/>
+        <result column="units_num" property="unitsNum"/>
+        <result column="units_name" property="unitsName"/>
         <result column="price" property="price"/>
         <result column="max_price" property="maxPrice"/>
         <result column="min_price" property="minPrice"/>
@@ -23,28 +27,8 @@
         <result column="del_flag" property="delFlag"/>
         <result column="remark" property="remark"/>
         <result column="modelName" property="modelName"/>
-        <association property="category" column="category_id" javaType="com.dc.project.basis.entity.SysCategory"
-                     resultMap="categoryResult"/>
-        <association property="units" column="units_id" javaType="com.dc.project.basis.entity.SysUnits"
-                     resultMap="unitsResult"/>
     </resultMap>
 
-    <resultMap id="categoryResult" type="com.dc.project.basis.entity.SysCategory">
-        <id property="categoryId" column="category_id"/>
-        <result property="parentId" column="parent_id"/>
-        <result property="categoryNum" column="category_num"/>
-        <result property="categoryName" column="category_name"/>
-    </resultMap>
-    <resultMap id="unitsResult" type="com.dc.project.basis.entity.SysUnits">
-        <id property="unitsId" column="units_id"/>
-        <result property="unitsNum" column="units_num"/>
-        <result property="unitsName" column="units_name"/>
-    </resultMap>
-    <resultMap id="modelResult" type="com.dc.project.basis.entity.SysMaterielModel">
-        <id property="pkId" column="pk_id"/>
-        <result property="mId" column="m_id"/>
-        <result property="modelName" column="model_name"/>
-    </resultMap>
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         materiel_id, materiel_num, materiel_name, category_id, specification, need_torque, out_torque, units_id, price, max_price, min_price, status, del_flag,create_time, create_by, update_time, update_by, remark
@@ -55,10 +39,9 @@
         m.materiel_id, m.materiel_num, m.materiel_name, m.category_id, m.specification, m.need_torque, m.out_torque,
         m.units_id, m.price, m.max_price, m.min_price, m.status, m.del_flag,m.create_time, m.create_by, m.update_time,
         m.update_by, m.remark,
-        u.units_num,u.units_name,
+        m.units_num,m.units_name,
         c.category_num,c.category_name,group_concat(mm.model_name) modelName
         from sys_materiel m
-        left join sys_units u on u.units_id=m.units_id
         left join sys_category c on c.category_id=m.category_id and c.category='0'
         left join sys_materiel_model mm on mm.m_id=m.materiel_id
         <where>
@@ -78,10 +61,9 @@
     <select id="get" resultMap="BaseResultMap">
         select
         m.materiel_id, m.materiel_num, m.materiel_name, m.category_id, m.specification, m.need_torque, m.out_torque, m.units_id, m.price, m.max_price, m.min_price, m.status, m.remark,
-        u.units_num,u.units_name,
+        m.units_num,m.units_name,
         c.category_num,c.category_name,group_concat(mm.model_name) modelName
         from sys_materiel m
-        left join sys_units u on u.units_id=m.units_id
         left join sys_category c on c.category_id=m.category_id and c.category='0'
         left join sys_materiel_model mm on mm.m_id=m.materiel_id
         where m.materiel_id=#{materielId}
@@ -90,9 +72,8 @@
     <select id="list" resultType="com.dc.common.vo.MaterielVo">
         select
         m.materiel_id, m.materiel_num, m.materiel_name, m.specification, m.need_torque, m.out_torque, m.price,
-        u.units_id,u.units_num,u.units_name,c.category_id,c.category_num,c.category_name, mm.model_name, mm.pk_id
+        m.units_id,m.units_num,m.units_name,c.category_id,c.category_num,c.category_name, mm.model_name, mm.pk_id
         from sys_materiel m
-        left join sys_units u on u.units_id=m.units_id
         left join sys_materiel_model mm on mm.m_id=m.materiel_id
         left join sys_category c on c.category_id=m.category_id and c.category='0'
         <where>
@@ -115,7 +96,7 @@
         left join sys_materiel_model mm on mm.m_id=m.materiel_id
         <where>
             <if test="materielNum!=null and materielNum!=''">m.materiel_num=#{materielNum}</if>
-            <if test="materielName!=null and materielName!=''">and m.materiel_name=#{materielName}</if>
+            <!--<if test="materielName!=null and materielName!=''">and m.materiel_name=#{materielName}</if>-->
             <if test="modelName!=null and modelName!=''">and mm.model_name=#{modelName}</if>
         </where>
     </select>

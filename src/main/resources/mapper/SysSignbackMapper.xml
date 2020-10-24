@@ -32,7 +32,8 @@
         <result column="process_mode" property="processMode"/>
         <result column="rejection_num" property="rejectionNum"/>
         <result column="sign_num" property="signNum"/>
-
+        <result column="signback_status" property="signbackStatus"/>
+        <result column="order_time" property="orderTime"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -41,7 +42,8 @@
     </sql>
     <select id="page" resultMap="BaseResultMap">
         select
-        sign.create_by, sign.create_time, sign.update_by, sign.update_time, sign.signback_id, sign.order_id,
+        sign.create_by, sign.create_time, sign.update_by, sign.update_time, sign.signback_id,
+        sign.order_id,sign.signback_status,sign.order_time,
         sign.shipments_id, sign.signback_num, sign.shipments_num, sign.order_num, sign.signback_time, sign.clientele_id,
         sign.clientele_num, sign.clientele_name, sign.personnel_id, sign.personnel_name, sign.status, sign.leader,
         sign.email, sign.phone, sign.mobilephone, sign.address, sign.audit_by, sign.audit_time,
@@ -66,20 +68,86 @@
             <if test="sign.clienteleName!=null and sign.clienteleName!=''">or sign.clientele_name like
                 concat(concat('%',#{sign.clienteleName}),'%')
             </if>
+            <if test="sign.clienteleId!=null">
+                and sign.clientele_id=#{sign.clienteleId}
+            </if>
             <if test="sign.status!=null and sign.status!=''">
                 and sign.status=#{sign.status}
             </if>
         </where>
-        order by create_time
+        order by sign.create_time desc
     </select>
     <select id="get" resultMap="BaseResultMap">
         select
-        sign.signback_id, sign.order_id, sign.shipments_id, sign.signback_num, sign.shipments_num, sign.order_num, sign.signback_time, sign.clientele_id, sign.clientele_num, sign.clientele_name, sign.personnel_id, sign.personnel_name, sign.status, sign.leader, sign.email, sign.phone, sign.mobilephone, sign.address, sign.audit_by, sign.audit_time, sign.remark,sign_num,rejection_num,process_mode
+        sign.signback_id, sign.order_id, sign.shipments_id, sign.signback_num, sign.shipments_num, sign.order_num, sign.signback_time, sign.clientele_id, sign.clientele_num, sign.clientele_name, sign.personnel_id, sign.personnel_name, sign.status, sign.leader, sign.email, sign.phone, sign.mobilephone, sign.address, sign.audit_by, sign.audit_time, sign.remark,sign_num,rejection_num,process_mode,sign.signback_status
         ,u.nickname as personnel_name
         from sys_signback sign
         left join sys_user u on u.user_id = sign.personnel_id
         /*left join sys_dept d on d.dept_id = u.dept_id*/
         where sign.signback_id=#{id}
+    </select>
+
+    <select id="findOrderByClienteleId" resultType="com.dc.project.sales.entity.SysSignback">
+        select
+        sign.signback_id, sign.order_id,
+        sign.shipments_id, sign.signback_num, sign.shipments_num, sign.order_num, sign.order_time, sign.signback_time,
+        sign_num,rejection_num,process_mode
+        from sys_signback sign
+        <where>
+            sign.clientele_id=#{sign.clienteleId}
+            <if test="sign.signbackNum!=null and sign.signbackNum!=''">and sign.signback_num like
+                concat(concat('%',#{sign.signbackNum}),'%')
+            </if>
+            <if test="sign.orderNum!=null and sign.orderNum!=''">or sign.order_num like
+                concat(concat('%',#{sign.orderNum}),'%')
+            </if>
+            <if test="sign.shipmentsNum!=null and sign.shipmentsNum!=''">or sign.shipments_num like
+                concat(concat('%',#{sign.shipmentsNum}),'%')
+            </if>
+        </where>
+        order by sign.create_time desc
+    </select>
+
+    <resultMap id="financeResultMap" type="map">
+        <result column="clientele_id" property="clienteleId"/>
+        <result column="clientele_num" property="clienteleNum"/>
+        <result column="clientele_name" property="clienteleName"/>
+        <result column="order_id" property="orderId"/>
+        <result column="order_num" property="orderNum"/>
+        <result column="order_time" property="orderTime"/>
+        <result column="signback_id" property="signbackId"/>
+        <result column="signback_num" property="signbackNum"/>
+        <result column="signback_time" property="signbackTime"/>
+        <result column="shipments_id" property="shipmentsId"/>
+        <result column="shipments_num" property="shipmentsNum"/>
+        <result column="taxrate" property="taxrate"/>
+        <result column="taxamount" property="taxamount"/>
+    </resultMap>
+    <select id="findFinanceOrder" resultMap="financeResultMap">
+        select
+        sign.clientele_id, sign.clientele_num, sign.clientele_name,
+        sign.order_id, sign.order_num, sign.order_time, sign.shipments_id, sign.shipments_num, sign.signback_id,
+        sign.signback_num, sign.signback_time,so.taxrate,so.taxamount
+        from sys_signback sign
+        left join sys_order so on so.order_id=sign.order_id
+        <where>
+            <if test="sign.signbackNum!=null and sign.signbackNum!=''">sign.signback_num like
+                concat(concat('%',#{sign.signbackNum}),'%')
+            </if>
+            <if test="sign.orderNum!=null and sign.orderNum!=''">or sign.order_num like
+                concat(concat('%',#{sign.orderNum}),'%')
+            </if>
+            <if test="sign.shipmentsNum!=null and sign.shipmentsNum!=''">or sign.shipments_num like
+                concat(concat('%',#{sign.shipmentsNum}),'%')
+            </if>
+            <if test="sign.clienteleNum!=null and sign.clienteleNum!=''">or sign.clientele_num like
+                concat(concat('%',#{sign.clienteleNum}),'%')
+            </if>
+            <if test="sign.clienteleName!=null and sign.clienteleName!=''">or sign.clientele_name like
+                concat(concat('%',#{sign.clienteleName}),'%')
+            </if>
+        </where>
+        order by sign.create_time desc
     </select>
 
 </mapper>

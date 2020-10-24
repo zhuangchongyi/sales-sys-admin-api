@@ -13,8 +13,10 @@ public class MybatisMetaObjectHandler implements MetaObjectHandler {
     public void insertFill(MetaObject metaObject) {
         Date date = new Date();
         String username = UserSecurityUtils.getUsername();
+        Integer userId = UserSecurityUtils.getUser().getUserId();
         this.setFieldValByName("createTime", date, metaObject);
         this.setFieldValByName("createBy", username, metaObject);
+        this.setFieldValByName("createId", userId, metaObject);
         this.setFieldValByName("updateTime", date, metaObject);
         this.setFieldValByName("updateBy", username, metaObject);
     }

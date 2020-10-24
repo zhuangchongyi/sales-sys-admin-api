@@ -80,8 +80,8 @@ public class SysAdjustment extends BaseEntity {
     /**
      * 审核时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss HH:mm:ss")
-    @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
     private Date auditTime;
 
     public void setAuditBy(String auditBy) {

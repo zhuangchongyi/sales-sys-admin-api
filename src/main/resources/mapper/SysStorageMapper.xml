@@ -21,6 +21,10 @@
         <result column="remark" property="remark"/>
         <result column="audit_by" property="auditBy"/>
         <result column="audit_time" property="auditTime"/>
+        <result column="inout_type" property="inoutType"/>
+        <result column="outbound_type" property="outboundType"/>
+        <result column="outbound_time" property="outboundTime"/>
+
     </resultMap>
 
     <!-- 通用查询结果列 -->

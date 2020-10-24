@@ -70,6 +70,8 @@ public class SysShipmentsServiceImpl extends ServiceImpl<SysShipmentsDao, SysShi
                 sysShipments.setStatus(SalesConstant.SAVE);
                 sysShipments.setShipmentsTime(new Date());
                 sysShipments.setRemark(null);
+                sysShipments.setAuditBy(null);
+                sysShipments.setAuditTime(null);
             }
             boolean save = this.save(sysShipments);
             if (!save) throw new ServiceException("保存失败");
@@ -248,6 +250,7 @@ public class SysShipmentsServiceImpl extends ServiceImpl<SysShipmentsDao, SysShi
                 BeanUtil.copyBeanProp(signbackSub, sub);
                 signbackSub.setSubId(null);
                 signbackSub.setSignbackId(signback.getSignbackId());
+                signbackSub.setTotalPrice(BigDecimalUtil.mul(sub.getPrice(), signbackSub.getOutboundNum()));
                 if (!signbackSubService.save(signbackSub)) {
                     throw new ServiceException("生成签回单失败");
                 }

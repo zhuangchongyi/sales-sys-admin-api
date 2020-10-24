@@ -2,6 +2,7 @@ package com.dc.project.common.service.impl;
 
 import com.dc.common.utils.UserSecurityUtils;
 import com.dc.common.vo.LoginUser;
+import com.dc.common.vo.UserInfo;
 import com.dc.project.common.service.ILoginService;
 import com.dc.project.system.entity.SysUser;
 import com.dc.project.system.service.ISysMenuService;
@@ -45,7 +46,7 @@ public class LoginServiceImpl implements ILoginService {
     }
 
     @Override
-    public Map<String, Object> getInfo() {
+    public UserInfo getInfo() {
         SysUser sysUser = userService.findByUsername(UserSecurityUtils.getUsername());
         Set<String> roles = new HashSet<>();
         Set<String> permissions = new HashSet<>();
@@ -56,10 +57,10 @@ public class LoginServiceImpl implements ILoginService {
             roles = sysUser.getRoles().stream().map(role -> role.getRoleNum()).collect(Collectors.toSet());
             permissions = menuService.getMenuPermission(sysUser.getUserId());
         }
-        Map<String, Object> resultMap = new HashMap<>();
-        resultMap.put("user", sysUser);
-        resultMap.put("roles", roles);
-        resultMap.put("permissions", permissions);
-        return resultMap;
+        UserInfo userInfo = new UserInfo();
+        userInfo.setUser(sysUser);
+        userInfo.setRoles(roles);
+        userInfo.setPermissions(permissions);
+        return userInfo;
     }
 }

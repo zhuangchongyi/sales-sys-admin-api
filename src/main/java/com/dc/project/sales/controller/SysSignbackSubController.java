@@ -25,9 +25,17 @@ public class SysSignbackSubController {
     @GetMapping("/list")
     public R list(SysSignbackSub sysSignbackSub) {
         QueryWrapper<SysSignbackSub> queryWrapper = new QueryWrapper<>();
-        queryWrapper.orderByDesc("create_time");
+        queryWrapper.eq("signback_id", sysSignbackSub.getSignbackId())
+                .orderByDesc("create_time");
         return R.success().data(signbackSubService.list(queryWrapper));
     }
 
+    @GetMapping("/finance")
+    public R finance(SysSignbackSub sysSignbackSub) {
+        QueryWrapper<SysSignbackSub> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("signback_id", sysSignbackSub.getSignbackId())
+                .orderByDesc("create_time");
+        return R.success().data(signbackSubService.list(queryWrapper));
+    }
 }
 

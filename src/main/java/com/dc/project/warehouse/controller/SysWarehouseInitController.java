@@ -7,6 +7,8 @@ import com.dc.common.vo.R;
 import com.dc.project.warehouse.entity.SysWarehouseInit;
 import com.dc.project.warehouse.service.ISysWarehouseInitService;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +27,7 @@ public class SysWarehouseInitController {
     private ISysWarehouseInitService warehouseInitService;
 
 
+    @RequiresPermissions(value = "warehouse:init:list")
     @GetMapping
     public R page(Page page, SysWarehouseInit warehouseInit) {
         QueryWrapper<SysWarehouseInit> queryWrapper = new QueryWrapper<>();
@@ -34,11 +37,13 @@ public class SysWarehouseInitController {
         return R.success().data(warehouseInitService.page(page, queryWrapper));
     }
 
+    @RequiresPermissions(value = {"warehouse:init:add", "warehouse:init:edit"}, logical = Logical.OR)
     @PostMapping
     public R addAndUpdate(@RequestBody Map formMap) throws Exception {
         return R.success().data(warehouseInitService.addAndUpdate(formMap));
     }
 
+    @RequiresPermissions(value = "warehouse:init:delete")
     @DeleteMapping("/{id}")
     public R delete(@PathVariable Integer id) {
         return R.success().data(warehouseInitService.delete(id));

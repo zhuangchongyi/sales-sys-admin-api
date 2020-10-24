@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public R exception(Exception e, HttpServletRequest request, HttpServletResponse response) {
         log.info(String.format("请求方式：%s, 请求路径：%s, 异常信息：%s", request.getMethod(), request.getServletPath(), e.getMessage()));
-        e.printStackTrace();
+        log.error("异常信息: ", e);
         if (e instanceof UnknownAccountException) {
             return R.error().code(R.AUTH_FAIL_CODE).msg("登录账号不存在");
         } else if (e instanceof IncorrectCredentialsException) {
@@ -41,11 +41,9 @@ public class GlobalExceptionHandler {
             return R.error().code(R.UNAUTHORIZED).msg("登录已过期，请重新登录");
         } else if (e instanceof UnauthorizedException) {
             return R.error().code(R.UNAUTHORIZED).msg("您的权限不足，无法访问");
-        } else if (e instanceof MethodArgumentNotValidException) {
-            //字段校验异常
+        } else if (e instanceof MethodArgumentNotValidException) { //字段校验异常
             return R.error().code(R.FAIL_CODE).msg(e.getMessage());
-        } else if (e instanceof ServiceException) {
-            // 自定义异常
+        } else if (e instanceof ServiceException) { // 自定义异常
             ServiceException ex = (ServiceException) e;
             return R.error().code(ex.getCode()).msg(ex.getMessage());
         } else if (e instanceof UtilsException) {

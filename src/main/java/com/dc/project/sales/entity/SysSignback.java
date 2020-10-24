@@ -141,6 +141,31 @@ public class SysSignback extends BaseEntity {
      */
     private String remark;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date orderTime;
+
+    /**
+     * 签收状态
+     */
+    private String signbackStatus;
+
+    public String getSignbackStatus() {
+        return signbackStatus;
+    }
+
+    public void setSignbackStatus(String signbackStatus) {
+        this.signbackStatus = signbackStatus;
+    }
+
+    public Date getOrderTime() {
+        return orderTime;
+    }
+
+    public void setOrderTime(Date orderTime) {
+        this.orderTime = orderTime;
+    }
+
     public Integer getSignbackId() {
         return signbackId;
     }

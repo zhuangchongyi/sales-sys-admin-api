@@ -1,5 +1,6 @@
 package com.dc.project.basis.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -17,8 +18,9 @@ public class SysMaterielModel {
     /**
      * 主键
      */
-    @TableId
+    @TableId(value = "pk_id", type = IdType.AUTO)
     private Long pkId;
+
     /**
      * 产品id
      */

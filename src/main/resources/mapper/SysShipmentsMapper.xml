@@ -76,8 +76,8 @@
                 and ss.shipments_status=#{ss.shipmentsStatus}
             </if>
             <if test="ss.outboundStatus!=null and ss.outboundStatus!=''">
-            and ss.outbound_status=#{ss.outboundStatus}
-        </if>
+                and ss.outbound_status=#{ss.outboundStatus}
+            </if>
         </where>
         order by ss.create_time desc
     </select>

@@ -3,6 +3,7 @@ package com.dc.project.system.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.dc.common.constant.CustomConstant;
 import com.dc.common.vo.R;
 import com.dc.common.exception.ServiceException;
 import com.dc.project.system.entity.SysRole;
@@ -49,7 +50,8 @@ public class SysRoleController {
 
     @GetMapping("/{roleId}")
     public R get(@PathVariable Integer roleId) {
-        return R.success().data(roleService.getById(roleId));
+        return R.success().data(roleService.getOne(
+                new QueryWrapper<SysRole>().select("role_id, role_name, role_num, data_scope, status, remark").eq("role_id", roleId)));
     }
 
     @RequiresPermissions("system:role:edit")
@@ -58,6 +60,12 @@ public class SysRoleController {
         SysRole res = roleService.getOne(new QueryWrapper<SysRole>().select("role_id").eq("role_num", sysRole.getRoleNum()));
         if (null != res && !res.getRoleId().equals(sysRole.getRoleId()))
             throw new ServiceException("该角色编码重复");
+        if (CustomConstant.STOP_STATUS.equals(res.getStatus())) {
+            SysUserRole userRole = userRoleService.getOne(new QueryWrapper<SysUserRole>().eq("role_id", res.getRoleId()));
+            if (null != userRole) {
+                throw new ServiceException("该角色已被使用，无法停用");
+            }
+        }
         return R.success().data(roleService.updateById(sysRole));
     }
 

@@ -1,5 +1,6 @@
 package com.dc.test;
 
+import com.dc.common.utils.CodeUtil;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,17 @@ public class UserTests {
             sb.append("0");
         }
         return String.valueOf((int) ((Math.random() + 1) * Integer.valueOf(sb.toString())));
+    }
+
+
+    @Test
+    public void cgetCode() {
+        for (int i = 0; i < 10; i++) {
+            String code = CodeUtil.getCode("SN");
+            System.out.println(code);
+            System.out.println(code.length());
+        }
+
     }
 
 }

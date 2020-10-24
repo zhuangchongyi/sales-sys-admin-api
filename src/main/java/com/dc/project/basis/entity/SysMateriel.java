@@ -96,13 +96,13 @@ public class SysMateriel extends BaseEntity {
     /**
      * 类别
      */
-    @TableField(exist = false)
-    private SysCategory category;
+    private String categoryName;
+    private String categoryNum;
     /**
      * 单位
      */
-    @TableField(exist = false)
-    private SysUnits units;
+    private String unitsName;
+    private String unitsNum;
 
     /**
      * 型号

@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc.common.vo.R;
 import com.dc.project.sales.entity.SysQuotation;
 import com.dc.project.sales.service.ISysQuotationService;
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +25,7 @@ public class SysQuotationController {
     @Autowired
     private ISysQuotationService quotationService;
 
+    @RequiresPermissions(value = "sales:quotation:list")
     @GetMapping
     public R page(Page page, SysQuotation quotation) {
         return R.success().data(quotationService.page(page, quotation));
@@ -40,22 +43,25 @@ public class SysQuotationController {
      * @return
      * @throws Exception
      */
+    @RequiresPermissions(value = {"sales:quotation:add", "sales:quotation:edit"}, logical = Logical.OR)
     @PostMapping
     public R saveAndUpdate(@RequestBody Map formMap) throws Exception {
         return R.success().data(quotationService.saveAndUpdate(formMap));
     }
 
+    @RequiresPermissions(value = "sales:quotation:delete")
     @DeleteMapping("/{quotationId}")
     public R delete(@PathVariable Integer quotationId) {
         return R.success().data(quotationService.delete(quotationId));
     }
 
-
+    @RequiresPermissions(value = "sales:quotation:submit")
     @PutMapping("/submit/{status}")
     public R submit(@RequestBody Integer[] ids, @PathVariable String status) {
         return R.success().data(quotationService.submit(ids, status));
     }
 
+    @RequiresPermissions(value = "sales:quotation:audit")
     @PutMapping("/audit")
     public R audit(@RequestBody SysQuotation quotation) {
         return R.success().data(quotationService.audit(quotation));
@@ -66,6 +72,7 @@ public class SysQuotationController {
      *
      * @param formMap {clientele，materielList}
      */
+    @RequiresPermissions(value = "sales:quotation:order")
     @PostMapping("/order")
     public R order(@RequestBody Map<String, Object> formMap) throws InvocationTargetException, IllegalAccessException {
         return R.success().data(quotationService.saveOrder(formMap));

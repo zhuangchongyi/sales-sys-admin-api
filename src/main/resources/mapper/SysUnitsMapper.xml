@@ -9,7 +9,7 @@
         <result column="units_name" property="unitsName"/>
         <result column="units_type" property="unitsType"/>
         <result column="status" property="status"/>
-        <result column="delFlag" property="del_flag"/>
+        <result column="del_flag" property="delFlag"/>
         <result column="create_time" property="createTime"/>
         <result column="create_by" property="createBy"/>
         <result column="update_time" property="updateTime"/>

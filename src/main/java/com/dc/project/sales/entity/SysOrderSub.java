@@ -126,17 +126,6 @@ public class SysOrderSub extends BaseEntity {
      */
     private Integer singbackNum;
 
-    /**
-     * 通知未发货
-     */
-    private Integer notShipmentNum;
-
-
-    /**
-     * 通知未签收数
-     */
-    private Integer notSignbackNum;
-
     public void setSubId(Long subId) {
         this.subId = subId;
     }
@@ -221,11 +210,4 @@ public class SysOrderSub extends BaseEntity {
         this.singbackNum = singbackNum;
     }
 
-    public void setNotShipmentNum(Integer notShipmentNum) {
-        this.notShipmentNum = notShipmentNum;
-    }
-
-    public void setNotSignbackNum(Integer notSignbackNum) {
-        this.notSignbackNum = notSignbackNum;
-    }
 }

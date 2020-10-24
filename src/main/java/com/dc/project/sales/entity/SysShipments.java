@@ -172,6 +172,18 @@ public class SysShipments extends BaseEntity {
     @TableField(exist = false)
     private Integer deptId;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date orderTime;
+
+    public Date getOrderTime() {
+        return orderTime;
+    }
+
+    public void setOrderTime(Date orderTime) {
+        this.orderTime = orderTime;
+    }
+
     public void setShipmentsId(Integer shipmentsId) {
         this.shipmentsId = shipmentsId;
     }

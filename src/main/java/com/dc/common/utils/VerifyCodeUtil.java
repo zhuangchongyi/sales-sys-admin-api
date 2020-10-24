@@ -67,8 +67,9 @@ public class VerifyCodeUtil {
         Color[] colors = new Color[5];
         Color[] colorSpaces = new Color[]{Color.WHITE, Color.CYAN, Color.GRAY, Color.LIGHT_GRAY, Color.MAGENTA,
                 Color.ORANGE, Color.PINK, Color.YELLOW};
-        float[] fractions = new float[colors.length];
-        for (int i = 0; i < colors.length; i++) {
+        int length = colors.length;
+        float[] fractions = new float[length];
+        for (int i = 0; i < length; i++) {
             colors[i] = colorSpaces[rand.nextInt(colorSpaces.length)];
             fractions[i] = rand.nextFloat();
         }

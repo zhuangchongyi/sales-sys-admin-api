@@ -40,7 +40,7 @@ public class SysMaterielServiceImpl extends ServiceImpl<SysMaterielDao, SysMater
     @Override
     public boolean insert(SysMateriel materiel) {
         int count = baseMapper.selectCount(new QueryWrapper<SysMateriel>().select("materiel_id").eq("materiel_num", materiel.getMaterielNum()));
-        if (count > 0) throw new ServiceException("编码不允许重复");
+        if (count > 0) throw new ServiceException(String.format("编码不允许重复,%s", materiel.getMaterielNum()));
         int row = baseMapper.insert(materiel);
         if (row == 0) throw new ServiceException("添加失败");
         insertModel(materiel, false);
@@ -52,7 +52,8 @@ public class SysMaterielServiceImpl extends ServiceImpl<SysMaterielDao, SysMater
     public boolean update(SysMateriel materiel) {
         SysMateriel res = baseMapper.selectOne(new QueryWrapper<SysMateriel>().select("materiel_id")
                 .eq("materiel_num", materiel.getMaterielNum()));
-        if (null != res && !res.getMaterielId().equals(materiel.getMaterielId())) throw new ServiceException("编码不允许重复");
+        if (null != res && !res.getMaterielId().equals(materiel.getMaterielId()))
+            throw new ServiceException(String.format("编码不允许重复,%s", materiel.getMaterielNum()));
         if (!this.updateById(materiel)) throw new ServiceException("修改失败");
         insertModel(materiel, true);
         return true;
@@ -82,15 +83,15 @@ public class SysMaterielServiceImpl extends ServiceImpl<SysMaterielDao, SysMater
         return true;
     }
 
-
     private void insertModel(SysMateriel materiel, boolean delFlag) {
         String[] modelNames = materiel.getModelNames();
-        if (modelNames.length != 0) {
+        int length = modelNames.length;
+        if (length != 0) {
             if (delFlag) {
                 materielModelService.remove(new QueryWrapper<SysMaterielModel>().eq("m_id", materiel.getMaterielId()));
             }
             List<SysMaterielModel> modelList = new ArrayList<>();
-            for (int i = 0; i < modelNames.length; i++) {
+            for (int i = 0; i < length; i++) {
                 SysMaterielModel model = new SysMaterielModel();
                 model.setMId(materiel.getMaterielId());
                 model.setModelName(modelNames[i].trim());

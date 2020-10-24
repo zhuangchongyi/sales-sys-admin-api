@@ -32,7 +32,7 @@ public class SysOrderSubController {
     @GetMapping
     public R get(SysOrderSub orderSub) {
         QueryWrapper<SysOrderSub> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("sub_id,materiel_id, materiel_num, materiel_name, specification, model_name, need_torque, out_torque, units_id, units_name, price, number, total_price, demand, has_shipment_num, has_outbound_num, has_signback_num, shipment_num, outbound_num, singback_num, not_shipment_num, not_signback_num");
+        queryWrapper.select("sub_id,materiel_id, materiel_num, materiel_name, specification, model_name, need_torque, out_torque, units_id, units_name, price, number, total_price, demand, has_shipment_num, has_outbound_num, has_signback_num, shipment_num, outbound_num, singback_num ");
         queryWrapper.eq(null != orderSub.getOrderId(), "order_id", orderSub.getOrderId());
         queryWrapper.orderByDesc("create_time");
         return R.success().data(orderSubService.list(queryWrapper));

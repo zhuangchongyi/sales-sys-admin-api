@@ -39,7 +39,11 @@ public class SysClienteleProductController {
 
     @GetMapping("/{id}")
     public R get(@PathVariable Long id) {
-        return R.success().data(clienteleProductService.getById(id));
+        QueryWrapper<SysClienteleProduct> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select(SysClienteleProduct.class,
+                info -> !info.getColumn().equals("create_time") && !info.getColumn().equals("update_time"))
+                .eq("product_id", id);
+        return R.success().data(clienteleProductService.getOne(queryWrapper));
     }
 
     @RequiresPermissions("basis:clienteleProduct:delete")

@@ -1,6 +1,6 @@
 package com.dc.framework.filter;
 
-import com.alibaba.fastjson.JSON;
+import com.dc.common.utils.ObjectMapperUtil;
 import com.dc.common.vo.R;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
@@ -45,7 +45,7 @@ public class CustomAuthenticationFilter extends FormAuthenticationFilter {
         res.setContentType("application/json; charset=utf-8");
         res.setStatus(HttpServletResponse.SC_OK);
         PrintWriter writer = res.getWriter();
-        writer.write(JSON.toJSONString(R.error().code(R.UNAUTHORIZED).msg("请求失败，未认证授权")));
+        writer.write(ObjectMapperUtil.toJSON(R.error().code(R.UNAUTHORIZED).msg("请求失败，未认证授权")));
         writer.close();
         //return false 拦截， true 放行
         return false;

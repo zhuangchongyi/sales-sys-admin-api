@@ -71,10 +71,10 @@ public class SysAccessoryServiceImpl extends ServiceImpl<SysAccessoryDao, SysAcc
         SysAccessory accessory = this.getById(pkId);
         boolean row = this.removeById(pkId);
         //删除文件
-        if (null == accessory.getMaterielId()) {
-            FTPClient ftpClient = FTPUtil.loginFTP(ftpEntity.getHost(), ftpEntity.getPort(), ftpEntity.getUsername(), ftpEntity.getPassword());
-            FTPUtil.deleteFile(ftpClient, accessory.getPath(), accessory.getFileName());
-        }
+//        if (null == accessory.getMaterielId()) {
+        FTPClient ftpClient = FTPUtil.loginFTP(ftpEntity.getHost(), ftpEntity.getPort(), ftpEntity.getUsername(), ftpEntity.getPassword());
+        FTPUtil.deleteFile(ftpClient, accessory.getPath(), accessory.getFileName());
+//        }
         return row;
     }
 }

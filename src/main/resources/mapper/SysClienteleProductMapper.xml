@@ -41,19 +41,20 @@
         left join sys_category c on c.category_id=m.category_id and c.category='0'
         <where>
             m.del_flag='0' and m.status='0'
-            <if test="mat.clienteleId!=null and mat.clienteleId!=''">
-                and mm.pk_id not in
-                (select scp.pk_id from sys_clientele_product scp
+            <if test="mat.clienteleId!=null">
+                and mm.model_name not in
+                (select scp.model_name from sys_clientele_product scp
                 where scp.clientele_id = #{mat.clienteleId} and scp.materiel_id=m.materiel_id and
                 scp.model_name=mm.model_name)
             </if>
+
             <if test="mat.materielNum!=null and mat.materielNum!=''">and m.materiel_num like
                 concat(concat('%',#{mat.materielNum}),'%')
             </if>
             <if test="mat.materielName!=null and mat.materielName!=''">or m.materiel_name like
                 concat(concat('%',#{mat.materielName}),'%')
             </if>
-            <if test="mat.categoryId!=null and mat.categoryId!=''">and c.category_id=#{mat.categoryId}</if>
+            <if test="mat.categoryId!=null">and c.category_id=#{mat.categoryId}</if>
         </where>
         order by m.create_time desc
     </select>

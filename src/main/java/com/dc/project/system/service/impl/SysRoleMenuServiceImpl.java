@@ -39,7 +39,8 @@ public class SysRoleMenuServiceImpl extends ServiceImpl<SysRoleMenuDao, SysRoleM
         }
         Integer[] menuIds = sysRole.getMenuIds();
         int row = 0;
-        for (int i = 0; i < menuIds.length; i++) {
+        int length = menuIds.length;
+        for (int i = 0; i < length; i++) {
             SysRoleMenu roleMenu = new SysRoleMenu();
             roleMenu.setRoleId(sysRole.getRoleId());
             roleMenu.setMenuId(menuIds[i]);

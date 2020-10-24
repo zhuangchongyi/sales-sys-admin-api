@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.project.finance.dao.SysReceiptDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.dc.project.finance.entity.SysReceipt">
+        <id column="receipt_id" property="receiptId"/>
+        <result column="create_id" property="createId"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="receipt_num" property="receiptNum"/>
+        <result column="receipt_time" property="receiptTime"/>
+        <result column="receipt_price" property="receiptPrice"/>
+        <result column="receipt_account" property="receiptAccount"/>
+        <result column="payment_type" property="paymentType"/>
+        <result column="payment_account" property="paymentAccount"/>
+        <result column="status" property="status"/>
+        <result column="cclientele_id" property="cclienteleId"/>
+        <result column="cclientele_num" property="cclienteleNum"/>
+        <result column="cclientele_name" property="cclienteleName"/>
+        <result column="personnel_id" property="personnelId"/>
+        <result column="personnel_name" property="personnelName"/>
+        <result column="personnel_num" property="personnelNum"/>
+        <result column="dept_id" property="deptId"/>
+        <result column="dept_name" property="deptName"/>
+        <result column="dept_num" property="deptNum"/>
+        <result column="verifica_status" property="verificaStatus"/>
+        <result column="verifica_price" property="verificaPrice"/>
+        <result column="has_verifica_price" property="hasVerificaPrice"/>
+        <result column="audit_by" property="auditBy"/>
+        <result column="audit_time" property="auditTime"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+            create_id,
+            create_by,
+            create_time,
+            update_by,
+            update_time,
+        receipt_id, receipt_num, receipt_time, receipt_price, receipt_account, receipt_type, payment_account, status, cclientele_id, cclientele_num, cclientele_name, personnel_id, personnel_name, personnel_num, dept_id, dept_name, dept_num, verifica_status, verifica_price, has_verifica_price, audit_by, audit_time, remark
+    </sql>
+
+</mapper>

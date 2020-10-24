@@ -23,4 +23,8 @@ public interface ISysSignbackService extends IService<SysSignback> {
     SysSignback get(Integer id);
 
     boolean audit(SysSignback sysSignback);
+
+    IPage<SysSignback> findOrderByClienteleId(Page page, SysSignback sysSignback);
+
+    IPage<Map<String, Object>> findFinanceOrder(Page page, SysSignback sysSignback);
 }

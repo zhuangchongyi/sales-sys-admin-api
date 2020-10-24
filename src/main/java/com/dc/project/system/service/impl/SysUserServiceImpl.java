@@ -115,11 +115,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUser> impleme
         Integer[] roleIds = sysUser.getRoleIds();
         QueryWrapper<SysUserRole> queryWrapper = new QueryWrapper<SysUserRole>().eq("user_id", sysUser.getUserId());
         int count = userRoleService.count(queryWrapper);
-        if (roleIds.length == 0 && count == 0) {
+        int length = roleIds.length;
+        if (length == 0 && count == 0) {
             throw new ServiceException("未选择角色");
         }
         userRoleService.remove(queryWrapper);
-        for (int i = 0; i < roleIds.length; i++) {
+        for (int i = 0; i < length; i++) {
             SysUserRole userRole = new SysUserRole();
             userRole.setRoleId(roleIds[i]);
             userRole.setUserId(sysUser.getUserId());

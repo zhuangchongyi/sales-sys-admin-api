@@ -46,7 +46,9 @@ public class SysStorageServiceImpl extends ServiceImpl<SysStorageDao, SysStorage
         Object delSubIdsForm = formMap.get("delSubIds");
         if (null == storageForm || null == storageSubForm || null == delSubIdsForm)
             throw new ServiceException("保存失败");
-        SysStorage sysStorage = ObjectMapperUtil.toObject(storageForm.toString(), SysStorage.class);
+        SysStorage sysStorage = new SysStorage();
+        BeanUtil.register();
+        BeanUtils.populate(sysStorage,ObjectMapperUtil.toObject(storageForm.toString(), Map.class));
         if (null == sysStorage.getWarehouseId()) {
             throw new ServiceException("保存失败，未选择仓库");
         }

@@ -27,4 +27,5 @@ public interface ISysMaterielService extends IService<SysMateriel> {
     MaterielVo findMateriel(MaterielVo materiel);
 
     boolean verifyStatus(Integer id);
+
 }

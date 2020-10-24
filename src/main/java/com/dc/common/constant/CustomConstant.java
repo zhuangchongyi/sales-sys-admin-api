@@ -68,4 +68,8 @@ public class CustomConstant {
     public final static String LAYOUT = "Layout";
 
 
+    /**
+     * 验证码缓存 Key值
+     */
+    public static final String CAPTCHA_CODE_KEY = "captcha_code_key:";
 }

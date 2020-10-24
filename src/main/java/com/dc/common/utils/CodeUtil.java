@@ -43,7 +43,8 @@ public class CodeUtil {
      */
     public static String randomCode(int digit) {
         StringBuilder sb = new StringBuilder("1");
-        for (int i = 0; i < digit - 1; i++) {
+        int len = digit - 1;
+        for (int i = 0; i < len; i++) {
             sb.append("0");
         }
         return String.valueOf((int) ((Math.random() * 9 + 1) * Integer.valueOf(sb.toString())));

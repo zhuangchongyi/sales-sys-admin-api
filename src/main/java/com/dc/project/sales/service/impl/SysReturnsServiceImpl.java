@@ -73,7 +73,7 @@ public class SysReturnsServiceImpl extends ServiceImpl<SysReturnsDao, SysReturns
         BeanUtil.register();
         BeanUtils.populate(sysReturns, ObjectMapperUtil.toObject(clienteleForm.toString(), Map.class));
         if (null == sysReturns.getReturnsId()) {
-            sysReturns.setReturnsNum(CodeUtil.getCode(SalesConstant.SALES_RETUENS_NO));
+            sysReturns.setReturnsNum(CodeUtil.getCode(SalesConstant.SALES_RETURNS_NO));
             sysReturns.setAuditBy(null);
             sysReturns.setAuditTime(null);
             sysReturns.setStatus(SalesConstant.SAVE);

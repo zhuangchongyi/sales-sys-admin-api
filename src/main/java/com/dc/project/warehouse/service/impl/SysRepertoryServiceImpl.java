@@ -27,7 +27,7 @@ public class SysRepertoryServiceImpl extends ServiceImpl<SysRepertoryDao, SysRep
 
     @Override
     public IPage<SysRepertory> page(Page page, SysRepertory sysRepertory) {
-        return baseMapper.page(page,sysRepertory);
+        return baseMapper.page(page, sysRepertory);
     }
 
     @Override
