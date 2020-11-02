@@ -76,6 +76,20 @@ public class SalesConstant {
     public static final String SHIPMENT = "8";
 
     /**
+     * 应收款单类型-签收单生成
+     */
+    public static final String RECEIVABLE_TYPE_SIGN = "0";
+    /**
+     * 应收款单类型-新增
+     */
+    public static final String RECEIVABLE_TYPE_ADD = "1";
+    /**
+     * 应收款单类型-销售退货单生成
+     */
+    public static final String RECEIVABLE_TYPE_RETURNS = "2";
+
+
+    /**
      * 校验审核状态
      *
      * @param targetStatus 修改状态

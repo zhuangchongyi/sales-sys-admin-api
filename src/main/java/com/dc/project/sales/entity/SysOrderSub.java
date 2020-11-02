@@ -110,21 +110,14 @@ public class SysOrderSub extends BaseEntity {
      * 已签收数
      */
     private Integer hasSignbackNum;
-
     /**
-     * 本次通知发货数
+     * 已拒收数
      */
-    private Integer shipmentNum;
+    private Integer hasReturnNum;
 
-    /**
-     * 本次通知出库数
-     */
-    private Integer outboundNum;
-
-    /**
-     * 本次通知签收数
-     */
-    private Integer singbackNum;
+    public void setHasReturnNum(Integer hasReturnNum) {
+        this.hasReturnNum = hasReturnNum;
+    }
 
     public void setSubId(Long subId) {
         this.subId = subId;
@@ -196,18 +189,6 @@ public class SysOrderSub extends BaseEntity {
 
     public void setHasSignbackNum(Integer hasSignbackNum) {
         this.hasSignbackNum = hasSignbackNum;
-    }
-
-    public void setShipmentNum(Integer shipmentNum) {
-        this.shipmentNum = shipmentNum;
-    }
-
-    public void setOutboundNum(Integer outboundNum) {
-        this.outboundNum = outboundNum;
-    }
-
-    public void setSingbackNum(Integer singbackNum) {
-        this.singbackNum = singbackNum;
     }
 
 }

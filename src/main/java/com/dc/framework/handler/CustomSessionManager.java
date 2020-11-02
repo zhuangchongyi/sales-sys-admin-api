@@ -23,7 +23,7 @@ public class CustomSessionManager extends DefaultWebSessionManager {
 
     public CustomSessionManager() {
         super();
-        long timeout = DEFAULT_GLOBAL_SESSION_TIMEOUT * 48;
+        long timeout = DEFAULT_GLOBAL_SESSION_TIMEOUT * 24;
         setGlobalSessionTimeout(timeout);
     }
 

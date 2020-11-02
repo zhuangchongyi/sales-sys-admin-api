@@ -60,7 +60,7 @@ public class SysRoleController {
         SysRole res = roleService.getOne(new QueryWrapper<SysRole>().select("role_id").eq("role_num", sysRole.getRoleNum()));
         if (null != res && !res.getRoleId().equals(sysRole.getRoleId()))
             throw new ServiceException("该角色编码重复");
-        if (CustomConstant.STOP_STATUS.equals(res.getStatus())) {
+        if (null != res && CustomConstant.STOP_STATUS.equals(res.getStatus())) {
             SysUserRole userRole = userRoleService.getOne(new QueryWrapper<SysUserRole>().eq("role_id", res.getRoleId()));
             if (null != userRole) {
                 throw new ServiceException("该角色已被使用，无法停用");

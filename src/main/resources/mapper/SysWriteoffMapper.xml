@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.project.finance.dao.SysWriteoffDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.dc.project.finance.entity.SysWriteoff">
+        <id column="writeoff_id" property="writeoffId"/>
+        <result column="create_id" property="createId"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="writeoff_status" property="writeoffStatus"/>
+        <result column="writeoff_price" property="writeoffPrice"/>
+        <result column="writeoff_time" property="writeoffTime"/>
+        <result column="clientele_id" property="clienteleId"/>
+        <result column="clientele_num" property="clienteleNum"/>
+        <result column="clientele_name" property="clienteleName"/>
+        <result column="status" property="status"/>
+        <result column="audit_by" property="auditBy"/>
+        <result column="audit_time" property="auditTime"/>
+        <result column="remark" property="remark"/>
+        <result column="dept_id" property="deptId"/>
+        <result column="dept_name" property="deptName"/>
+        <result column="dept_num" property="deptNum"/>
+        <result column="personnel_id" property="personnelId"/>
+        <result column="personnel_name" property="personnelName"/>
+        <result column="personnel_num" property="personnelNum"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+            create_id,
+            create_by,
+            create_time,
+            update_by,
+            update_time,
+        writeoff_id, writeoff_status, writeoff_price, writeoff_time, clientele_id, clientele_num, clientele_name, status, audit_by, audit_time, remark, dept_id, dept_name, dept_num, personnel_id, personnel_name, personnel_num
+    </sql>
+
+</mapper>

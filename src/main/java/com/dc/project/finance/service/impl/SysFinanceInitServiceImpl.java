@@ -27,9 +27,7 @@ public class SysFinanceInitServiceImpl extends ServiceImpl<SysFinanceInitDao, Sy
     @Override
     public boolean saveAndUpdate(Map<String, Object> formMap) throws InvocationTargetException, IllegalAccessException {
         Object clienteleForm = formMap.get("clienteleForm");
-        Object orderList = formMap.get("orderList");
-        Object delSubIds = formMap.get("delSubIds");
-        if (null == clienteleForm || null == orderList) {
+        if (null == clienteleForm) {
             throw new ServiceException();
         }
         SysFinanceInit financeInit = new SysFinanceInit();

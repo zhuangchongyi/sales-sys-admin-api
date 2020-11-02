@@ -14,9 +14,11 @@ import com.dc.common.utils.ObjectMapperUtil;
 import com.dc.project.finance.entity.SysReceivable;
 import com.dc.project.finance.service.ISysReceivableService;
 import com.dc.project.sales.dao.SysSignbackDao;
+import com.dc.project.sales.entity.SysOrder;
 import com.dc.project.sales.entity.SysOrderSub;
 import com.dc.project.sales.entity.SysSignback;
 import com.dc.project.sales.entity.SysSignbackSub;
+import com.dc.project.sales.service.ISysOrderService;
 import com.dc.project.sales.service.ISysOrderSubService;
 import com.dc.project.sales.service.ISysSignbackService;
 import com.dc.project.sales.service.ISysSignbackSubService;
@@ -45,6 +47,8 @@ public class SysSignbackServiceImpl extends ServiceImpl<SysSignbackDao, SysSignb
     private ISysReceivableService receivableService;
     @Autowired
     private ISysOrderSubService orderSubService;
+    @Autowired
+    private ISysOrderService orderService;
 
     @Override
     public IPage<SysSignback> page(Page<SysSignback> page, SysSignback sysSignback) {
@@ -58,21 +62,29 @@ public class SysSignbackServiceImpl extends ServiceImpl<SysSignbackDao, SysSignb
         Object materielListForm = formMap.get("materielList");
         if (null == clienteleForm || null == materielListForm)
             throw new ServiceException("保存失败");
-
         SysSignback sysSignback = new SysSignback();
         BeanUtil.register();
         BeanUtils.populate(sysSignback, ObjectMapperUtil.toObject(clienteleForm.toString(), Map.class));
         List<Map<String, Object>> subList = ObjectMapperUtil.toObject(materielListForm.toString(), List.class);
+        BigDecimal totalPrice = BigDecimalUtil.ZERO;
         for (Map<String, Object> map : subList) {
             SysSignbackSub sub = new SysSignbackSub();
             BeanUtils.populate(sub, map);
             sub.setTotalPrice(BigDecimalUtil.mul(sub.getPrice(), sub.getSignNum()));
+            if (sub.getSignNum() > sub.getOutboundNum()) {
+                throw new ServiceException("保存失败，签收数量超过出库数量");
+            }
             if (!signbackSubService.updateById(sub)) {
                 throw new ServiceException("保存失败");
             }
+            totalPrice = BigDecimalUtil.add(totalPrice, sub.getTotalPrice());
         }
+        sysSignback.setTotalPrice(totalPrice);
         sysSignback.setSignbackStatus(CustomConstant.YES_STATUS);
-        return this.updateById(sysSignback);
+        if (!this.updateById(sysSignback)) {
+            throw new ServiceException("保存失败");
+        }
+        return true;
     }
 
     @Override
@@ -85,52 +97,63 @@ public class SysSignbackServiceImpl extends ServiceImpl<SysSignbackDao, SysSignb
     public boolean audit(SysSignback sysSignback) {
         SysSignback signback = this.getById(sysSignback.getSignbackId());
         if (CustomConstant.NO_STATUS.equals(signback.getSignbackStatus()))
-            throw new ServiceException(String.format("请先签收 %s", signback.getSignbackNum()));
-        SalesConstant.verifyAuditStatus(sysSignback.getStatus(), signback.getStatus());
-
+            throw new ServiceException(String.format("%s请先签收", signback.getSignbackNum()));
+        String checkStatus = sysSignback.getStatus();
+        SalesConstant.verifyAuditStatus(checkStatus, signback.getStatus());
         List<SysSignbackSub> subList = signbackSubService.list(new QueryWrapper<SysSignbackSub>().eq("signback_id", signback.getSignbackId()));
-        if (SalesConstant.AUDIT.equals(sysSignback.getStatus())) {
-            insertReceivable(signback, subList);
+        if (SalesConstant.AUDIT.equals(checkStatus)) {
+            insertReceivable(signback);
         } else {
             delReceivable(signback.getSignbackNum());
         }
-        updateOrderSign(sysSignback.getStatus(), signback, subList);
-
-        return this.updateById(sysSignback);
+        updateOrderSign(checkStatus, signback, subList);
+        if (!this.updateById(sysSignback)) {
+            throw new ServiceException();
+        }
+        return true;
     }
 
     private void updateOrderSign(String status, SysSignback signback, List<SysSignbackSub> subList) {
+        Integer orderId = signback.getOrderId();
+        SysOrderSub orderSub = new SysOrderSub();
+        BigDecimal signbackPrice = BigDecimalUtil.ZERO;
         for (SysSignbackSub sub : subList) {
             Long orderSubId = sub.getOrderSubId();
             SysOrderSub one = orderSubService.getById(orderSubId);
-            int singbackNum = 0;
             if (SalesConstant.AUDIT.equals(status)) {
-                singbackNum = sub.getSignNum() + one.getHasSignbackNum();
+                orderSub.setHasSignbackNum(one.getHasSignbackNum() + sub.getSignNum());
+                orderSub.setHasOutboundNum(one.getHasOutboundNum() - sub.getOutboundNum());
             } else {
-                singbackNum = sub.getSignNum() - one.getHasSignbackNum();
-                if (singbackNum < 0) {
-                    throw new ServiceException(String.format("%s %s %s签收数量计算错误", one.getMaterielNum(), one.getMaterielName(), one.getModelName()));
-                }
+                orderSub.setHasSignbackNum(one.getHasSignbackNum() - sub.getSignNum());
+                orderSub.setHasOutboundNum(one.getHasOutboundNum() + sub.getOutboundNum());
             }
-            SysOrderSub orderSub = new SysOrderSub();
+            if (one.getNumber() < orderSub.getHasSignbackNum()) {
+                throw new ServiceException(String.format("%s %s %s产品累计签收数量超过订购数量", one.getMaterielNum(), one.getMaterielName(), one.getModelName()));
+            } else if (orderSub.getHasSignbackNum() < 0) {
+                throw new ServiceException(String.format("%s %s %s签收数量计算错误", one.getMaterielNum(), one.getMaterielName(), one.getModelName()));
+            }
             orderSub.setSubId(orderSubId);
-            orderSub.setHasSignbackNum(singbackNum);
-            orderSubService.updateById(orderSub);
+            if (!orderSubService.updateById(orderSub)) {
+                throw new ServiceException();
+            }
+            signbackPrice = BigDecimalUtil.add(signbackPrice, BigDecimalUtil.mul(one.getPrice(), orderSub.getHasSignbackNum()));
         }
-
+        SysOrder sysOrder = new SysOrder();
+        sysOrder.setSignbackPrice(signbackPrice);
+        sysOrder.setOrderId(orderId);
+        if (!orderService.updateById(sysOrder)) {
+            throw new ServiceException();
+        }
     }
 
-    private void insertReceivable(SysSignback signback, List<SysSignbackSub> subList) {
+    private void insertReceivable(SysSignback signback) {
         SysReceivable receivable = new SysReceivable();
         BeanUtil.copyBeanProp(receivable, signback);
         receivable.setAuditBy(null);
         receivable.setAuditTime(null);
-        receivable.setStatus(SalesConstant.SAVE);
+        receivable.setStatus(SalesConstant.SUBMIT);
         receivable.setFinanceTime(new Date());
         receivable.setReceivableNum(CodeUtil.getCode(SalesConstant.FINANCE_RECEIVABLE_NO));
-        BigDecimal totalPrice = BigDecimal.ZERO;
-        receivable.setTotalPrice(totalPrice);
-        receivable.setReceivePrice(totalPrice);
         if (!receivableService.save(receivable)) {
             throw new ServiceException("生成应收款异常");
         }
@@ -139,16 +162,14 @@ public class SysSignbackServiceImpl extends ServiceImpl<SysSignbackDao, SysSignb
     private void delReceivable(String signbackNum) {
         QueryWrapper<SysReceivable> queryWrapper = new QueryWrapper<SysReceivable>().eq("signback_num", signbackNum);
         SysReceivable one = receivableService.getOne(queryWrapper);
-        if (null == one)
+        if (null == one) {
+            log.error(String.format("%s此签收单的应收款不存在"));
             return;
-        if (SalesConstant.AUDIT.equals(one.getStatus()) ||
-                SalesConstant.NO_AUDIT.equals(one.getStatus()) ||
-                SalesConstant.SUBMIT.equals(one.getStatus())) {
-            throw new ServiceException(String.format("生成签收单%s已提交审核", one.getReceivableNum()));
         }
-
-        Integer receivableId = one.getReceivableId();
-        if (!receivableService.removeById(receivableId)) {
+        if (SalesConstant.AUDIT.equals(one.getStatus())) {
+            throw new ServiceException(String.format("生成应收款%s已审核", one.getReceivableNum()));
+        }
+        if (!receivableService.removeById(one.getReceivableId())) {
             throw new ServiceException("应收单删除失败");
         }
     }

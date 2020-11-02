@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.dc.project.finance.entity.SysReceivable;
 
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,4 +23,10 @@ public interface ISysReceivableService extends IService<SysReceivable> {
     String saveAndUpdate(Map<String, Object> formMap) throws InvocationTargetException, IllegalAccessException;
 
     boolean delete(Integer id);
+
+    BigDecimal findReceivePriceByClienteleId(Integer id);
+
+    List<SysReceivable> getClienteleReceivable(SysReceivable receivable);
+
+    List<SysReceivable> getClienteleReceivableList(SysReceivable receivable);
 }

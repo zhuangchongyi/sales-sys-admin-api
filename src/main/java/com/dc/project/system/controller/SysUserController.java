@@ -35,7 +35,7 @@ public class SysUserController {
     @RequiresPermissions("basis:personnel:add")
     @PostMapping
     public R save(@RequestBody @Validated SysUser sysUser) {
-        return R.success().data(userService.save(sysUser));
+        return R.success().data(userService.insert(sysUser));
     }
 
     @GetMapping("/{userId}")

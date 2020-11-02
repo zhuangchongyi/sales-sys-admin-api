@@ -57,7 +57,6 @@ public class BeanUtil extends BeanUtils {
         ConvertUtils.register(new Converter() {
             @Override
             public Object convert(Class clazz, Object value) {
-                log.info("ConvertUtils.register.convert value=", value);
                 try {
                     if (value != null) {
                         //将String转化为date

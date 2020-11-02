@@ -16,7 +16,6 @@
         <result column="clientele_name" property="clienteleName"/>
         <result column="status" property="status"/>
         <result column="total_price" property="totalPrice"/>
-        <result column="receive_price" property="receivePrice"/>
         <result column="finance_time" property="financeTime"/>
         <result column="taxamount" property="taxamount"/>
         <result column="taxrate" property="taxrate"/>
@@ -29,6 +28,7 @@
         <result column="signback_time" property="signbackTime"/>
         <result column="audit_by" property="auditBy"/>
         <result column="audit_time" property="auditTime"/>
+        <result column="has_verifica_price" property="hasVerificaPrice"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -38,7 +38,37 @@
             create_time,
             update_by,
             update_time,
-        receivable_id, receivable_num, clientele_id, clientele_num, clientele_name, status, total_price, receive_price, finance_time, taxamount, taxrate, invoice, order_num, order_time, shipments_num, shipments_time, signback_num, signback_time, audit_by, audit_time
+        receivable_id, receivable_num, clientele_id, clientele_num, clientele_name, status, total_price, finance_time, taxamount, taxrate, invoice, order_num, order_time, shipments_num, shipments_time, signback_num, signback_time, audit_by, audit_time
     </sql>
+    <select id="getReceivePrice" resultType="java.math.BigDecimal">
+        select
+        IFNULL(sum(total_price),0)-IFNULL(sum(has_verifica_price),0)
+        from sys_receivable
+        where clientele_id=#{clienteleId} and status=#{status}
+    </select>
+    <select id="getClienteleReceivable" resultType="com.dc.project.finance.entity.SysReceivable">
+    select
+    receivable_id, receivable_num, total_price, finance_time, order_num, order_time, shipments_num, shipments_time, signback_num, signback_time,has_verifica_price
+    from sys_receivable
+    where clientele_id=#{clienteleId} and status=#{status}
+    and (total_price - has_verifica_price)>0
+    order by create_time asc
+    </select>
+
+    <select id="getClienteleReceivableList" resultType="com.dc.project.finance.entity.SysReceivable">
+    select
+    receivable_id, receivable_num, total_price, finance_time, order_num, order_time, shipments_num, shipments_time, signback_num, signback_time,has_verifica_price
+    from sys_receivable
+    <where>
+        <if test="clienteleId!=null and clienteleId!=''">
+            clientele_id=#{clienteleId}
+        </if>
+        <if test="orderNum!=null and orderNum!=''">
+            and order_num=#{orderNum}
+        </if>
+         <if test="status!=null and status!=''">and status=#{status}</if>
+    </where>
+    order by create_time asc
+    </select>
 
 </mapper>

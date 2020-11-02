@@ -16,5 +16,7 @@ public interface SysShipmentsDao extends BaseMapper<SysShipments> {
 
     IPage<SysShipments> page(Page page, @Param("ss") SysShipments shipments);
 
+    IPage<SysShipments> outboundPage(Page page, @Param("ss") SysShipments shipments);
+
     SysShipments get(Integer shipmentsId);
 }

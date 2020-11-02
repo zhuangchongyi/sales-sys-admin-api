@@ -3,6 +3,8 @@ package com.dc.project.sales.service;
 import com.dc.project.sales.entity.SysOrderSub;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * 销售订单子表 服务类
  *
@@ -11,4 +13,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface ISysOrderSubService extends IService<SysOrderSub> {
     boolean delete(Long subId);
+
+    List<SysOrderSub> getOrderSub(SysOrderSub orderSub);
 }

@@ -55,7 +55,7 @@
     </sql>
     <sql id="orderSql">
         select
-        so.order_id, so.order_num, so.delivery_time, so.order_time, so.clientele_id, so.clientele_num, so.clientele_name, so.category_id, so.personnel_id, so.pay_condition, so.status, so.remark, so.legal_person, so.leader, so.email, so.phone, so.mobilephone, so.abbreviation, so.certificate_num, so.address, so.taxrate, so.taxamount
+        so.order_id, so.order_num, so.delivery_time, so.order_time, so.clientele_id, so.clientele_num, so.clientele_name, so.category_id, so.personnel_id, so.pay_condition, so.status, so.remark, so.legal_person, so.leader, so.email, so.phone, so.mobilephone, so.abbreviation, so.certificate_num, so.address, so.taxrate, so.taxamount, so.total_price
         ,u.user_num personnel_num,u.nickname personnel_name,d.dept_id,d.dept_num,d.dept_name
         from sys_order so
         left join sys_user u on u.user_id = so.personnel_id
@@ -101,6 +101,29 @@
             </if>
         </where>
         order by so.create_time desc
+    </select>
+    <select id="findReturnsOrder" resultType="com.dc.project.sales.entity.SysOrder">
+        select
+        so.order_id, so.order_num, so.delivery_time, so.order_time, so.clientele_id, so.clientele_num,
+        so.clientele_name, so.category_id, so.personnel_id, so.pay_condition, so.legal_person,
+        so.leader, so.email, so.phone, so.mobilephone, so.abbreviation, so.certificate_num, so.address,so.taxrate,
+        so.taxamount
+        from sys_order so
+        <where>
+            <if test="so.orderNum!=null and so.orderNum!=''">and so.order_num like
+                concat(concat('%',#{so.orderNum}),'%')
+            </if>
+            <if test="so.clienteleNum!=null and so.clienteleNum!=''">or so.clientele_num like
+                concat(concat('%',#{so.clienteleNum}),'%')
+            </if>
+            <if test="so.clienteleName!=null and so.clienteleName!=''">or so.clientele_name like
+                concat(concat('%',#{so.clienteleNum}),'%')
+            </if>
+            <if test="so.status!=null and so.status!=''">
+                and so.status=#{so.status}
+            </if>
+        </where>
+        group by so.order_id order by so.create_time desc
     </select>
 
 </mapper>

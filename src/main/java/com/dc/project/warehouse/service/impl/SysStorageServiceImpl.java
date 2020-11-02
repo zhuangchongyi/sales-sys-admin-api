@@ -48,7 +48,7 @@ public class SysStorageServiceImpl extends ServiceImpl<SysStorageDao, SysStorage
             throw new ServiceException("保存失败");
         SysStorage sysStorage = new SysStorage();
         BeanUtil.register();
-        BeanUtils.populate(sysStorage,ObjectMapperUtil.toObject(storageForm.toString(), Map.class));
+        BeanUtils.populate(sysStorage, ObjectMapperUtil.toObject(storageForm.toString(), Map.class));
         if (null == sysStorage.getWarehouseId()) {
             throw new ServiceException("保存失败，未选择仓库");
         }

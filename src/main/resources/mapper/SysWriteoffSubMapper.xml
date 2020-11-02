@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.project.finance.dao.SysWriteoffSubDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.dc.project.finance.entity.SysWriteoffSub">
+        <id column="writeoff_sub_id" property="writeoffSubId"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_id" property="createId"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="writeoff_id" property="writeoffId"/>
+        <result column="receipt_id" property="receiptId"/>
+        <result column="receipt_num" property="receiptNum"/>
+        <result column="front_receipt_price" property="frontReceiptPrice"/>
+        <result column="back_receipt_price" property="backReceiptPrice"/>
+        <result column="receivable_id" property="receivableId"/>
+        <result column="receivable_num" property="receivableNum"/>
+        <result column="front_receivable_price" property="frontReceivablePrice"/>
+        <result column="back_receivable_price" property="backReceivablePrice"/>
+        <result column="writeoff_price" property="writeoffPrice"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+            update_by,
+            update_time,
+            create_id,
+            create_by,
+            create_time,
+        writeoff_sub_id, writeoff_id, receipt_id, receipt_num, front_receipt_price, back_receipt_price, receivable_id, receivable_num, front_receivable_price, back_receivable_price, writeoff_price
+    </sql>
+    <select id="findReceiptPrice" resultType="com.dc.project.finance.entity.SysWriteoffSub">
+        select receipt_id,IFNULL(sum(writeoff_price),0) receipt_price
+        from sys_writeoff_sub
+        where writeoff_id=#{writeoffId}
+        GROUP BY receipt_id
+    </select>
+    <select id="findReceivablePrice" resultType="com.dc.project.finance.entity.SysWriteoffSub">
+        select receivable_id,IFNULL(sum(writeoff_price),0) receivable_price
+        from sys_writeoff_sub
+        where writeoff_id=#{writeoffId}
+        GROUP BY receivable_id
+    </select>
+
+</mapper>

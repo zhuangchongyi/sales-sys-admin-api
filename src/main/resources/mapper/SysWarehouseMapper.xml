@@ -34,10 +34,10 @@
 
     <sql id="warehouse_dept_sql">
         select
-        w.warehouse_id, w.warehouse_num, w.warehouse_name, w.status, w.del_flag, w.create_by, w.create_time, w.update_by, w.update_time, w.remark,
-        d.dept_id,d.dept_num,d.dept_name,d.parent_id,d.dept_type
+        w.warehouse_id, w.warehouse_num, w.warehouse_name, w.status, w.del_flag, w.create_by, w.create_time, w.update_by, w.update_time, w.remark
+        /*,d.dept_id,d.dept_num,d.dept_name,d.parent_id,d.dept_type*/
         from sys_warehouse w
-        left join sys_dept d on d.dept_id = w.dept_id
+        /*left join sys_dept d on d.dept_id = w.dept_id*/
     </sql>
     <select id="list" resultMap="BaseResultMap">
         <include refid="warehouse_dept_sql"/>
@@ -55,10 +55,10 @@
     </select>
     <select id="getByWarehouseId" resultMap="BaseResultMap">
         select
-        w.warehouse_id, w.warehouse_num, w.warehouse_name, w.status, w.remark,
-        d.dept_id,d.dept_num,d.dept_name,d.parent_id,d.dept_type
+        w.warehouse_id, w.warehouse_num, w.warehouse_name, w.status, w.remark
+        /*,d.dept_id,d.dept_num,d.dept_name,d.parent_id,d.dept_type*/
         from sys_warehouse w
-        left join sys_dept d on d.dept_id = w.dept_id
+        /*left join sys_dept d on d.dept_id = w.dept_id*/
         where w.warehouse_id=#{warehouseId}
     </select>
     <select id="initPage" resultMap="BaseResultMap">

@@ -41,7 +41,7 @@ public class SysRepertoryServiceImpl extends ServiceImpl<SysRepertoryDao, SysRep
             throw new SecurityException();
         for (SysRepertory repertory : list) {
             if (null == repertory.getPkId()) { //新增
-                this.save(repertory);
+                if (!this.save(repertory)) throw new ServiceException("修改库存失败");
             } else { //修改
                 update(repertory);
             }
@@ -51,15 +51,14 @@ public class SysRepertoryServiceImpl extends ServiceImpl<SysRepertoryDao, SysRep
 
     private void update(SysRepertory one) {
         if (one.getNumber() == 0 || one.getTotalPrice().compareTo(BigDecimalUtil.ZERO) <= 0) {
-            this.removeById(one.getPkId());
-            return;
+            if (!this.removeById(one.getPkId())) throw new ServiceException("修改库存失败");
         }
         UpdateWrapper<SysRepertory> uw = new UpdateWrapper<>();
         uw.set("price", one.getPrice());
         uw.set("total_price", one.getTotalPrice());
         uw.set("number", one.getNumber());
         uw.eq("pk_id", one.getPkId());
-        this.update(uw);
+        if (!this.update(uw)) throw new ServiceException("修改库存失败");
     }
 
     @Override

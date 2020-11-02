@@ -68,5 +68,25 @@ public class SysReceivableController {
     public R delete(@PathVariable Integer id) {
         return R.success().data(receivableService.delete(id));
     }
+
+    /**
+     * 查询客户已审核的应收款单
+     * @param receivable
+     * @return
+     */
+    @GetMapping("/clientele")
+    public R getClienteleReceivable(SysReceivable receivable) {
+        return R.success().data(receivableService.getClienteleReceivable(receivable));
+    }
+
+    /**
+     * 订单查询应收款明细
+     * @param receivable
+     * @return
+     */
+    @GetMapping("/clienteleList")
+    public R getClienteleReceivableList(SysReceivable receivable) {
+        return R.success().data(receivableService.getClienteleReceivableList(receivable));
+    }
 }
 

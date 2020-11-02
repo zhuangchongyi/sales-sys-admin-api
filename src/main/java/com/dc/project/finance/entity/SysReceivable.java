@@ -1,6 +1,7 @@
 package com.dc.project.finance.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.dc.common.vo.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -48,14 +49,9 @@ public class SysReceivable extends BaseEntity {
     private String status;
 
     /**
-     * 累计金额
-     */
-    private BigDecimal totalPrice;
-
-    /**
      * 应收金额
      */
-    private BigDecimal receivePrice;
+    private BigDecimal totalPrice;
 
     /**
      * 财务日期
@@ -123,9 +119,34 @@ public class SysReceivable extends BaseEntity {
     private Date auditTime;
 
     /**
-     * 来源类型
+     * 来源类型（0签收，1新增，2退货）
      */
     private String sourceType;
+    /**
+     * 已核销金额
+     */
+    private BigDecimal hasVerificaPrice;
+    /**
+     * 本次核销金额
+     */
+    @TableField(exist = false)
+    private BigDecimal verificaPrice;
+
+    public BigDecimal getVerificaPrice() {
+        return verificaPrice;
+    }
+
+    public void setVerificaPrice(BigDecimal verificaPrice) {
+        this.verificaPrice = verificaPrice;
+    }
+
+    public BigDecimal getHasVerificaPrice() {
+        return hasVerificaPrice;
+    }
+
+    public void setHasVerificaPrice(BigDecimal hasVerificaPrice) {
+        this.hasVerificaPrice = hasVerificaPrice;
+    }
 
     public String getSourceType() {
         return sourceType;
@@ -189,14 +210,6 @@ public class SysReceivable extends BaseEntity {
 
     public void setTotalPrice(BigDecimal totalPrice) {
         this.totalPrice = totalPrice;
-    }
-
-    public BigDecimal getReceivePrice() {
-        return receivePrice;
-    }
-
-    public void setReceivePrice(BigDecimal receivePrice) {
-        this.receivePrice = receivePrice;
     }
 
     public Date getFinanceTime() {

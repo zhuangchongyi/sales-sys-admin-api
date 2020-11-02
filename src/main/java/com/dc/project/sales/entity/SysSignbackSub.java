@@ -115,6 +115,19 @@ public class SysSignbackSub extends BaseEntity {
      */
     private Long orderSubId;
 
+    /**
+     * 拒收数
+     */
+    private Integer rejectionNum;
+
+    public void setRejectionNum(Integer rejectionNum) {
+        this.rejectionNum = rejectionNum;
+    }
+
+    public Integer getRejectionNum() {
+        return rejectionNum;
+    }
+
     public Long getSubId() {
         return subId;
     }

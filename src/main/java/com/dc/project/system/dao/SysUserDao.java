@@ -20,5 +20,4 @@ public interface SysUserDao extends BaseMapper<SysUser> {
 
     SysUser findRoleByUsername(String username);
 
-    SysUser getUserByUsername(String username);
 }

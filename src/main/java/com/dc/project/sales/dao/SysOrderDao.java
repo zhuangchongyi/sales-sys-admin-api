@@ -19,4 +19,6 @@ public interface SysOrderDao extends BaseMapper<SysOrder> {
     SysOrder get(Integer orderId);
 
     IPage<SysOrder> list(Page page, @Param("so") SysOrder order);
+
+    IPage<SysOrder> findReturnsOrder(Page page, @Param("so") SysOrder order);
 }

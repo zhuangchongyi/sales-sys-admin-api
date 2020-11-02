@@ -12,7 +12,7 @@ import java.util.Date;
  * 销售退货主表
  *
  * @author zhuangcy
- * @since 2020-10-11
+ * @since 2020-10-30
  */
 public class SysReturns extends BaseEntity {
 
@@ -28,11 +28,6 @@ public class SysReturns extends BaseEntity {
     private Integer orderId;
 
     /**
-     * 发货单id
-     */
-    private Integer shipmentsId;
-
-    /**
      * 退货单号
      */
     private String returnsNum;
@@ -41,11 +36,6 @@ public class SysReturns extends BaseEntity {
      * 订单单号
      */
     private String orderNum;
-
-    /**
-     * 发货单号
-     */
-    private String shipmentsNum;
 
     /**
      * 退货日期
@@ -77,10 +67,14 @@ public class SysReturns extends BaseEntity {
      * 开单人id
      */
     private Integer personnelId;
+
+    /**
+     * 开单人名称
+     */
     private String personnelName;
 
     /**
-     * 退货审批状态
+     * 状态
      */
     private String status;
 
@@ -110,21 +104,6 @@ public class SysReturns extends BaseEntity {
     private String address;
 
     /**
-     * 仓库id
-     */
-    private Integer warehouseId;
-
-    /**
-     * 仓库编码
-     */
-    private String warehouseNum;
-
-    /**
-     * 仓库名称
-     */
-    private String warehouseName;
-
-    /**
      * 审核人
      */
     private String auditBy;
@@ -132,6 +111,7 @@ public class SysReturns extends BaseEntity {
     /**
      * 审核时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date auditTime;
 
     /**
@@ -143,61 +123,47 @@ public class SysReturns extends BaseEntity {
      * 退货总金额
      */
     private BigDecimal totalPrice;
+
     /**
-     * 入库状态
+     * 仓库id
      */
-    private String storageStatus;
-    private Integer storageId;
-    private String storageBy;
+    private Integer warehouseId;
+
     /**
-     * 退货日期
+     * 仓库名称
      */
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date storageTime;
+    private String warehouseName;
+
+    /**
+     * 仓库编码
+     */
+    private String warehouseNum;
+
     /**
      * 入库审批状态
      */
     private String auditStatus;
 
-    public Date getStorageTime() {
-        return storageTime;
-    }
+    /**
+     * 入库状态
+     */
+    private String storageStatus;
 
-    public void setStorageTime(Date storageTime) {
-        this.storageTime = storageTime;
-    }
+    /**
+     * 入库人id
+     */
+    private Integer storageId;
 
-    public Integer getStorageId() {
-        return storageId;
-    }
+    /**
+     * 入库人
+     */
+    private String storageBy;
 
-    public void setStorageId(Integer storageId) {
-        this.storageId = storageId;
-    }
-
-    public String getStorageBy() {
-        return storageBy;
-    }
-
-    public void setStorageBy(String storageBy) {
-        this.storageBy = storageBy;
-    }
-
-    public String getAuditStatus() {
-        return auditStatus;
-    }
-
-    public void setAuditStatus(String auditStatus) {
-        this.auditStatus = auditStatus;
-    }
-
-    public String getStorageStatus() {
-        return storageStatus;
-    }
-
-    public void setStorageStatus(String storageStatus) {
-        this.storageStatus = storageStatus;
-    }
+    /**
+     * 入库时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date storageTime;
 
     public Integer getReturnsId() {
         return returnsId;
@@ -215,14 +181,6 @@ public class SysReturns extends BaseEntity {
         this.orderId = orderId;
     }
 
-    public Integer getShipmentsId() {
-        return shipmentsId;
-    }
-
-    public void setShipmentsId(Integer shipmentsId) {
-        this.shipmentsId = shipmentsId;
-    }
-
     public String getReturnsNum() {
         return returnsNum;
     }
@@ -237,14 +195,6 @@ public class SysReturns extends BaseEntity {
 
     public void setOrderNum(String orderNum) {
         this.orderNum = orderNum;
-    }
-
-    public String getShipmentsNum() {
-        return shipmentsNum;
-    }
-
-    public void setShipmentsNum(String shipmentsNum) {
-        this.shipmentsNum = shipmentsNum;
     }
 
     public Date getReturnsTime() {
@@ -295,6 +245,14 @@ public class SysReturns extends BaseEntity {
         this.personnelId = personnelId;
     }
 
+    public String getPersonnelName() {
+        return personnelName;
+    }
+
+    public void setPersonnelName(String personnelName) {
+        this.personnelName = personnelName;
+    }
+
     public String getStatus() {
         return status;
     }
@@ -343,30 +301,6 @@ public class SysReturns extends BaseEntity {
         this.address = address;
     }
 
-    public Integer getWarehouseId() {
-        return warehouseId;
-    }
-
-    public void setWarehouseId(Integer warehouseId) {
-        this.warehouseId = warehouseId;
-    }
-
-    public String getWarehouseNum() {
-        return warehouseNum;
-    }
-
-    public void setWarehouseNum(String warehouseNum) {
-        this.warehouseNum = warehouseNum;
-    }
-
-    public String getWarehouseName() {
-        return warehouseName;
-    }
-
-    public void setWarehouseName(String warehouseName) {
-        this.warehouseName = warehouseName;
-    }
-
     public String getAuditBy() {
         return auditBy;
     }
@@ -399,11 +333,102 @@ public class SysReturns extends BaseEntity {
         this.totalPrice = totalPrice;
     }
 
-    public String getPersonnelName() {
-        return personnelName;
+    public Integer getWarehouseId() {
+        return warehouseId;
     }
 
-    public void setPersonnelName(String personnelName) {
-        this.personnelName = personnelName;
+    public void setWarehouseId(Integer warehouseId) {
+        this.warehouseId = warehouseId;
+    }
+
+    public String getWarehouseName() {
+        return warehouseName;
+    }
+
+    public void setWarehouseName(String warehouseName) {
+        this.warehouseName = warehouseName;
+    }
+
+    public String getWarehouseNum() {
+        return warehouseNum;
+    }
+
+    public void setWarehouseNum(String warehouseNum) {
+        this.warehouseNum = warehouseNum;
+    }
+
+    public String getAuditStatus() {
+        return auditStatus;
+    }
+
+    public void setAuditStatus(String auditStatus) {
+        this.auditStatus = auditStatus;
+    }
+
+    public String getStorageStatus() {
+        return storageStatus;
+    }
+
+    public void setStorageStatus(String storageStatus) {
+        this.storageStatus = storageStatus;
+    }
+
+    public Integer getStorageId() {
+        return storageId;
+    }
+
+    public void setStorageId(Integer storageId) {
+        this.storageId = storageId;
+    }
+
+    public String getStorageBy() {
+        return storageBy;
+    }
+
+    public void setStorageBy(String storageBy) {
+        this.storageBy = storageBy;
+    }
+
+    public Date getStorageTime() {
+        return storageTime;
+    }
+
+    public void setStorageTime(Date storageTime) {
+        this.storageTime = storageTime;
+    }
+
+    @Override
+    public String toString() {
+        return "SysReturns{" +
+                "returnsId=" + returnsId +
+                ", orderId=" + orderId +
+                ", returnsNum=" + returnsNum +
+                ", orderNum=" + orderNum +
+                ", returnsTime=" + returnsTime +
+                ", clienteleId=" + clienteleId +
+                ", clienteleNum=" + clienteleNum +
+                ", clienteleName=" + clienteleName +
+                ", categoryId=" + categoryId +
+                ", personnelId=" + personnelId +
+                ", personnelName=" + personnelName +
+                ", status=" + status +
+                ", leader=" + leader +
+                ", email=" + email +
+                ", phone=" + phone +
+                ", mobilephone=" + mobilephone +
+                ", address=" + address +
+                ", auditBy=" + auditBy +
+                ", auditTime=" + auditTime +
+                ", remark=" + remark +
+                ", totalPrice=" + totalPrice +
+                ", warehouseId=" + warehouseId +
+                ", warehouseName=" + warehouseName +
+                ", warehouseNum=" + warehouseNum +
+                ", auditStatus=" + auditStatus +
+                ", storageStatus=" + storageStatus +
+                ", storageId=" + storageId +
+                ", storageBy=" + storageBy +
+                ", storageTime=" + storageTime +
+                "}";
     }
 }

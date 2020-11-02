@@ -8,6 +8,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
 
 @Data
 @Accessors(chain = true)
@@ -45,4 +46,10 @@ public class BaseEntity implements Serializable {
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;
 
+
+    /**
+     * 请求参数
+     */
+    @TableField(exist = false)
+    private Map<String, Object> params;
 }

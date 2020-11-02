@@ -128,13 +128,13 @@ public class SysUser extends BaseEntity implements Serializable {
     /**
      * 入职时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date entryTime;
 
     /**
      * 离职时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date resignationTime;
 
     /**

@@ -44,21 +44,21 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUser> impleme
 
 
     @Override
-    public boolean save(SysUser sysUser) {
+    public boolean insert(SysUser sysUser) {
         QueryWrapper<SysUser> queryWrapper = new QueryWrapper<SysUser>().select("user_id")
                 .eq("username", sysUser.getUsername()).or().eq("user_num", sysUser.getUserNum());
-        int count = baseMapper.selectCount(queryWrapper);
+        int count = this.count(queryWrapper);
         if (count > 0)//不允许重复添加
-            throw new ServiceException("编码或登录账号不唯一");
-        if ("admin".equals(sysUser.getUsername())) {
-            throw new ServiceException("登录账号不能为管理员账号");
-        }
+            throw new ServiceException("员工编码已存在");
         if (StringUtils.isEmpty(sysUser.getUsername())) {
             sysUser.setUsername(sysUser.getUserNum());
         } else {
+            if ("admin".equals(sysUser.getUsername())) {
+                throw new ServiceException("登录账号已存在");
+            }
             QueryWrapper<SysUser> qw = new QueryWrapper<SysUser>().select("user_id").eq("username", sysUser.getUsername());
-            SysUser res = baseMapper.selectOne(qw);
-            if (null != res)//不允许编码重复
+            SysUser one = this.getOne(qw);
+            if (null != one)//不允许编码重复
                 throw new ServiceException("登录账号已存在");
         }
         sysUser.setSalt(new SecureRandomNumberGenerator().nextBytes().toHex());//获取盐值
@@ -69,17 +69,17 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUser> impleme
     @Override
     public boolean update(SysUser sysUser) {
         QueryWrapper<SysUser> queryWrapper = new QueryWrapper<SysUser>().select("user_id").eq("username", sysUser.getUsername());
-        SysUser res = baseMapper.selectOne(queryWrapper);
+        SysUser res = this.getOne(queryWrapper);
         if (null != res && !res.getUserId().equals(sysUser.getUserId()))//不允许编码重复
             throw new ServiceException("登录账号不能重复");
         queryWrapper = new QueryWrapper<SysUser>().select("user_id").eq("user_num", sysUser.getUserNum());
-        res = baseMapper.selectOne(queryWrapper);
+        res = this.getOne(queryWrapper);
         if ("admin".equals(sysUser.getUsername())) {
-            throw new ServiceException("不允许修改关键账号");
+            throw new ServiceException("登录账号已存在");
         }
         if (null != res && !res.getUserId().equals(sysUser.getUserId()))//不允许编码重复
             throw new ServiceException("编码不能重复");
-        return baseMapper.updateById(sysUser) > 0;
+        return this.updateById(sysUser);
     }
 
     @Override
@@ -145,8 +145,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUser> impleme
             throw new ServiceException("确认密码不能为空");
         } else if (!StringUtils.equals(newPassword, checkPassword)) {
             throw new ServiceException("两次输入密码不一致!");
-//        } else if (StringUtils.length(newPassword)<6) {
-//            throw new ServiceException("密码长度不能小于6位");
         }
 
         String username = UserSecurityUtils.getUsername();
@@ -174,13 +172,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUser> impleme
         if (CustomConstant.ORDINARY_USER_TYPE.equals(sysUser.getUserType())) {
             userRoleService.remove(new QueryWrapper<SysUserRole>().eq("user_id", sysUser.getUserId()));
         }
-        baseMapper.updateById(sysUser);
+        this.updateById(sysUser);
         return false;
-    }
-
-    @Override
-    public SysUser getUserByUsername(String username) {
-        return baseMapper.getUserByUsername(username);
     }
 
     @Override
@@ -202,8 +195,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUser> impleme
         String newPassword = CodeUtil.randomCode();
         SysUser user = new SysUser().setUserId(userId)
                 .setPassword(new Md5Hash(newPassword, sysUser.getSalt(), CustomConstant.ENCRYPTION_NUM).toString());
-        int row = baseMapper.updateById(user);
-        if (row == 0) {
+        if (!this.updateById(user)) {
             throw new ServiceException("重置失败");
         }
         return newPassword;

@@ -21,7 +21,6 @@
         <result column="units_name" property="unitsName"/>
         <result column="price" property="price"/>
         <result column="number" property="number"/>
-        <result column="total_price" property="totalPrice"/>
         <result column="demand" property="demand"/>
         <result column="shipment_num" property="shipmentNum"/>
         <result column="outbound_num" property="outboundNum"/>
@@ -34,7 +33,7 @@
             create_time,
             update_by,
             update_time,
-        sub_id, shipments_id, materiel_id, materiel_num, materiel_name, specification, model_name, need_torque, out_torque, units_id, units_name, price, number, total_price, demand, shipment_num, outbound_num
+        sub_id, shipments_id, materiel_id, materiel_num, materiel_name, specification, model_name, need_torque, out_torque, units_id, units_name, price, number, demand, shipment_num, outbound_num
     </sql>
 
 </mapper>

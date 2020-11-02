@@ -72,5 +72,32 @@ public class SysOrderController {
         return R.success().data(orderService.audit(order));
     }
 
+    /**
+     * 校验是否可以关闭订单
+     * @param order
+     * @return
+     */
+    @GetMapping("/checkClose")
+    public R checkCloseOrder(SysOrder order) {
+        return R.success().data(orderService.checkCloseOrder(order));
+    }
+
+    @RequiresPermissions(value = "sales:order:edit")
+    @PutMapping("/close")
+    public R closeOrder(@RequestBody SysOrder order) {
+        return R.success().data(orderService.closeOrder(order));
+    }
+
+    /**
+     * 查询可退款订单
+     * @param page
+     * @param order
+     * @return
+     */
+    @GetMapping("/returns")
+    public R findReturnsOrder(Page page, SysOrder order) {
+        return R.success().data(orderService.findReturnsOrder(page,order));
+    }
+
 }
 

@@ -62,8 +62,8 @@ public class LoginController {
         // 唯一标识
         String uuid = IdUtils.simpleUUID();
         String verifyKey = CustomConstant.CAPTCHA_CODE_KEY + uuid;
-        // TODO 存入缓存中
-
+        // TODO<zhuangcy> 验证码存入缓存
+        log.info("验证码:" + verifyCode);
         // 生成图片
         int w = 111, h = 36;
         ByteArrayOutputStream stream = new ByteArrayOutputStream();

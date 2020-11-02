@@ -82,6 +82,34 @@
         order by ss.create_time desc
     </select>
 
+    <select id="outboundPage" resultMap="BaseResultMap">
+        <include refid="shipmentSql"/>
+        <where>
+            <if test="ss.orderNum!=null and ss.orderNum!=''">ss.order_num like
+                concat(concat('%',#{ss.orderNum}),'%')
+            </if>
+            <if test="ss.shipmentsNum!=null and ss.shipmentsNum!=''">or ss.shipments_num like
+                concat(concat('%',#{ss.shipmentsNum}),'%')
+            </if>
+            <if test="ss.clienteleNum!=null and ss.clienteleNum!=''">or ss.clientele_num like
+                concat(concat('%',#{ss.clienteleNum}),'%')
+            </if>
+            <if test="ss.clienteleName!=null and ss.clienteleName!=''">or ss.clientele_name like
+                concat(concat('%',#{ss.clienteleName}),'%')
+            </if>
+            <if test="ss.status!=null and ss.status!=''">
+                and ss.status=#{ss.status}
+            </if>
+            <if test="ss.shipmentsStatus!=null and ss.shipmentsStatus!=''">
+                and ss.shipments_status=#{ss.shipmentsStatus}
+            </if>
+            <if test="ss.outboundStatus!=null and ss.outboundStatus!=''">
+                and ss.outbound_status=#{ss.outboundStatus}
+            </if>
+        </where>
+        order by ss.outbound_status ,ss.create_time desc
+    </select>
+
     <select id="get" resultMap="BaseResultMap">
         select
         ss.shipments_id, ss.order_id,audit_status, ss.shipments_num, ss.order_num, ss.shipments_time, ss.outbound_time, ss.clientele_id, ss.clientele_num, ss.clientele_name, ss.category_id, ss.personnel_id, ss.status, ss.shipments_status, ss.outbound_status, ss.leader, ss.email, ss.phone, ss.mobilephone, ss.address, ss.warehouse_id, ss.warehouse_num, ss.warehouse_name, ss.audit_by, ss.audit_time, ss.remark

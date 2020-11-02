@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -50,6 +51,9 @@ public class SysReceivableServiceImpl extends ServiceImpl<SysReceivableDao, SysR
     public boolean audit(SysReceivable receivable) {
         SysReceivable one = this.getById(receivable.getReceivableId());
         SalesConstant.verifyAuditStatus(receivable.getStatus(), one.getStatus());
+        if (BigDecimalUtil.compareTo(one.getHasVerificaPrice(), BigDecimalUtil.ZERO) > 0) {
+            throw new ServiceException("已核销不允许操作");
+        }
         receivable.setAuditTime(new Date());
         receivable.setAuditBy(UserSecurityUtils.getUsername());
         return this.updateById(receivable);
@@ -59,8 +63,7 @@ public class SysReceivableServiceImpl extends ServiceImpl<SysReceivableDao, SysR
     @Override
     public String saveAndUpdate(Map<String, Object> formMap) throws InvocationTargetException, IllegalAccessException {
         Object clienteleForm = formMap.get("clienteleForm");
-        Object materielList = formMap.get("materielList");
-        if (null == clienteleForm || null == materielList) {
+        if (null == clienteleForm) {
             throw new ServiceException();
         }
         SysReceivable sysReceivable = new SysReceivable();
@@ -85,9 +88,34 @@ public class SysReceivableServiceImpl extends ServiceImpl<SysReceivableDao, SysR
         if (one == null) {
             throw new ServiceException("未找到应收单");
         }
-        if (!SalesConstant.SAVE.equals(one.getStatus()) || !SalesConstant.NO_SUBMIT.equals(one.getStatus())) {
-            throw new ServiceException("请收回再删除");
+        if (BigDecimalUtil.compareTo(one.getHasVerificaPrice(), BigDecimalUtil.ZERO) > 0) {
+            throw new ServiceException("已核销不允许删除");
         }
-        return this.removeById(id);
+        if (!SalesConstant.NO_SUBMIT.equals(one.getStatus()) || !SalesConstant.SAVE.equals(one.getStatus())) {
+            if (!this.removeById(id)) {
+                throw new ServiceException();
+            }
+        } else {
+            throw new ServiceException("请收回在删除");
+        }
+        return true;
+    }
+
+    @Override
+    public BigDecimal findReceivePriceByClienteleId(Integer id) {
+        SysReceivable receivable = new SysReceivable();
+        receivable.setClienteleId(id);
+        receivable.setStatus(SalesConstant.AUDIT);
+        return baseMapper.getReceivePrice(receivable);
+    }
+
+    @Override
+    public List<SysReceivable> getClienteleReceivable(SysReceivable receivable) {
+        return baseMapper.getClienteleReceivable(receivable);
+    }
+
+    @Override
+    public List<SysReceivable> getClienteleReceivableList(SysReceivable receivable) {
+        return baseMapper.getClienteleReceivableList(receivable);
     }
 }

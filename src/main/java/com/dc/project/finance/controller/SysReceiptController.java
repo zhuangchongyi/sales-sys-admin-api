@@ -47,6 +47,7 @@ public class SysReceiptController {
     @PostMapping
     public R add(@RequestBody SysReceipt receipt) {
         receipt.setReceiptNum(CodeUtil.getCode(SalesConstant.FINANCE_RECEIPT_NO));
+        receipt.setStatus(SalesConstant.SAVE);
         if (!receiptService.save(receipt)) {
             throw new SecurityException();
         }
@@ -76,6 +77,26 @@ public class SysReceiptController {
     @PutMapping("/audit")
     public R audit(@RequestBody SysReceipt receipt) {
         return R.success().data(receiptService.audit(receipt));
+    }
+
+    /**
+     * 查询客户已审核的收款单
+     * @param receipt
+     * @return
+     */
+    @GetMapping("/clientele")
+    public R getClienteleReceipt(SysReceipt receipt) {
+        return R.success().data(receiptService.getClienteleReceipt(receipt));
+    }
+
+    /**
+     * 查询订单收款明细
+     * @param receipt
+     * @return
+     */
+    @GetMapping("/clienteleList")
+    public R getClienteleReceiptList(SysReceipt receipt) {
+        return R.success().data(receiptService.getClienteleReceiptList(receipt));
     }
 }
 

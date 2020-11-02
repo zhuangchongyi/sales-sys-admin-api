@@ -48,6 +48,32 @@ public class SysFinanceInit extends BaseEntity {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date financeTime;
 
+    /**
+     * 备注
+     */
+    private String remark;
+
+    /**
+     * 已核销金额
+     */
+    private BigDecimal hasVerificaPrice;
+
+    public BigDecimal getHasVerificaPrice() {
+        return hasVerificaPrice;
+    }
+
+    public void setHasVerificaPrice(BigDecimal hasVerificaPrice) {
+        this.hasVerificaPrice = hasVerificaPrice;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
     public Integer getInitId() {
         return initId;
     }

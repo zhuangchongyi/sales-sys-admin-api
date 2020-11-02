@@ -85,5 +85,10 @@ public class SysClienteleProduct extends BaseEntity {
 
     private String categoryName;
 
-    private Long pkId;
+    /**
+     * 状态
+     */
+    private String status;
+
+
 }

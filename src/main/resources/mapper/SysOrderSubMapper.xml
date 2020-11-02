@@ -26,9 +26,7 @@
         <result column="has_shipment_num" property="hasShipmentNum"/>
         <result column="has_outbound_num" property="hasOutboundNum"/>
         <result column="has_signback_num" property="hasSignbackNum"/>
-        <result column="shipment_num" property="shipmentNum"/>
-        <result column="outbound_num" property="outboundNum"/>
-        <result column="singback_num" property="singbackNum"/>
+        <result column="has_return_num" property="hasReturnNum"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -37,7 +35,21 @@
             create_time,
             update_by,
             update_time,
-        sub_id, order_id, materiel_id, materiel_num, materiel_name, specification, model_name, need_torque, out_torque, units_id, units_name, price, number, total_price, demand, has_shipment_num, has_outbound_num, has_signback_num, shipment_num, outbound_num, singback_num, not_shipment_num, not_signback_num
+        sub_id, order_id, materiel_id, materiel_num, materiel_name, specification, model_name, need_torque, out_torque, units_id, units_name, price, number, total_price, demand, has_shipment_num, has_outbound_num, has_signback_num
     </sql>
+    <select id="getOrderSub" resultType="com.dc.project.sales.entity.SysOrderSub">
+        select
+        sub_id, order_id, materiel_id, materiel_num, materiel_name, specification, model_name, need_torque, out_torque,
+        units_id, units_name, price, number, total_price, demand,
+        (IFNULL(has_shipment_num,0)+ IFNULL(has_outbound_num,0) + IFNULL(has_signback_num,0)) has_shipment_num,
+        IFNULL(has_outbound_num,0) has_outbound_num,
+        IFNULL(has_signback_num,0) has_signback_num, IFNULL(has_return_num,0) has_return_num
+        from sys_order_sub
+        <where>
+            order_id=#{orderId}
+            and (number - IFNULL(has_shipment_num,0)- IFNULL(has_outbound_num,0)- IFNULL(has_signback_num,0)) > 0
+        </where>
+        order by sub_id desc
+    </select>
 
 </mapper>

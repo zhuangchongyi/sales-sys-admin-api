@@ -86,7 +86,7 @@
             </if>
             <if test="mat.categoryId!=null and mat.categoryId!=''">and c.category_id=#{mat.categoryId}</if>
         </where>
-        order by m.materiel_id desc
+        order by m.create_time desc
     </select>
     <select id="findMateriel" resultType="com.dc.common.vo.MaterielVo">
         select

@@ -29,4 +29,10 @@ public interface ISysOrderService extends IService<SysOrder> {
     boolean audit(SysOrder order);
 
     IPage<SysOrder> list(Page page, SysOrder order);
+
+    boolean closeOrder(SysOrder order);
+
+    IPage<SysOrder> findReturnsOrder(Page page, SysOrder order);
+
+    String checkCloseOrder(SysOrder order);
 }

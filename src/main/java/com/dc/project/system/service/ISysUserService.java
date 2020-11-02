@@ -21,6 +21,8 @@ public interface ISysUserService extends IService<SysUser> {
 
     String resetPassword(Integer userId);
 
+    boolean insert(SysUser sysUser);
+
     boolean update(SysUser sysUser);
 
     Map findUserRoleByUserId(Integer userId);
@@ -35,5 +37,4 @@ public interface ISysUserService extends IService<SysUser> {
 
     boolean updateStatus(SysUser sysUser);
 
-    SysUser getUserByUsername(String username);
 }

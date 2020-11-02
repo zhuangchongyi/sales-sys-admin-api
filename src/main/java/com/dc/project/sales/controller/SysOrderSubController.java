@@ -24,18 +24,25 @@ public class SysOrderSubController {
     @GetMapping("/list")
     public R list(SysOrderSub orderSub) {
         QueryWrapper<SysOrderSub> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select(SysOrderSub.class, info -> !info.getColumn().equals("create_time") && !info.getColumn().equals("update_time"));
         queryWrapper.eq(null != orderSub.getOrderId(), "order_id", orderSub.getOrderId());
-        queryWrapper.orderByDesc("create_time");
+        queryWrapper.orderByDesc("sub_id");
+        return R.success().data(orderSubService.list(queryWrapper));
+    }
+
+    @GetMapping("/sign")
+    public R findSignOrderSub(SysOrderSub orderSub) {
+        QueryWrapper<SysOrderSub> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select(SysOrderSub.class, info -> !info.getColumn().equals("create_time") && !info.getColumn().equals("update_time"));
+        queryWrapper.eq(null != orderSub.getOrderId(), "order_id", orderSub.getOrderId());
+        queryWrapper.gt("has_signback_num",0);
+        queryWrapper.orderByDesc("sub_id");
         return R.success().data(orderSubService.list(queryWrapper));
     }
 
     @GetMapping
     public R get(SysOrderSub orderSub) {
-        QueryWrapper<SysOrderSub> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("sub_id,materiel_id, materiel_num, materiel_name, specification, model_name, need_torque, out_torque, units_id, units_name, price, number, total_price, demand, has_shipment_num, has_outbound_num, has_signback_num, shipment_num, outbound_num, singback_num ");
-        queryWrapper.eq(null != orderSub.getOrderId(), "order_id", orderSub.getOrderId());
-        queryWrapper.orderByDesc("create_time");
-        return R.success().data(orderSubService.list(queryWrapper));
+        return R.success().data(orderSubService.getOrderSub(orderSub));
     }
 
     @DeleteMapping("/{subId}")

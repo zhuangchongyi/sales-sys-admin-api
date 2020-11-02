@@ -9,18 +9,20 @@ import com.dc.common.constant.CustomConstant;
 import com.dc.common.constant.SalesConstant;
 import com.dc.common.exception.ServiceException;
 import com.dc.common.utils.*;
+import com.dc.project.finance.service.ISysReceiptService;
+import com.dc.project.finance.service.ISysReceivableService;
 import com.dc.project.sales.dao.SysShipmentsDao;
 import com.dc.project.sales.entity.*;
 import com.dc.project.sales.service.*;
 import com.dc.project.warehouse.entity.SysRepertory;
 import com.dc.project.warehouse.service.ISysRepertoryService;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -29,7 +31,6 @@ import java.util.*;
  * @author zhuangcy
  * @since 2020-09-21
  */
-@Slf4j
 @Service
 public class SysShipmentsServiceImpl extends ServiceImpl<SysShipmentsDao, SysShipments> implements ISysShipmentsService {
     @Autowired
@@ -37,11 +38,18 @@ public class SysShipmentsServiceImpl extends ServiceImpl<SysShipmentsDao, SysShi
     @Autowired
     private ISysRepertoryService repertoryService;
     @Autowired
+    private ISysOrderService orderService;
+    @Autowired
     private ISysOrderSubService orderSubService;
     @Autowired
     private ISysSignbackService signbackService;
     @Autowired
     private ISysSignbackSubService signbackSubService;
+    @Autowired
+    private ISysReceiptService receiptService;
+    @Autowired
+    private ISysReceivableService receivableService;
+
 
     @Override
     public IPage<SysShipments> page(Page page, SysShipments shipments) {
@@ -49,10 +57,16 @@ public class SysShipmentsServiceImpl extends ServiceImpl<SysShipmentsDao, SysShi
     }
 
     @Override
+    public IPage<SysShipments> outboundPage(Page page, SysShipments shipments) {
+        return baseMapper.outboundPage(page, shipments);
+    }
+
+    @Override
     public SysShipments get(Integer shipmentId) {
         return baseMapper.get(shipmentId);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean saveAndUpdate(Map formMap) throws Exception {
         Object clienteleForm = formMap.get("clientele");
@@ -65,70 +79,43 @@ public class SysShipmentsServiceImpl extends ServiceImpl<SysShipmentsDao, SysShi
         BeanUtils.populate(sysShipments, ObjectMapperUtil.toObject(clienteleForm.toString(), Map.class));
         if (null == sysShipments.getShipmentsId()) {
             sysShipments.setShipmentsNum(CodeUtil.getCode(SalesConstant.SALES_SHIPMENTS_NO));
-            if (SalesConstant.AUDIT.equals(sysShipments.getStatus()) ||
-                    SalesConstant.RATIFY.equals(sysShipments.getStatus())) { //已审核订单发货
-                sysShipments.setStatus(SalesConstant.SAVE);
+            if (SalesConstant.AUDIT.equals(sysShipments.getStatus())) { //订单发货
+                sysShipments.setStatus(SalesConstant.SUBMIT);
                 sysShipments.setShipmentsTime(new Date());
                 sysShipments.setRemark(null);
                 sysShipments.setAuditBy(null);
                 sysShipments.setAuditTime(null);
             }
-            boolean save = this.save(sysShipments);
-            if (!save) throw new ServiceException("保存失败");
+            if (!this.save(sysShipments)) throw new ServiceException("保存失败");
         } else {
-            update(sysShipments);
+            if (!this.updateById(sysShipments)) throw new ServiceException("保存失败");
         }
         List<Map<String, Object>> subList = ObjectMapperUtil.toObject(materielListForm.toString(), List.class);
-        ArrayList<SysShipmentsSub> addSubs = new ArrayList<>();
-        ArrayList<SysShipmentsSub> updateSubs = new ArrayList<>();
         for (Map<String, Object> map : subList) {
             SysShipmentsSub sub = new SysShipmentsSub();
             BeanUtils.populate(sub, map);
-            if (null != sub.getShipmentNum() && 0 != sub.getShipmentNum()) {
+            if (null == sub.getOutboundNum() || 0 == sub.getOutboundNum()) {
                 sub.setOutboundNum(sub.getShipmentNum());
-                if (null == sub.getSubId()) {
-                    sub.setShipmentsId(sysShipments.getShipmentsId());
-                    addSubs.add(sub);
-                } else {
-                    updateSubs.add(sub);
-                }
+            }
+            if (null == sub.getSubId()) {
+                sub.setShipmentsId(sysShipments.getShipmentsId());
+                if (!shipmentsSubService.save(sub)) throw new ServiceException();
+            } else {
+                UpdateWrapper<SysShipmentsSub> uw = new UpdateWrapper<>();
+                uw.set(null != sub.getShipmentNum(), "shipment_num", sub.getShipmentNum());
+                uw.set(null != sub.getOutboundNum(), "outbound_num", sub.getOutboundNum());
+                uw.eq("sub_id", sub.getSubId());
+                if (!shipmentsSubService.update(uw)) throw new ServiceException();
             }
         }
-        insertAndUpdateSub(addSubs);
-        insertAndUpdateSub(updateSubs);
         if (null != delSubIdsForm) {
             List<Long> delSubIds = ObjectMapperUtil.toObject(delSubIdsForm.toString(), List.class);
             if (delSubIds.isEmpty()) {
                 return true;
             }
-            shipmentsSubService.removeByIds(delSubIds);
+            if (!shipmentsSubService.removeByIds(delSubIds)) throw new ServiceException();
         }
         return true;
-    }
-
-    private void insertAndUpdateSub(ArrayList<SysShipmentsSub> subs) {
-        if (!subs.isEmpty()) {
-            for (SysShipmentsSub sub : subs) {
-                if (null == sub.getSubId()) {
-                    shipmentsSubService.save(sub);
-                } else {
-                    UpdateWrapper<SysShipmentsSub> uw = new UpdateWrapper<>();
-                    uw.set(null != sub.getShipmentNum(), "shipment_num", sub.getShipmentNum());
-                    uw.set(null != sub.getOutboundNum(), "outbound_num", sub.getOutboundNum());
-                    uw.eq("sub_id", sub.getSubId());
-                    shipmentsSubService.update(uw);
-                }
-            }
-        }
-    }
-
-    private void update(SysShipments sysShipments) {
-        UpdateWrapper<SysShipments> uw = new UpdateWrapper<>();
-        uw.set(null != sysShipments.getShipmentsTime(), "shipments_time", sysShipments.getShipmentsTime());
-        uw.set(null != sysShipments.getOutboundTime(), "outbound_time", sysShipments.getOutboundTime());
-        uw.set(null != sysShipments.getPersonnelId(), "personnel_id", sysShipments.getPersonnelId());
-        uw.eq("shipments_id", sysShipments.getShipmentsId());
-        this.update(uw);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -151,8 +138,7 @@ public class SysShipmentsServiceImpl extends ServiceImpl<SysShipmentsDao, SysShi
             throw new ServiceException("操作失败");
         List<SysShipments> list = this.list(new QueryWrapper<SysShipments>()
                 .select("shipments_id,shipments_num,status").in("shipments_id", Arrays.asList(ids)));
-        if (list.isEmpty())
-            throw new ServiceException("操作失败");
+        if (list.isEmpty()) throw new ServiceException();
         ArrayList<Integer> idList = new ArrayList<>();
         for (SysShipments shipments : list) {
             SalesConstant.verifySubmitStatus(status, shipments.getShipmentsNum(), shipments.getStatus());
@@ -166,71 +152,81 @@ public class SysShipmentsServiceImpl extends ServiceImpl<SysShipmentsDao, SysShi
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean audit(SysShipments shipments) {
-        if (null == shipments.getShipmentsId() || StringUtils.isEmpty(shipments.getStatus()))
+        String checkStatus = shipments.getStatus();// 审核后状态
+        if (null == shipments.getShipmentsId() || StringUtils.isEmpty(checkStatus))
             throw new ServiceException();
-        SysShipments sysShipments = this.getById(shipments.getShipmentsId());
-        if (null == sysShipments) throw new ServiceException();
+        SysShipments one = this.getById(shipments.getShipmentsId());
+        if (null == one) throw new ServiceException("发货单不存在");
+        Integer shipmentsId = one.getShipmentsId();
+        Integer orderId = one.getOrderId();
+        String nowShipmentsStatus = one.getShipmentsStatus();//当前发货状态
+        String nowOutboundStatus = one.getOutboundStatus();//当前出库状态
+        String nowAuditStatus = one.getAuditStatus();//当前出库审核状态
+        String nowStatus = one.getStatus();//当前发货审核状态
+        if (SalesConstant.AUDIT.equals(checkStatus) || SalesConstant.RATIFY.equals(checkStatus)) { //审核时
+            if (SalesConstant.AUDIT.equals(nowStatus)) {
+                throw new ServiceException("已审核");
+            } else if (SalesConstant.RATIFY.equals(nowAuditStatus)) {
+                throw new ServiceException("已特批");
+            }
+            // 表示通知已发货
+            shipments.setShipmentsStatus(CustomConstant.YES_STATUS);
+        } else { // 反审核时
+            if (SalesConstant.AUDIT.equals(nowAuditStatus)) {
+                if (SalesConstant.NO_RATIFY.equals(checkStatus)) {
+                    throw new ServiceException("已出库，取消特批失败");
+                } else if (SalesConstant.NO_AUDIT.equals(checkStatus)) {
+                    throw new ServiceException("已出库，反审核失败");
+                }
+            } else if (SalesConstant.NO_AUDIT.equals(nowStatus)) {
+                throw new ServiceException("已反审核");
+            } else if (SalesConstant.NO_RATIFY.equals(nowStatus)) {
+                throw new ServiceException("已取消特批");
+            }
+            // 表示取消通知发货
+            shipments.setShipmentsStatus(CustomConstant.NO_STATUS);
+        }
+        //回写订单子表
+        this.updateOrderSubs(checkStatus, nowShipmentsStatus, nowOutboundStatus, shipmentsId, orderId);
         shipments.setAuditTime(new Date());
         shipments.setAuditBy(UserSecurityUtils.getUsername());
-        List<SysShipmentsSub> subList = shipmentsSubService.list(new QueryWrapper<SysShipmentsSub>()
-                .eq("shipments_id", shipments.getShipmentsId()));
-        String shipmentsStatus = sysShipments.getShipmentsStatus();//当前发货状态
-        String outboundStatus = sysShipments.getOutboundStatus();//当前出库状态
-        String status = sysShipments.getStatus();//当前发货审批状态
-        String auditStatus = sysShipments.getAuditStatus();//当前出库审批状态
-        if (SalesConstant.AUDIT.equals(shipments.getStatus())) { //审核时
-            if (CustomConstant.NO_STATUS.equals(shipmentsStatus) &&
-                    CustomConstant.NO_STATUS.equals(outboundStatus)) {
-                //未发货未出库时
-                SalesConstant.verifyAuditStatus(shipments.getStatus(), status);
-                shipments.setShipmentsStatus(CustomConstant.YES_STATUS);
-                shipments.setStatus(SalesConstant.AUDIT);
-                //回写订单子表
-                this.updateOrderSubs(SalesConstant.AUDIT, shipmentsStatus, outboundStatus, subList);
-            } else if (CustomConstant.YES_STATUS.equals(shipmentsStatus) &&
-                    CustomConstant.NO_STATUS.equals(outboundStatus)) {
-                // 发货未出库时
-                SalesConstant.verifyAuditStatus(shipments.getAuditStatus(), auditStatus);
-                shipments.setAuditStatus(SalesConstant.AUDIT);
-                shipments.setOutboundStatus(CustomConstant.YES_STATUS);
-                // 扣减相应产品的库存
-                repertoryService.saveAndUpdate(this.transformRepertory(shipments, subList));
-                // 生成签回单
-                this.insertSignback(sysShipments, subList);
-                //回写订单子表
-                this.updateOrderSubs(SalesConstant.AUDIT, shipmentsStatus, outboundStatus, subList);
-            } else {
-                throw new ServiceException("审核失败,未找到校验规则");
-            }
-        } else { // 反审核时
-            if (CustomConstant.YES_STATUS.equals(shipmentsStatus) &&
-                    CustomConstant.YES_STATUS.equals(outboundStatus)) {
-                //发货出库时
-                SalesConstant.verifyAuditStatus(shipments.getAuditStatus(), auditStatus);
-                if (SalesConstant.AUDIT.equals(auditStatus) && SalesConstant.SUBMIT.equals(shipments.getAuditStatus())) {
-                    shipments.setAuditStatus(SalesConstant.NO_AUDIT);
-                    shipments.setOutboundStatus(CustomConstant.NO_STATUS);
-                    // 添加相应产品的库存
-                    repertoryService.saveAndUpdate(this.transformRepertory(shipments, subList));
-                    // 删除签回单
-                    this.deleteSignback(sysShipments.getShipmentsId());
-                    //回写订单子表
-                    this.updateOrderSubs(SalesConstant.NO_AUDIT, shipmentsStatus, outboundStatus, subList);
-                } else {
-                    throw new ServiceException("已出库，反审核不通过");
-                }
-            } else if (CustomConstant.NO_STATUS.equals(outboundStatus) &&
-                    CustomConstant.YES_STATUS.equals(shipmentsStatus)) {
-                // 发货未出库时
-                SalesConstant.verifyAuditStatus(shipments.getStatus(), status);
-                shipments.setStatus(SalesConstant.NO_AUDIT);
-                shipments.setShipmentsStatus(CustomConstant.NO_STATUS);
-                //回写订单子表
-                this.updateOrderSubs(SalesConstant.NO_AUDIT, shipmentsStatus, outboundStatus, subList);
-            } else {
-                throw new ServiceException("反审核失败,未找到校验规则");
-            }
+        return this.updateById(shipments);
+    }
+
+    /**
+     * 出库单审核
+     *
+     * @param shipments
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public boolean auditOutbound(SysShipments shipments) {
+        String checkAuditStatus = shipments.getAuditStatus();
+        if (null == shipments.getShipmentsId() || StringUtils.isEmpty(checkAuditStatus))
+            throw new ServiceException();
+        SysShipments one = this.getById(shipments.getShipmentsId());
+        if (null == one) throw new ServiceException("出库单不存在");
+        if (null == one.getWarehouseId()) throw new ServiceException("未选择出库仓库");
+        Integer shipmentsId = one.getShipmentsId();
+        List<SysShipmentsSub> subList = shipmentsSubService.list(new QueryWrapper<SysShipmentsSub>().eq("shipments_id", shipmentsId));
+        if (SalesConstant.AUDIT.equals(checkAuditStatus)) { //出库审核时
+            SalesConstant.verifyAuditStatus(checkAuditStatus, one.getAuditStatus());
+            // 生成签回单
+            this.insertSignback(one, subList);
+            shipments.setOutboundStatus(CustomConstant.YES_STATUS);
+        } else { // 出库反审核时
+            SalesConstant.verifyAuditStatus(checkAuditStatus, one.getAuditStatus());
+            // 删除签回单
+            this.deleteSignback(shipmentsId);
+            shipments.setOutboundStatus(CustomConstant.NO_STATUS);
         }
+        //回写订单子表
+        this.updateOrderSubs(checkAuditStatus, one.getShipmentsStatus(), one.getOutboundStatus(), shipmentsId, one.getOrderId());
+        // 添加或扣减相应产品的库存
+        repertoryService.saveAndUpdate(this.transformRepertory(shipments, subList));
+        shipments.setAuditTime(new Date());
+        shipments.setAuditBy(UserSecurityUtils.getUsername());
         return this.updateById(shipments);
     }
 
@@ -245,15 +241,26 @@ public class SysShipmentsServiceImpl extends ServiceImpl<SysShipmentsDao, SysShi
         signback.setAuditTime(null);
         signback.setSignbackNum(CodeUtil.getCode(SalesConstant.SALES_SIGNBACK_NO));
         if (signbackService.save(signback)) {
+            BigDecimal zero = BigDecimalUtil.ZERO;
+            int signNum = 0;
             for (SysShipmentsSub sub : subList) {
                 SysSignbackSub signbackSub = new SysSignbackSub();
                 BeanUtil.copyBeanProp(signbackSub, sub);
                 signbackSub.setSubId(null);
                 signbackSub.setSignbackId(signback.getSignbackId());
-                signbackSub.setTotalPrice(BigDecimalUtil.mul(sub.getPrice(), signbackSub.getOutboundNum()));
+                signbackSub.setSignNum(sub.getOutboundNum());
+                signNum += sub.getOutboundNum();
+                BigDecimal totalPrice = BigDecimalUtil.mul(sub.getPrice(), signbackSub.getOutboundNum());
+                zero = BigDecimalUtil.add(zero, totalPrice);
+                signbackSub.setTotalPrice(totalPrice);
                 if (!signbackSubService.save(signbackSub)) {
                     throw new ServiceException("生成签回单失败");
                 }
+            }
+            signback.setSignNum(signNum);
+            signback.setTotalPrice(zero);
+            if (!signbackService.updateById(signback)) {
+                throw new ServiceException("生成签回单失败");
             }
         } else {
             throw new ServiceException("生成签回单失败");
@@ -267,11 +274,11 @@ public class SysShipmentsServiceImpl extends ServiceImpl<SysShipmentsDao, SysShi
         QueryWrapper<SysSignback> wrapper = new QueryWrapper<SysSignback>().eq("shipments_id", shipmentsId);
         SysSignback one = signbackService.getOne(wrapper);
         if (null == one) {
-            log.info(String.format("为找到发货单id的%s签回单", shipmentsId));
+            log.error(String.format("为找到发货单id的%s签回单", shipmentsId));
             return;
         }
         if (SalesConstant.AUDIT.equals(one.getStatus())) {
-            throw new ServiceException(String.format("反审核失败，已有审核的签回单%s", one.getSignbackNum()));
+            throw new ServiceException(String.format("反审核失败，%s签回单已审核", one.getSignbackNum()));
         }
         signbackService.remove(wrapper);
         signbackSubService.remove(new QueryWrapper<SysSignbackSub>().eq("shipments_id", shipmentsId));
@@ -279,38 +286,102 @@ public class SysShipmentsServiceImpl extends ServiceImpl<SysShipmentsDao, SysShi
 
     /**
      * 修改订单子表
+     *
+     * @param checkStatus     审核状态
+     * @param shipmentsStatus 当前发货状态
+     * @param outboundStatus  当前出库状态
+     * @param shipmentsId     发货单id
+     * @param orderId
      */
-    private void updateOrderSubs(String audit, String shipmentsStatus, String outboundStatus, List<SysShipmentsSub> shipmentsSubs) {
+    private void updateOrderSubs(String checkStatus, String shipmentsStatus, String outboundStatus, Integer shipmentsId, Integer orderId) {
+        List<SysShipmentsSub> shipmentsSubs = shipmentsSubService.list(new QueryWrapper<SysShipmentsSub>().eq("shipments_id", shipmentsId));
+        SysOrder order = orderService.getById(orderId);
+        BigDecimal shipmentPrice = BigDecimalUtil.ZERO; //累计发货金额
+        BigDecimal outboundPrice = BigDecimalUtil.ZERO; //累计出库金额
+        SysOrderSub resultSub = new SysOrderSub();// 修改订单子表对象
+        SysOrder sysOrder = new SysOrder();
         for (SysShipmentsSub sub : shipmentsSubs) {
-            SysOrderSub orderSub = orderSubService.getById(sub.getOrderSubId());
-            if (null == orderSub)
-                throw new ServiceException(String.format("审核失败，未找到产品%s %s %s", sub.getMaterielName(), sub.getMaterielName(), sub.getModelName()));
-            SysOrderSub resultSub = new SysOrderSub();
-            resultSub.setSubId(orderSub.getSubId());
-            if (SalesConstant.AUDIT.equals(audit)) {
-                if (CustomConstant.NO_STATUS.equals(shipmentsStatus) &&
-                        CustomConstant.NO_STATUS.equals(outboundStatus)) {// 未发货未出库
-                    resultSub.setHasShipmentNum(orderSub.getHasShipmentNum() + sub.getShipmentNum());
-                    if (resultSub.getHasShipmentNum() > orderSub.getNumber()) {
-                        throw new ServiceException(String.format("审批失败，发货数量之和(%s)大于订购数量(%s)", resultSub.getHasShipmentNum(), orderSub.getNumber()));
+            SysOrderSub one = orderSubService.getById(sub.getOrderSubId());
+            if (null == one) {
+                throw new ServiceException(String.format("操作失败，未找到产品(%s %s %s)", sub.getMaterielName(), sub.getMaterielName(), sub.getModelName()));
+            }
+            String materielNum = one.getMaterielNum();
+            Integer nowHasShipmentNum = one.getHasShipmentNum();// 当前已通知发货数量
+            Integer nowHasOutboundNum = one.getHasOutboundNum();// 当前已出库数量
+            Integer nowHasSignbackNum = one.getHasSignbackNum();// 当前签收的数量
+            //Integer returnNum = one.getHasReturnNum(); // 已退货数
+            Integer number = one.getNumber();//订购数量
+            Integer shipmentNum = sub.getShipmentNum();// 通知发货数量
+            Integer outboundNum = sub.getOutboundNum();// 通知出库数量
+            //发货审核或者发货特批时
+            if (SalesConstant.AUDIT.equals(checkStatus) || SalesConstant.RATIFY.equals(checkStatus)) {
+                if (CustomConstant.NO_STATUS.equals(shipmentsStatus) && CustomConstant.NO_STATUS.equals(outboundStatus)) {// 未发货未出库->发货未出库
+                    if (shipmentNum > number) { // 发货数不能大于订购数
+                        throw new ServiceException(String.format("审核失败，产品%s发货数量(%s)大于订购数量(%s)", materielNum, shipmentNum, number));
                     }
-                } else if (CustomConstant.YES_STATUS.equals(shipmentsStatus) &&
-                        CustomConstant.NO_STATUS.equals(outboundStatus)) {//已发货未出库
-                    resultSub.setHasOutboundNum(orderSub.getHasOutboundNum() + sub.getOutboundNum());
-                    if (resultSub.getHasOutboundNum() > orderSub.getHasShipmentNum()) {
-                        throw new ServiceException(String.format("审批失败，出库数量之和(%s)大于已发货数量(%s)", resultSub.getHasOutboundNum(), orderSub.getHasShipmentNum()));
+                    int num = number - (nowHasShipmentNum + nowHasOutboundNum + nowHasSignbackNum);//最大发货数量
+                    if (shipmentNum > num) {
+                        throw new ServiceException(String.format("审核失败，产品%s发货数量(%s)大于已发货签收数量(%s)", materielNum, shipmentNum, num));
                     }
+                    resultSub.setHasShipmentNum(nowHasShipmentNum + shipmentNum);
+                    shipmentPrice = BigDecimalUtil.add(shipmentPrice, BigDecimalUtil.mul(one.getPrice(), resultSub.getHasShipmentNum()));
+                    sysOrder.setShipmentPrice(shipmentPrice);
+                } else if (CustomConstant.YES_STATUS.equals(shipmentsStatus) && CustomConstant.NO_STATUS.equals(outboundStatus)) {//发货未出库->已发货未出库
+                    if (outboundNum > shipmentNum) { // 出库数量不能大于通知发货数量
+                        throw new ServiceException(String.format("审批失败，产品%s出库数量(%s)大于发货数量(%s)", materielNum, outboundNum, shipmentNum));
+                    }
+                    resultSub.setHasShipmentNum(nowHasShipmentNum - shipmentNum);
+                    resultSub.setHasOutboundNum(nowHasOutboundNum + outboundNum);
+                    outboundPrice = BigDecimalUtil.add(outboundPrice, BigDecimalUtil.mul(one.getPrice(), resultSub.getHasOutboundNum()));
+                    sysOrder.setOutboundPrice(outboundPrice);
+                } else {
+                    throw new ServiceException();
                 }
-            } else {
-                if (CustomConstant.YES_STATUS.equals(shipmentsStatus) &&
-                        CustomConstant.YES_STATUS.equals(outboundStatus)) {//发货已出库
-                    resultSub.setHasOutboundNum(orderSub.getHasOutboundNum() - sub.getOutboundNum());
-                } else if (CustomConstant.NO_STATUS.equals(outboundStatus) &&
-                        CustomConstant.YES_STATUS.equals(shipmentsStatus)) {//未出库已发货
-                    resultSub.setHasShipmentNum(orderSub.getHasShipmentNum() - sub.getShipmentNum());
+            } else { //发货反审核或者取消特批时
+                if (CustomConstant.YES_STATUS.equals(shipmentsStatus) && CustomConstant.YES_STATUS.equals(outboundStatus)) {//已发货已出库->已发货未出库
+                    int hasOutboundNum = nowHasOutboundNum - outboundNum;
+                    if (hasOutboundNum < 0) {
+                        throw new ServiceException(String.format("反审核失败，产品%s出库数量(%s)大于已出库数量(%s)", materielNum, hasOutboundNum, nowHasOutboundNum));
+                    }
+                    resultSub.setHasOutboundNum(hasOutboundNum);
+                    resultSub.setHasShipmentNum(nowHasShipmentNum + shipmentNum);
+                    BigDecimal price = BigDecimalUtil.add(order.getOutboundPrice(), outboundPrice);
+                    if (BigDecimalUtil.compareTo(price, BigDecimalUtil.ZERO) < 0) {
+                        throw new ServiceException("金额校验异常");
+                    }
+                    outboundPrice = BigDecimalUtil.add(outboundPrice, BigDecimalUtil.mul(one.getPrice(), hasOutboundNum));
+                    sysOrder.setOutboundPrice(outboundPrice);
+                } else if (CustomConstant.NO_STATUS.equals(outboundStatus) && CustomConstant.YES_STATUS.equals(shipmentsStatus)) {//已发货未出库->未发货未出库
+                    int hasShipmentNum = nowHasShipmentNum - shipmentNum;
+                    if (hasShipmentNum < 0) {
+                        throw new ServiceException(String.format("反审核失败，产品%s发货数量(%s)大于已发货数量(%s)", materielNum, hasShipmentNum, nowHasShipmentNum));
+                    }
+                    resultSub.setHasShipmentNum(hasShipmentNum);
+                    shipmentPrice = BigDecimalUtil.add(shipmentPrice, BigDecimalUtil.mul(one.getPrice(), hasShipmentNum));
+                    sysOrder.setShipmentPrice(shipmentPrice);
+                } else {
+                    throw new ServiceException();
                 }
             }
-            orderSubService.updateById(resultSub);
+            resultSub.setSubId(one.getSubId());
+            if (!orderSubService.updateById(resultSub)) {
+                throw new ServiceException();
+            }
+        }
+        sysOrder.setOrderId(orderId);
+        if (!orderService.updateById(sysOrder)) {
+            throw new ServiceException();
+        }
+        // 审核时校验收款金额
+        if (SalesConstant.AUDIT.equals(checkStatus) && CustomConstant.NO_STATUS.equals(shipmentsStatus)) {//未发货时审核
+            Integer clienteleId = order.getClienteleId();
+            BigDecimal receiptPrice = receiptService.findReceiptPriceByClienteleId(clienteleId);// 未核销的收款
+            BigDecimal receivePrice = receivableService.findReceivePriceByClienteleId(clienteleId);//未核销的应收款
+            //本次发货金额<=未核销的收款-未核销的应收款
+            BigDecimal sub = BigDecimalUtil.sub(receiptPrice, receivePrice);
+            if (BigDecimalUtil.compareTo(shipmentPrice, sub) > 0) {
+                throw new ServiceException(String.format("审核失败，客户发货累计金额大于累计收款 ", shipmentPrice, receiptPrice));
+            }
         }
     }
 
@@ -329,11 +400,16 @@ public class SysShipmentsServiceImpl extends ServiceImpl<SysShipmentsDao, SysShi
             repertory.setWarehouseName(shipments.getWarehouseName());
             repertory.setWarehouseNum(shipments.getWarehouseNum());
             if (null == repertory.getMaterielId() || null == repertory.getWarehouseId() || StringUtils.isEmpty(repertory.getModelName()))
-                throw new ServiceException("系统异常");
+                throw new ServiceException("产品参数异常");
             SysRepertory one = repertoryService.getSysRepertory(repertory);
             if (null == one) {
-                throw new ServiceException(String.format("该仓库(%s)未找到产品(%s %s)",
-                        shipments.getWarehouseNum(), sub.getMaterielNum(), sub.getModelName()));
+                if (SalesConstant.AUDIT.equals(shipments.getAuditStatus())) {
+                    throw new ServiceException(String.format("该仓库(%s)未找到产品(%s %s)", shipments.getWarehouseNum(), sub.getMaterielNum(), sub.getModelName()));
+                } else {
+                    repertory.setNumber(sub.getOutboundNum());
+                    repertory.setTotalPrice(BigDecimalUtil.mul(sub.getPrice(), sub.getNumber()));
+                    resultList.add(repertory);
+                }
             } else {
                 if (SalesConstant.AUDIT.equals(shipments.getAuditStatus())) {
                     one.setNumber(one.getNumber() - sub.getOutboundNum());

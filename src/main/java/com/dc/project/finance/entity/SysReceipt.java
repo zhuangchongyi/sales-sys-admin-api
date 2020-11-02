@@ -104,16 +104,6 @@ public class SysReceipt extends BaseEntity {
     private String deptNum;
 
     /**
-     * 核销状态
-     */
-    private String verificaStatus;
-
-    /**
-     * 可核销金额
-     */
-    private BigDecimal verificaPrice;
-
-    /**
      * 已核销金额
      */
     private BigDecimal hasVerificaPrice;
@@ -148,6 +138,14 @@ public class SysReceipt extends BaseEntity {
 
     public void setReceiptNum(String receiptNum) {
         this.receiptNum = receiptNum;
+    }
+
+    public Date getReceiptTime() {
+        return receiptTime;
+    }
+
+    public void setReceiptTime(Date receiptTime) {
+        this.receiptTime = receiptTime;
     }
 
     public BigDecimal getReceiptPrice() {
@@ -254,20 +252,12 @@ public class SysReceipt extends BaseEntity {
         this.deptName = deptName;
     }
 
-    public String getVerificaStatus() {
-        return verificaStatus;
+    public String getDeptNum() {
+        return deptNum;
     }
 
-    public void setVerificaStatus(String verificaStatus) {
-        this.verificaStatus = verificaStatus;
-    }
-
-    public BigDecimal getVerificaPrice() {
-        return verificaPrice;
-    }
-
-    public void setVerificaPrice(BigDecimal verificaPrice) {
-        this.verificaPrice = verificaPrice;
+    public void setDeptNum(String deptNum) {
+        this.deptNum = deptNum;
     }
 
     public BigDecimal getHasVerificaPrice() {
@@ -286,35 +276,19 @@ public class SysReceipt extends BaseEntity {
         this.auditBy = auditBy;
     }
 
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark;
-    }
-
-    public Date getReceiptTime() {
-        return receiptTime;
-    }
-
-    public void setReceiptTime(Date receiptTime) {
-        this.receiptTime = receiptTime;
-    }
-
-    public String getDeptNum() {
-        return deptNum;
-    }
-
-    public void setDeptNum(String deptNum) {
-        this.deptNum = deptNum;
-    }
-
     public Date getAuditTime() {
         return auditTime;
     }
 
     public void setAuditTime(Date auditTime) {
         this.auditTime = auditTime;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 }

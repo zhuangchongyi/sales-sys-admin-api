@@ -9,6 +9,7 @@
         <result column="create_time" property="createTime"/>
         <result column="update_by" property="updateBy"/>
         <result column="update_time" property="updateTime"/>
+        <result column="create_id" property="createId"/>
         <result column="returns_id" property="returnsId"/>
         <result column="materiel_id" property="materielId"/>
         <result column="materiel_num" property="materielNum"/>
@@ -21,11 +22,13 @@
         <result column="units_name" property="unitsName"/>
         <result column="price" property="price"/>
         <result column="number" property="number"/>
-        <result column="total_price" property="totalPrice"/>
         <result column="demand" property="demand"/>
-        <result column="shipment_num" property="shipmentNum"/>
+        <result column="has_shipment_num" property="hasShipmentNum"/>
+        <result column="has_signback_num" property="hasSignbackNum"/>
+        <result column="has_returns_num" property="hasReturnsNum"/>
+        <result column="total_price" property="totalPrice"/>
+        <result column="reality_num" property="realityNum"/>
         <result column="returns_num" property="returnsNum"/>
-        <result column="outbound_num" property="outboundNum"/>
         <result column="order_sub_id" property="orderSubId"/>
     </resultMap>
 
@@ -35,7 +38,8 @@
             create_time,
             update_by,
             update_time,
-        sub_id, returns_id, materiel_id, materiel_num, materiel_name, specification, model_name, need_torque, out_torque, units_id, units_name, price, number, total_price, demand, shipment_num, returns_num, outbound_num, order_sub_id
+            create_id,
+        sub_id, returns_id, materiel_id, materiel_num, materiel_name, specification, model_name, need_torque, out_torque, units_id, units_name, price, number, demand, has_shipment_num, has_signback_num, has_returns_num, total_price, reality_num, returns_num, order_sub_id
     </sql>
 
 </mapper>

@@ -31,7 +31,7 @@ public class SysStorageController {
     @GetMapping
     public R page(Page page, SysStorage sysStorage) {
         QueryWrapper<SysStorage> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("inout_type",sysStorage.getInoutType());
+        queryWrapper.eq("inout_type", sysStorage.getInoutType());
         queryWrapper.like(StringUtils.isNotEmpty(sysStorage.getWarehouseNum()), "warehouse_num", sysStorage.getWarehouseNum())
                 .or().like(StringUtils.isNotEmpty(sysStorage.getWarehouseNum()), "warehouse_name", sysStorage.getWarehouseName())
                 .orderByDesc("create_time");

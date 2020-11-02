@@ -161,6 +161,39 @@ public class SysOrder extends BaseEntity {
     @TableField(exist = false)
     private Integer deptId;
 
+    /**
+     * 累计发货金额
+     */
+    private BigDecimal shipmentPrice;
+    /**
+     * 累计出库金额
+     */
+    private BigDecimal outboundPrice;
+    /**
+     * 累计签收金额（累计应收款金额）
+     */
+    private BigDecimal signbackPrice;
+    /**
+     * 累计收款金额
+     */
+    private BigDecimal receiptPrice;
+
+    public void setShipmentPrice(BigDecimal shipmentPrice) {
+        this.shipmentPrice = shipmentPrice;
+    }
+
+    public void setOutboundPrice(BigDecimal outboundPrice) {
+        this.outboundPrice = outboundPrice;
+    }
+
+    public void setSignbackPrice(BigDecimal signbackPrice) {
+        this.signbackPrice = signbackPrice;
+    }
+
+    public void setReceiptPrice(BigDecimal receiptPrice) {
+        this.receiptPrice = receiptPrice;
+    }
+
     public void setTotalPrice(BigDecimal totalPrice) {
         this.totalPrice = totalPrice;
     }

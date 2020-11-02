@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dc.common.constant.SalesConstant;
 import com.dc.common.exception.ServiceException;
+import com.dc.common.utils.BigDecimalUtil;
 import com.dc.common.utils.UserSecurityUtils;
 import com.dc.project.finance.dao.SysReceiptDao;
 import com.dc.project.finance.entity.SysReceipt;
@@ -13,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -49,6 +51,12 @@ public class SysReceiptServiceImpl extends ServiceImpl<SysReceiptDao, SysReceipt
     @Override
     public boolean audit(SysReceipt receipt) {
         SysReceipt one = this.getById(receipt.getReceiptId());
+        if (SalesConstant.NO_AUDIT.equals(receipt.getStatus()) && BigDecimalUtil.compareTo(one.getHasVerificaPrice(), BigDecimalUtil.ZERO) > 0) {
+            throw new ServiceException("已核销，无法反审核");
+        }
+        if (BigDecimalUtil.compareTo(one.getHasVerificaPrice(), BigDecimalUtil.ZERO) > 0) {
+            throw new ServiceException("已核销不允许操作");
+        }
         SalesConstant.verifyAuditStatus(receipt.getStatus(), one.getStatus());
         receipt.setAuditTime(new Date());
         receipt.setAuditBy(UserSecurityUtils.getUsername());
@@ -57,11 +65,14 @@ public class SysReceiptServiceImpl extends ServiceImpl<SysReceiptDao, SysReceipt
 
     @Override
     public boolean delete(Integer id) {
-        SysReceipt receipt = this.getById(id);
-        if (receipt == null) {
+        SysReceipt one = this.getById(id);
+        if (one == null) {
             throw new ServiceException("未找到收款单");
         }
-        if (SalesConstant.SAVE.equals(receipt.getStatus()) || SalesConstant.NO_SUBMIT.equals(receipt.getStatus())) {
+        if (BigDecimalUtil.compareTo(one.getHasVerificaPrice(), BigDecimalUtil.ZERO) > 0) {
+            throw new ServiceException("已核销不允许删除");
+        }
+        if (!SalesConstant.NO_SUBMIT.equals(one.getStatus()) || !SalesConstant.SAVE.equals(one.getStatus())) {
             if (!this.removeById(id)) {
                 throw new ServiceException();
             }
@@ -69,5 +80,22 @@ public class SysReceiptServiceImpl extends ServiceImpl<SysReceiptDao, SysReceipt
             throw new ServiceException("请收回在删除");
         }
         return true;
+    }
+
+    @Override
+    public BigDecimal findReceiptPriceByClienteleId(Integer clienteleId) {
+        SysReceipt receipt = new SysReceipt();
+        receipt.setClienteleId(clienteleId);
+        receipt.setStatus(SalesConstant.AUDIT);
+        return baseMapper.getReceiptPrice(receipt);
+    }
+
+    @Override
+    public List<SysReceipt> getClienteleReceipt(SysReceipt receipt) {
+        return baseMapper.getClienteleReceipt(receipt);
+    }
+    @Override
+    public List<SysReceipt> getClienteleReceiptList(SysReceipt receipt) {
+        return baseMapper.getClienteleReceiptList(receipt);
     }
 }

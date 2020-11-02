@@ -6,6 +6,7 @@ import com.dc.common.vo.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -149,6 +150,19 @@ public class SysSignback extends BaseEntity {
      * 签收状态
      */
     private String signbackStatus;
+
+    /**
+     * 累计金额
+     */
+    private BigDecimal totalPrice;
+
+    public BigDecimal getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
+    }
 
     public String getSignbackStatus() {
         return signbackStatus;

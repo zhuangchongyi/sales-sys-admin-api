@@ -23,7 +23,7 @@
         <result column="number" property="number"/>
         <result column="total_price" property="totalPrice"/>
         <result column="demand" property="demand"/>
-        <result column="signback_num" property="signbackNum"/>
+        <result column="sign_num" property="signNum"/>
         <result column="shipment_num" property="shipmentNum"/>
         <result column="outbound_num" property="outboundNum"/>
         <result column="order_sub_id" property="orderSubId"/>

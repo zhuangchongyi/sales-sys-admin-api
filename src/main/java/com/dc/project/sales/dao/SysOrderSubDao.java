@@ -3,6 +3,8 @@ package com.dc.project.sales.dao;
 import com.dc.project.sales.entity.SysOrderSub;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
+import java.util.List;
+
 /**
  * 销售订单子表 Mapper 接口
  *
@@ -11,4 +13,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface SysOrderSubDao extends BaseMapper<SysOrderSub> {
 
+    List<SysOrderSub> getOrderSub(SysOrderSub orderSub);
 }

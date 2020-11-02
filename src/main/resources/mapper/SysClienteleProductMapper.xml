@@ -34,7 +34,7 @@
     <select id="listMateriel" resultMap="BaseResultMap">
         select
         m.materiel_id, m.materiel_num, m.materiel_name, m.specification, m.need_torque, m.out_torque, m.price,
-        u.units_id,u.units_name,c.category_id,c.category_name, mm.model_name, mm.pk_id
+        u.units_id,u.units_name,c.category_id,c.category_name, mm.model_name
         from sys_materiel m
         left join sys_units u on u.units_id=m.units_id
         left join sys_materiel_model mm on mm.m_id=m.materiel_id

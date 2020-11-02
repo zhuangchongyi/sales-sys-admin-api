@@ -42,7 +42,7 @@ public class LoginServiceImpl implements ILoginService {
 
     @Override
     public SysUser getUserByUsername(String username) {
-        return userService.getUserByUsername(username);
+        return userService.findByUsername(username);
     }
 
     @Override

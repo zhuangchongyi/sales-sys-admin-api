@@ -26,6 +26,9 @@ public class SysShipmentsSub extends BaseEntity {
     @TableId(value = "sub_id", type = IdType.AUTO)
     private Long subId;
 
+    /**
+     * 订单子表id
+     */
     private Long orderSubId;
 
     /**
@@ -89,23 +92,19 @@ public class SysShipmentsSub extends BaseEntity {
     private Integer number;
 
     /**
-     * 金额
-     */
-    private BigDecimal totalPrice;
-
-    /**
      * 技术要求
      */
     private String demand;
 
     /**
-     * 本次发货数量
-     */
-    private Integer shipmentNum;
-    /**
      * 已发货数量
      */
     private Integer hasShipmentNum;
+
+    /**
+     * 本次发货数量
+     */
+    private Integer shipmentNum;
 
     /**
      * 本次出库数量
@@ -166,10 +165,6 @@ public class SysShipmentsSub extends BaseEntity {
 
     public void setNumber(Integer number) {
         this.number = number;
-    }
-
-    public void setTotalPrice(BigDecimal totalPrice) {
-        this.totalPrice = totalPrice;
     }
 
     public void setDemand(String demand) {
