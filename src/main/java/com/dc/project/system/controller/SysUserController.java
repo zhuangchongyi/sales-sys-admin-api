@@ -3,6 +3,7 @@ package com.dc.project.system.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.dc.common.lang.annotation.RepeatSubmit;
 import com.dc.common.vo.R;
 import com.dc.project.system.entity.SysUser;
 import com.dc.project.system.service.ISysUserService;
@@ -28,10 +29,16 @@ public class SysUserController {
 
     @RequiresPermissions(value = {"system:user:list", "system:dept:user", "basis:personnel:list"}, logical = Logical.OR)
     @GetMapping
+    public R page(Page<SysUser> page, SysUser user) {
+        return R.success().data(userService.list(page, user));
+    }
+
+    @GetMapping("/list")
     public R list(Page<SysUser> page, SysUser user) {
         return R.success().data(userService.list(page, user));
     }
 
+    @RepeatSubmit
     @RequiresPermissions("basis:personnel:add")
     @PostMapping
     public R save(@RequestBody @Validated SysUser sysUser) {
@@ -41,16 +48,20 @@ public class SysUserController {
     @GetMapping("/{userId}")
     public R get(@PathVariable(value = "userId", required = false) Integer userId) {
         QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("user_id, username, password, user_num, nickname, gender, phone, email, qq, identity_no, birthday, now_address, home_address, avatar,dept_id, job_status, user_type, start_status, entry_time, resignation_time").eq("user_id", userId);
+        queryWrapper.select(SysUser.class,
+                info -> !info.getColumn().equals("create_time") && !info.getColumn().equals("create_by"))
+                .eq("user_id", userId);
         return R.success().data(userService.getOne(queryWrapper));
     }
 
+    @RepeatSubmit
     @RequiresPermissions(value = {"basis:personnel:edit"})
     @PutMapping
     public R update(@RequestBody @Validated SysUser sysUser) {
         return R.success().data(userService.update(sysUser));
     }
 
+    @RepeatSubmit
     @RequiresPermissions(value = {"basis:personnel:delete"})
     @DeleteMapping("/{userId}")
     public R delete(@PathVariable(value = "userId", required = false) Integer userId) {
@@ -63,6 +74,7 @@ public class SysUserController {
      * @param sysUser
      * @return
      */
+    @RepeatSubmit
     @RequiresPermissions(value = {"system:user:delete", "system:user:edit"}, logical = Logical.OR)
     @PutMapping("/status")
     public R status(@RequestBody SysUser sysUser) {
@@ -75,6 +87,7 @@ public class SysUserController {
      * @param userId
      * @return
      */
+    @RepeatSubmit
     @RequiresPermissions("system:user:reset")
     @PutMapping("/resetPassword")
     public R resetPassword(@RequestBody Integer userId) {
@@ -108,6 +121,7 @@ public class SysUserController {
      * @param sysUser
      * @return
      */
+    @RepeatSubmit
     @RequiresPermissions("system:user:role")
     @PostMapping("/addUserRole")
     public R addUserRole(@RequestBody SysUser sysUser) {
@@ -119,6 +133,7 @@ public class SysUserController {
      *
      * @return
      */
+    @RepeatSubmit
     @PutMapping("/changePassword")
     public R changePassword(@RequestBody Map<String, Object> formMap) {
         return R.success().data(userService.changePassword(formMap));

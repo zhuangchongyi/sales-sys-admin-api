@@ -1,6 +1,7 @@
 package com.dc.common.utils;
 
 
+import com.dc.common.constant.CustomConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
@@ -19,10 +20,6 @@ import java.util.List;
  */
 @Slf4j
 public class FTPUtil {
-    private static String host = "127.0.0.1";
-    private static String username = "admin";
-    private static String password = "admin";
-    private static int port = 21;
 
     /**
      * 登陆FTP并获取FTPClient对象
@@ -40,7 +37,7 @@ public class FTPUtil {
             ftpClient.setConnectTimeout(1000 * 30);//设置连接超时时间
             ftpClient.connect(host, port);// 连接FTP服务器
             ftpClient.login(userName, password);// 登陆FTP服务器
-            ftpClient.setControlEncoding("UTF-8");// 中文支持
+            ftpClient.setControlEncoding(CustomConstant.UTF8);// 中文支持
             // 设置文件类型为二进制（如果从FTP下载或上传的文件是压缩文件的时候，不进行该设置可能会导致获取的压缩文件解压失败）
             ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
             ftpClient.enterLocalPassiveMode();//开启被动模式，否则文件上传不成功，也不报错

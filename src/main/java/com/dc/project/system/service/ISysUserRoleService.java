@@ -18,4 +18,5 @@ public interface ISysUserRoleService extends IService<SysUserRole> {
     Page<SysUser> roleUserListPage(Page<SysUser> page, Integer roleId);
 
     List<Integer> userRoleList(Integer userId);
+
 }

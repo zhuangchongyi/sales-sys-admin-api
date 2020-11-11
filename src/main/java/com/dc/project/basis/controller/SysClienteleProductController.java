@@ -3,6 +3,7 @@ package com.dc.project.basis.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.dc.common.lang.annotation.RepeatSubmit;
 import com.dc.common.vo.R;
 import com.dc.project.basis.entity.SysClienteleProduct;
 import com.dc.project.basis.service.ISysClienteleProductService;
@@ -37,27 +38,41 @@ public class SysClienteleProductController {
         return R.success().data(clienteleProductService.page(page, queryWrapper));
     }
 
+    @GetMapping("/list")
+    public R list(Page<SysClienteleProduct> page, SysClienteleProduct product) {
+        QueryWrapper<SysClienteleProduct> queryWrapper = new QueryWrapper<SysClienteleProduct>()
+                .eq("clientele_id", product.getClienteleId())
+                .eq(null != product.getCategoryId(), "category_id", product.getCategoryId())
+                .like(StringUtils.isNotEmpty(product.getMaterielNum()), "materiel_num", product.getMaterielNum())
+                .or().like(StringUtils.isNotEmpty(product.getMaterielName()), "materiel_name", product.getMaterielName())
+                .orderByDesc("create_time");
+        return R.success().data(clienteleProductService.page(page, queryWrapper));
+    }
+
     @GetMapping("/{id}")
     public R get(@PathVariable Long id) {
         QueryWrapper<SysClienteleProduct> queryWrapper = new QueryWrapper<>();
         queryWrapper.select(SysClienteleProduct.class,
                 info -> !info.getColumn().equals("create_time") && !info.getColumn().equals("update_time"))
                 .eq("product_id", id);
-        return R.success().data(clienteleProductService.getOne(queryWrapper));
+        return R.success().data(clienteleProductService.getOne(queryWrapper, false));
     }
 
+    @RepeatSubmit
     @RequiresPermissions("basis:clienteleProduct:delete")
     @DeleteMapping("/{id}")
     public R delete(@PathVariable Long id) {
         return R.success().data(clienteleProductService.removeById(id));
     }
 
+    @RepeatSubmit
     @RequiresPermissions("basis:clienteleProduct:add")
     @PostMapping
     public R add(@RequestBody List<SysClienteleProduct> products) {
         return R.success().data(clienteleProductService.insert(products));
     }
 
+    @RepeatSubmit
     @RequiresPermissions("basis:clienteleProduct:edit")
     @PutMapping
     public R update(@RequestBody SysClienteleProduct product) {

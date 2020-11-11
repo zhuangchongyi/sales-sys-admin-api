@@ -2,6 +2,7 @@ package com.dc.project.sales.controller;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.dc.common.lang.annotation.RepeatSubmit;
 import com.dc.common.vo.R;
 import com.dc.project.sales.entity.SysReturns;
 import com.dc.project.sales.service.ISysReturnsService;
@@ -36,42 +37,50 @@ public class SysReturnsController {
         return R.success().data(returnsService.get(id));
     }
 
+    @RepeatSubmit
     @RequiresPermissions(value = {"sales:returns:delete"})
     @DeleteMapping("/{id}")
     public R delete(@PathVariable Integer id) {
         return R.success().data(returnsService.delete(id));
     }
 
+    @RepeatSubmit
     @RequiresPermissions(value = {"sales:returns:add"})
     @PostMapping
     public R add(@RequestBody Map<String, Object> formMap) throws InvocationTargetException, IllegalAccessException {
         return R.success().data(returnsService.saveAndUpdate(formMap));
     }
 
+    @RepeatSubmit
     @RequiresPermissions(value = {"sales:returns:edit"})
     @PutMapping
     public R edit(@RequestBody Map<String, Object> formMap) throws InvocationTargetException, IllegalAccessException {
         return R.success().data(returnsService.saveAndUpdate(formMap));
     }
 
+    @RepeatSubmit
     @RequiresPermissions(value = {"sales:returns:audit"})
     @PutMapping("/audit")
     public R audit(@RequestBody SysReturns sysReturns) {
         return R.success().data(returnsService.audit(sysReturns));
     }
 
+    @RepeatSubmit
     @RequiresPermissions(value = {"sales:returns:submit"})
     @PutMapping("/submit/{status}")
     public R submit(@RequestBody Integer[] ids, @PathVariable String status) {
         return R.success().data(returnsService.submit(ids, status));
     }
 
+    /**************仓库退货入库*****************/
+    @RepeatSubmit
     @RequiresPermissions(value = {"warehouse:returns:audit"})
     @PutMapping("/auditStorage")
     public R auditStorage(@RequestBody SysReturns sysReturns) {
         return R.success().data(returnsService.auditStorage(sysReturns));
     }
 
+    @RepeatSubmit
     @RequiresPermissions(value = {"warehouse:returns:submit"})
     @PutMapping("/submitStorage/{status}")
     public R submitStorage(@RequestBody Integer[] ids, @PathVariable String status) {

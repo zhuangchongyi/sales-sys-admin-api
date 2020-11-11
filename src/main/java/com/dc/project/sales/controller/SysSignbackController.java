@@ -2,6 +2,7 @@ package com.dc.project.sales.controller;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.dc.common.lang.annotation.RepeatSubmit;
 import com.dc.common.vo.R;
 import com.dc.project.sales.entity.SysSignback;
 import com.dc.project.sales.service.ISysSignbackService;
@@ -36,12 +37,14 @@ public class SysSignbackController {
         return R.success().data(signbackService.get(id));
     }
 
+    @RepeatSubmit
     @RequiresPermissions(value = {"sales:signback:edit"})
     @PutMapping
     public R edit(@RequestBody Map<String, Object> formMap) throws InvocationTargetException, IllegalAccessException {
         return R.success().data(signbackService.edit(formMap));
     }
 
+    @RepeatSubmit
     @RequiresPermissions(value = {"sales:signback:audit"})
     @PutMapping("/audit")
     public R audit(@RequestBody SysSignback sysSignback) {

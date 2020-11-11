@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dc.common.constant.SalesConstant;
 import com.dc.common.exception.ServiceException;
 import com.dc.common.utils.BigDecimalUtil;
-import com.dc.common.utils.UserSecurityUtils;
+import com.dc.common.utils.UserSecurityUtil;
 import com.dc.project.finance.dao.SysReceiptDao;
 import com.dc.project.finance.entity.SysReceipt;
 import com.dc.project.finance.service.ISysReceiptService;
@@ -59,7 +59,7 @@ public class SysReceiptServiceImpl extends ServiceImpl<SysReceiptDao, SysReceipt
         }
         SalesConstant.verifyAuditStatus(receipt.getStatus(), one.getStatus());
         receipt.setAuditTime(new Date());
-        receipt.setAuditBy(UserSecurityUtils.getUsername());
+        receipt.setAuditBy(UserSecurityUtil.getUsername());
         return this.updateById(receipt);
     }
 
@@ -94,6 +94,7 @@ public class SysReceiptServiceImpl extends ServiceImpl<SysReceiptDao, SysReceipt
     public List<SysReceipt> getClienteleReceipt(SysReceipt receipt) {
         return baseMapper.getClienteleReceipt(receipt);
     }
+
     @Override
     public List<SysReceipt> getClienteleReceiptList(SysReceipt receipt) {
         return baseMapper.getClienteleReceiptList(receipt);

@@ -87,6 +87,8 @@ public class SysMenu extends BaseEntity implements Serializable {
      * 子菜单
      */
     @TableField(exist = false)
-    private List<SysMenu> children = new ArrayList<SysMenu>();
+    private List<SysMenu> children = new ArrayList<>();
+
+    private String remark;
 
 }

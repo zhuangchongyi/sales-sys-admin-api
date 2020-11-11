@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.dc.common.lang.annotation.DataScope;
 import com.dc.common.constant.SalesConstant;
 import com.dc.common.exception.ServiceException;
 import com.dc.common.utils.*;
@@ -48,6 +49,7 @@ public class SysQuotationServiceImpl extends ServiceImpl<SysQuotationDao, SysQuo
     @Autowired
     private ISysMaterielService materielService;
 
+    @DataScope(userAlias = "sq", userColumn = "create_id")
     @Override
     public IPage<SysQuotation> page(Page page, SysQuotation quotation) {
         return baseMapper.page(page, quotation);
@@ -189,7 +191,7 @@ public class SysQuotationServiceImpl extends ServiceImpl<SysQuotationDao, SysQuo
         SysQuotation sysQuotation = this.getOne(new QueryWrapper<SysQuotation>().select("quotation_id,status").eq("quotation_id", quotation.getQuotationId()));
         SalesConstant.verifyAuditStatus(quotation.getStatus(), sysQuotation.getStatus());
         quotation.setAuditTime(new Date());
-        quotation.setAuditBy(UserSecurityUtils.getUsername());
+        quotation.setAuditBy(UserSecurityUtil.getUsername());
         return this.updateById(quotation);
     }
 

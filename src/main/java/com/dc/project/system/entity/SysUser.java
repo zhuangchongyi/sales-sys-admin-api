@@ -161,6 +161,11 @@ public class SysUser extends BaseEntity implements Serializable {
     private String delFlag;
 
     /**
+     * 备注
+     */
+    private String remark;
+
+    /**
      * 角色组
      */
     @TableField(exist = false)

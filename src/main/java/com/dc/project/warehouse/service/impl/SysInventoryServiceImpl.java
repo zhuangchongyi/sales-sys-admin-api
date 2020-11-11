@@ -2,13 +2,16 @@ package com.dc.project.warehouse.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dc.common.constant.SalesConstant;
 import com.dc.common.exception.ServiceException;
+import com.dc.common.lang.annotation.DataScope;
 import com.dc.common.utils.BeanUtil;
 import com.dc.common.utils.BigDecimalUtil;
 import com.dc.common.utils.ObjectMapperUtil;
-import com.dc.common.utils.UserSecurityUtils;
+import com.dc.common.utils.UserSecurityUtil;
 import com.dc.project.warehouse.dao.SysInventoryDao;
 import com.dc.project.warehouse.entity.*;
 import com.dc.project.warehouse.service.*;
@@ -36,6 +39,16 @@ public class SysInventoryServiceImpl extends ServiceImpl<SysInventoryDao, SysInv
     private ISysAdjustmentService adjustmentService;
     @Autowired
     private ISysAdjustmentSubService adjustmentSubService;
+
+    @DataScope(userColumn = "create_id")
+    @Override
+    public IPage<SysInventory> page(Page<SysInventory> page, SysInventory inventory) {
+        QueryWrapper<SysInventory> queryWrapper = new QueryWrapper<>();
+        queryWrapper.like(StringUtils.isNotEmpty(inventory.getWarehouseName()), "warehouse_name", inventory.getWarehouseName())
+                .or().like(StringUtils.isNotEmpty(inventory.getWarehouseNum()), "warehouse_num", inventory.getWarehouseNum())
+                .orderByDesc("create_time");
+        return this.page(page, queryWrapper);
+    }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -154,7 +167,7 @@ public class SysInventoryServiceImpl extends ServiceImpl<SysInventoryDao, SysInv
         if (null == one)
             throw new ServiceException();
         SalesConstant.verifyAuditStatus(one.getStatus(), inventory.getStatus());
-        inventory.setAuditBy(UserSecurityUtils.getUsername());
+        inventory.setAuditBy(UserSecurityUtil.getUsername());
         inventory.setAuditTime(new Date());
         QueryWrapper<SysInventorySub> qw = new QueryWrapper<>();
         qw.eq("inventory_id", inventory.getInventoryId());

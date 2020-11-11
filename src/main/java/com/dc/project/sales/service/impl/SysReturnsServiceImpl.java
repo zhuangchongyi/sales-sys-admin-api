@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.dc.common.lang.annotation.DataScope;
 import com.dc.common.constant.CustomConstant;
 import com.dc.common.constant.SalesConstant;
 import com.dc.common.exception.ServiceException;
@@ -46,6 +47,7 @@ public class SysReturnsServiceImpl extends ServiceImpl<SysReturnsDao, SysReturns
     @Autowired
     private ISysReceivableService receivableService;
 
+    @DataScope(userAlias = "sr", userColumn = "create_id")
     @Override
     public IPage<SysReturns> page(Page<SysReturns> page, SysReturns sysReturns) {
         return baseMapper.page(page, sysReturns);
@@ -159,7 +161,7 @@ public class SysReturnsServiceImpl extends ServiceImpl<SysReturnsDao, SysReturns
         }
         updateOrderSub(sysReturns);
         sysReturns.setAuditTime(new Date());
-        sysReturns.setAuditBy(UserSecurityUtils.getUsername());
+        sysReturns.setAuditBy(UserSecurityUtil.getUsername());
         if (!this.updateById(sysReturns)) {
             throw new ServiceException();
         }
@@ -243,7 +245,7 @@ public class SysReturnsServiceImpl extends ServiceImpl<SysReturnsDao, SysReturns
         SysReturns returns = this.getById(sysReturns.getReturnsId());
         SalesConstant.verifyAuditStatus(sysReturns.getAuditStatus(), returns.getAuditStatus());
         sysReturns.setAuditTime(new Date());
-        sysReturns.setAuditBy(UserSecurityUtils.getUsername());
+        sysReturns.setAuditBy(UserSecurityUtil.getUsername());
         List<SysReturnsSub> subList = returnsSubService.list(new QueryWrapper<SysReturnsSub>().eq("returns_id", sysReturns.getReturnsId()));
         if (SalesConstant.AUDIT.equals(sysReturns.getAuditStatus())) {
             sysReturns.setStorageStatus(CustomConstant.YES_STATUS);

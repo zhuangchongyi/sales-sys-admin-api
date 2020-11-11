@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.dc.common.lang.annotation.DataScope;
 import com.dc.common.constant.CustomConstant;
 import com.dc.common.constant.SalesConstant;
 import com.dc.common.exception.ServiceException;
@@ -51,6 +52,7 @@ public class SysShipmentsServiceImpl extends ServiceImpl<SysShipmentsDao, SysShi
     private ISysReceivableService receivableService;
 
 
+    @DataScope(userAlias = "ss", userColumn = "create_id")
     @Override
     public IPage<SysShipments> page(Page page, SysShipments shipments) {
         return baseMapper.page(page, shipments);
@@ -189,7 +191,7 @@ public class SysShipmentsServiceImpl extends ServiceImpl<SysShipmentsDao, SysShi
         //回写订单子表
         this.updateOrderSubs(checkStatus, nowShipmentsStatus, nowOutboundStatus, shipmentsId, orderId);
         shipments.setAuditTime(new Date());
-        shipments.setAuditBy(UserSecurityUtils.getUsername());
+        shipments.setAuditBy(UserSecurityUtil.getUsername());
         return this.updateById(shipments);
     }
 
@@ -226,7 +228,7 @@ public class SysShipmentsServiceImpl extends ServiceImpl<SysShipmentsDao, SysShi
         // 添加或扣减相应产品的库存
         repertoryService.saveAndUpdate(this.transformRepertory(shipments, subList));
         shipments.setAuditTime(new Date());
-        shipments.setAuditBy(UserSecurityUtils.getUsername());
+        shipments.setAuditBy(UserSecurityUtil.getUsername());
         return this.updateById(shipments);
     }
 
@@ -321,7 +323,8 @@ public class SysShipmentsServiceImpl extends ServiceImpl<SysShipmentsDao, SysShi
                     }
                     int num = number - (nowHasShipmentNum + nowHasOutboundNum + nowHasSignbackNum);//最大发货数量
                     if (shipmentNum > num) {
-                        throw new ServiceException(String.format("审核失败，产品%s发货数量(%s)大于已发货签收数量(%s)", materielNum, shipmentNum, num));
+                        throw new ServiceException(String.format("审核失败，产品%s本次发货数量(%s)大于已发货数量(%s)+出库未签收数量(%s)+已签收数量(%s)之和",
+                                materielNum, shipmentNum, nowHasShipmentNum, nowHasOutboundNum, nowHasSignbackNum));
                     }
                     resultSub.setHasShipmentNum(nowHasShipmentNum + shipmentNum);
                     shipmentPrice = BigDecimalUtil.add(shipmentPrice, BigDecimalUtil.mul(one.getPrice(), resultSub.getHasShipmentNum()));
@@ -378,9 +381,9 @@ public class SysShipmentsServiceImpl extends ServiceImpl<SysShipmentsDao, SysShi
             BigDecimal receiptPrice = receiptService.findReceiptPriceByClienteleId(clienteleId);// 未核销的收款
             BigDecimal receivePrice = receivableService.findReceivePriceByClienteleId(clienteleId);//未核销的应收款
             //本次发货金额<=未核销的收款-未核销的应收款
-            BigDecimal sub = BigDecimalUtil.sub(receiptPrice, receivePrice);
-            if (BigDecimalUtil.compareTo(shipmentPrice, sub) > 0) {
-                throw new ServiceException(String.format("审核失败，客户发货累计金额大于累计收款 ", shipmentPrice, receiptPrice));
+            BigDecimal decimal = BigDecimalUtil.sub(receiptPrice, receivePrice);
+            if (BigDecimalUtil.compareTo(shipmentPrice, decimal) > 0) {
+                throw new ServiceException(String.format("审核失败，客户本次发货金额(%s)大于客户收款可用金额(%s)，请前往特批", shipmentPrice, decimal));
             }
         }
     }

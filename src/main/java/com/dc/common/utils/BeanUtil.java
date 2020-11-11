@@ -9,7 +9,6 @@ import org.springframework.beans.BeanUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -59,13 +58,7 @@ public class BeanUtil extends BeanUtils {
             public Object convert(Class clazz, Object value) {
                 try {
                     if (value != null) {
-                        //将String转化为date
-                        String source = value.toString();
-                        if (DateUtil.FORMAT_YYYYMMDD.length() == source.length()) {
-                            return new SimpleDateFormat(DateUtil.FORMAT_YYYYMMDD).parse(value.toString());
-                        } else if (DateUtil.FORMAT_YYYYMMDDHHMMSS.length() == source.length()) {
-                            return new SimpleDateFormat(DateUtil.FORMAT_YYYYMMDDHHMMSS).parse(value.toString());
-                        }
+                        return DateUtil.parseDate(value);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

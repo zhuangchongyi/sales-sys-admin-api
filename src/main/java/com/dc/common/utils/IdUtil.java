@@ -6,7 +6,7 @@ import com.dc.common.lang.UUID;
 /**
  * ID生成器工具类
  */
-public class IdUtils {
+public class IdUtil {
     /**
      * 获取随机UUID
      *

@@ -38,6 +38,12 @@ public class SysReturns extends BaseEntity {
     private String orderNum;
 
     /**
+     * 订单日期
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date orderTime;
+
+    /**
      * 退货日期
      */
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -164,6 +170,14 @@ public class SysReturns extends BaseEntity {
      */
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date storageTime;
+
+    public Date getOrderTime() {
+        return orderTime;
+    }
+
+    public void setOrderTime(Date orderTime) {
+        this.orderTime = orderTime;
+    }
 
     public Integer getReturnsId() {
         return returnsId;

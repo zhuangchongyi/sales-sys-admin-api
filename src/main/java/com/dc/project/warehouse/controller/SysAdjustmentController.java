@@ -1,12 +1,10 @@
 package com.dc.project.warehouse.controller;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc.common.vo.R;
 import com.dc.project.warehouse.entity.SysAdjustment;
 import com.dc.project.warehouse.service.ISysAdjustmentService;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +26,8 @@ public class SysAdjustmentController {
 
     @RequiresPermissions(value = {"warehouse:adjustment:list"})
     @GetMapping
-    public R page(Page page, SysAdjustment inventory) {
-        QueryWrapper<SysAdjustment> queryWrapper = new QueryWrapper<>();
-        queryWrapper.like(StringUtils.isNotEmpty(inventory.getWarehouseName()), "warehouse_name", inventory.getWarehouseName())
-                .or().like(StringUtils.isNotEmpty(inventory.getWarehouseNum()), "warehouse_num", inventory.getWarehouseNum())
-                .orderByDesc("create_time");
-        return R.success().data(adjustmentService.page(page, queryWrapper));
+    public R page(Page<SysAdjustment> page, SysAdjustment adjustment) {
+        return R.success().data(adjustmentService.page(page, adjustment));
     }
 
     @RequiresPermissions(value = {"warehouse:adjustment:add", "warehouse:adjustment:edit"}, logical = Logical.OR)

@@ -16,7 +16,7 @@ public class AsyncFactory {
         return new TimerTask() {
             @Override
             public void run() {
-                log.info("异步消息 == " + msg);
+                log.info("异步消息日志 == " + msg);
             }
         };
     }

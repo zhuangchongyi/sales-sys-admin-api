@@ -21,6 +21,7 @@ public class R implements Serializable {
      * 错误code
      */
     public static final int ERROR_CODE = 500;
+
     /**
      * 失败code
      */
@@ -33,6 +34,7 @@ public class R implements Serializable {
      * 未授权code
      */
     public static final int UNAUTHORIZED = 403;
+
 
     private R(int code, boolean success, String message) {
         this.code = code;

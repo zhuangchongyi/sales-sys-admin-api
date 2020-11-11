@@ -1,7 +1,7 @@
 package com.dc.framework.realm;
 
 import com.dc.common.constant.CustomConstant;
-import com.dc.common.utils.UserSecurityUtils;
+import com.dc.common.utils.UserSecurityUtil;
 import com.dc.common.vo.UserInfo;
 import com.dc.project.common.service.ILoginService;
 import com.dc.project.system.entity.SysUser;
@@ -21,7 +21,7 @@ import java.util.Set;
  * @Description 实现AuthorizingRealm接口用户用户认证
  * @Date 2020/8/14 12:11
  */
-@Slf4j
+@Slf4j(topic = "sys-user")
 public class LoginUserRealm extends AuthorizingRealm {
     @Autowired
     private ILoginService loginService;
@@ -47,7 +47,7 @@ public class LoginUserRealm extends AuthorizingRealm {
     }
 
     /**
-     * 用户认证
+     * 用户授权
      */
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
@@ -56,16 +56,17 @@ public class LoginUserRealm extends AuthorizingRealm {
             return null;
         }
         // 获取用户信息
-        String name = authenticationToken.getPrincipal().toString();
-        SysUser user = loginService.getUserByUsername(name);
+        SysUser user = loginService.getUserByUsername(authenticationToken.getPrincipal().toString());
         if (user == null) {
             //登录用户不存在
             throw new UnknownAccountException();
         } else {
-            if (!UserSecurityUtils.isAdmin(user.getUserId())) {
+            if (!UserSecurityUtil.isAdmin(user.getUserId())) {
                 // 登录用户已被禁用
                 if (CustomConstant.STOP_STATUS.equals(user.getStartStatus())) {
                     throw new DisabledAccountException();
+                } else if (CustomConstant.ORDINARY_USER_TYPE.equals(user.getUserType())) {
+                    throw new LockedAccountException();
                 }
             }
             SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(user, user.getPassword(), getName());

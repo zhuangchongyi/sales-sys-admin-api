@@ -1,12 +1,10 @@
 package com.dc.project.warehouse.controller;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc.common.vo.R;
 import com.dc.project.warehouse.entity.SysStorage;
 import com.dc.project.warehouse.service.ISysStorageService;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,13 +27,8 @@ public class SysStorageController {
 
     @RequiresPermissions(value = {"warehouse:storage:list"}, logical = Logical.OR)
     @GetMapping
-    public R page(Page page, SysStorage sysStorage) {
-        QueryWrapper<SysStorage> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("inout_type", sysStorage.getInoutType());
-        queryWrapper.like(StringUtils.isNotEmpty(sysStorage.getWarehouseNum()), "warehouse_num", sysStorage.getWarehouseNum())
-                .or().like(StringUtils.isNotEmpty(sysStorage.getWarehouseNum()), "warehouse_name", sysStorage.getWarehouseName())
-                .orderByDesc("create_time");
-        return R.success().data(storageService.page(page, queryWrapper));
+    public R page(Page<SysStorage> page, SysStorage sysStorage) {
+        return R.success().data(storageService.page(page, sysStorage));
     }
 
     @RequiresPermissions(value = {"warehouse:storage:add", "warehouse:storage:edit"}, logical = Logical.OR)

@@ -74,6 +74,7 @@
             <if test="sign.status!=null and sign.status!=''">
                 and sign.status=#{sign.status}
             </if>
+            ${sign.params.dataScope}
         </where>
         order by sign.create_time desc
     </select>

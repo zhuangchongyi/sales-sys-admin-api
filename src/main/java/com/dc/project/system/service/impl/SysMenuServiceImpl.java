@@ -2,17 +2,16 @@ package com.dc.project.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.dc.common.vo.TreeSelect;
 import com.dc.common.constant.CustomConstant;
-import com.dc.common.utils.UserSecurityUtils;
+import com.dc.common.utils.UserSecurityUtil;
 import com.dc.common.vo.MetaVo;
 import com.dc.common.vo.RouterVo;
+import com.dc.common.vo.TreeSelect;
 import com.dc.project.system.dao.SysMenuDao;
 import com.dc.project.system.entity.SysMenu;
-import com.dc.project.system.entity.SysUser;
 import com.dc.project.system.service.ISysMenuService;
 import com.dc.project.system.service.ISysRoleMenuService;
-import com.dc.project.system.service.ISysUserService;
+import com.dc.project.system.service.ISysUserRoleService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,18 +30,19 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuDao, SysMenu> impleme
     @Autowired
     private ISysRoleMenuService roleMenuService;
     @Autowired
-    private ISysUserService userService;
+    private ISysUserRoleService userRoleService;
 
     @Override
     public Map findMenuByRoleId(Integer roleId) {
         QueryWrapper<SysMenu> queryWrapper = new QueryWrapper<SysMenu>()
-                .eq("status", "0")
+                .select(" menu_id, menu_name, parent_id")
+                .eq("status", CustomConstant.START_STATUS)
                 .orderByAsc("menu_id")
                 .orderByAsc("parent_id");
-        List<SysMenu> menus = baseMapper.selectList(queryWrapper);// 获取全部菜单
+        List<SysMenu> menus = this.list(queryWrapper);// 获取全部菜单
         Map<Object, Object> resultMap = new HashMap<>();
         resultMap.put("menus", this.buildMenuTreeSelect(menus));
-        resultMap.put("checkedKeys", roleMenuService.findRoleMenuByRoleIds(new Integer[]{roleId}));
+        resultMap.put("checkedKeys", roleMenuService.findRoleMenuByRoleIds(roleId));
         return resultMap;
     }
 
@@ -55,13 +55,11 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuDao, SysMenu> impleme
     @Override
     public List<RouterVo> getRouters() {
         List<SysMenu> menus = null;
-        if (UserSecurityUtils.isAdmin(null)) {
+        if (UserSecurityUtil.isAdmin(null)) {
             menus = baseMapper.findMenuTreeAll();
         } else {
-            String username = UserSecurityUtils.getUsername();
-            SysUser sysUser = userService.findRoleByUsername(username);
-            Integer[] roleIds = sysUser.getRoles().stream().map(role -> role.getRoleId()).toArray(Integer[]::new);
-            if (roleIds.length != 0) {
+            List<Integer> roleIds = userRoleService.userRoleList(UserSecurityUtil.getUserId());
+            if (!roleIds.isEmpty()) {
                 menus = baseMapper.findMenuTreeByRoleIds(roleIds);
             }
         }
@@ -72,12 +70,11 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuDao, SysMenu> impleme
     @Override
     public Set<String> getMenuPermission(Integer userId) {
         List<String> permission = baseMapper.getMenuPermission(userId);
-        Set<String> permsSet = new HashSet<>();
-        for (String perm : permission) {
-            if (StringUtils.isNotEmpty(perm)) {
-                permsSet.add(perm.trim());
-            }
-        }
+        if (permission.isEmpty())
+            return null;
+        Set<String> permsSet = permission.stream()
+                .filter(perm -> StringUtils.isNotEmpty(perm))
+                .collect(Collectors.toSet());
         return permsSet;
     }
 

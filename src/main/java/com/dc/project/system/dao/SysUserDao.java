@@ -18,6 +18,4 @@ public interface SysUserDao extends BaseMapper<SysUser> {
 
     IPage<SysUser> list(Page page, @Param("user") SysUser user);
 
-    SysUser findRoleByUsername(String username);
-
 }

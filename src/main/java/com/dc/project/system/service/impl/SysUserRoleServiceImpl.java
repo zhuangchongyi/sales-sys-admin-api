@@ -28,4 +28,5 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleDao, SysUserR
     public List<Integer> userRoleList(Integer userId) {
         return baseMapper.findUserRoleByUserId(userId);
     }
+
 }

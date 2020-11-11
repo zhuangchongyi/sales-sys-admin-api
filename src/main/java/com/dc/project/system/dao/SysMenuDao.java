@@ -15,7 +15,7 @@ public interface SysMenuDao extends BaseMapper<SysMenu> {
 
     List<SysMenu> findMenuTreeAll();
 
-    List<SysMenu> findMenuTreeByRoleIds(Integer... roleIds);
+    List<SysMenu> findMenuTreeByRoleIds(List<Integer> roleIds);
 
     List<String> getMenuPermission(Integer userId);
 }

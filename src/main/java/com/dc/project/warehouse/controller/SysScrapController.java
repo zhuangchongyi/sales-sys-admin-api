@@ -28,12 +28,8 @@ public class SysScrapController {
 
     @RequiresPermissions(value = {"warehouse:scrap:list"})
     @GetMapping
-    public R page(Page page, SysScrap scrap) {
-        QueryWrapper<SysScrap> queryWrapper = new QueryWrapper<>();
-        queryWrapper.like(StringUtils.isNotEmpty(scrap.getWarehouseName()), "warehouse_name", scrap.getWarehouseName())
-                .or().like(StringUtils.isNotEmpty(scrap.getWarehouseNum()), "warehouse_num", scrap.getWarehouseNum())
-                .orderByDesc("create_time");
-        return R.success().data(scrapService.page(page, queryWrapper));
+    public R page(Page<SysScrap> page, SysScrap scrap) {
+        return R.success().data(scrapService.page(page, scrap));
     }
 
     @RequiresPermissions(value = {"warehouse:scrap:add", "warehouse:scrap:edit"}, logical = Logical.OR)

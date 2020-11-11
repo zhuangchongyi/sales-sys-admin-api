@@ -1,5 +1,7 @@
 package com.dc.common.utils;
 
+import com.dc.common.constant.CustomConstant;
+
 import javax.crypto.Cipher;
 import java.io.ByteArrayOutputStream;
 import java.security.*;
@@ -124,7 +126,7 @@ public class RSAUtil {
         byte[] decryptedData = out.toByteArray();
         out.close();
         // 解密后的内容
-        return new String(decryptedData, "UTF-8");
+        return new String(decryptedData, CustomConstant.UTF8);
     }
 
     /**

@@ -1,5 +1,7 @@
 package com.dc.project.warehouse.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc.project.warehouse.entity.SysAdjustment;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -12,6 +14,8 @@ import java.util.Map;
  * @since 2020-09-23
  */
 public interface ISysAdjustmentService extends IService<SysAdjustment> {
+
+    IPage<SysAdjustment> page(Page<SysAdjustment> page,SysAdjustment adjustment);
 
     boolean addAndUpdate(Map formMap) throws Exception;
 

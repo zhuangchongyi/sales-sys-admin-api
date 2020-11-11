@@ -45,12 +45,12 @@ public class SysClienteleProductServiceImpl extends ServiceImpl<SysClienteleProd
     public boolean insert(List<SysClienteleProduct> products) {
         if (null != products && !products.isEmpty()) {
             for (SysClienteleProduct product : products) {
-                Integer count = baseMapper.selectCount(new QueryWrapper<SysClienteleProduct>()
+                SysClienteleProduct one = this.getOne(new QueryWrapper<SysClienteleProduct>()
                         .select("pk_id")
                         .eq("materiel_id", product.getMaterielId())
                         .eq("clientele_id", product.getClienteleId())
-                        .eq("model_name", product.getModelName()));
-                if (count == 0) {
+                        .eq("model_name", product.getModelName()), false);
+                if (one == null) {
                     if (!this.save(product)) throw new ServiceException("添加产品失败");
                 } else {
                     log.info(String.format("产品 %s / %s 重复添加", product.getMaterielId(), product.getModelName()));

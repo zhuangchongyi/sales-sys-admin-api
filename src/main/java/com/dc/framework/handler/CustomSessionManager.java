@@ -1,7 +1,6 @@
 package com.dc.framework.handler;
 
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.web.servlet.ShiroHttpServletRequest;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
@@ -16,15 +15,12 @@ import java.io.Serializable;
  * @Description 自定义session管理器
  * @Date 2020/9/27 10:29
  */
-@Slf4j
 public class CustomSessionManager extends DefaultWebSessionManager {
     private static final String AUTHORIZATION = "Authorization";
     private static final String REFERENCED_SESSION_ID_SOURCE = "Stateless request";
 
     public CustomSessionManager() {
         super();
-        long timeout = DEFAULT_GLOBAL_SESSION_TIMEOUT * 24;
-        setGlobalSessionTimeout(timeout);
     }
 
     @Override

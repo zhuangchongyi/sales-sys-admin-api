@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * @Author zhuangchongyi
  * @Description 菜单控制层
@@ -36,7 +38,7 @@ public class SysMenuController {
      * @return
      */
     @GetMapping("/menuPermission/{roleId}")
-    public R menuPermission(@PathVariable Integer roleId) {
+    public R menuPermission(@PathVariable @NotNull Integer roleId) {
         return R.success().data(menuService.findMenuByRoleId(roleId));
     }
 }

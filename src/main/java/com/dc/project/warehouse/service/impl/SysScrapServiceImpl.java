@@ -2,13 +2,16 @@ package com.dc.project.warehouse.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dc.common.constant.SalesConstant;
 import com.dc.common.exception.ServiceException;
+import com.dc.common.lang.annotation.DataScope;
 import com.dc.common.utils.BeanUtil;
 import com.dc.common.utils.BigDecimalUtil;
 import com.dc.common.utils.ObjectMapperUtil;
-import com.dc.common.utils.UserSecurityUtils;
+import com.dc.common.utils.UserSecurityUtil;
 import com.dc.project.warehouse.dao.SysScrapDao;
 import com.dc.project.warehouse.entity.SysRepertory;
 import com.dc.project.warehouse.entity.SysScrap;
@@ -37,6 +40,16 @@ public class SysScrapServiceImpl extends ServiceImpl<SysScrapDao, SysScrap> impl
     private ISysScrapSubService scrapSubService;
     @Autowired
     private ISysRepertoryService repertoryService;
+
+    @DataScope(userColumn = "create_id")
+    @Override
+    public IPage<SysScrap> page(Page<SysScrap> page, SysScrap scrap) {
+        QueryWrapper<SysScrap> queryWrapper = new QueryWrapper<>();
+        queryWrapper.like(StringUtils.isNotEmpty(scrap.getWarehouseName()), "warehouse_name", scrap.getWarehouseName())
+                .or().like(StringUtils.isNotEmpty(scrap.getWarehouseNum()), "warehouse_num", scrap.getWarehouseNum())
+                .orderByDesc("create_time");
+        return this.page(page, scrap);
+    }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -152,7 +165,7 @@ public class SysScrapServiceImpl extends ServiceImpl<SysScrapDao, SysScrap> impl
         SysScrap one = this.getById(scrap.getScrapId());
         if (null == one) throw new ServiceException();
         SalesConstant.verifyAuditStatus(one.getStatus(), scrap.getStatus());
-        scrap.setAuditBy(UserSecurityUtils.getUsername());
+        scrap.setAuditBy(UserSecurityUtil.getUsername());
         scrap.setAuditTime(new Date());
         // 报废时时扣减产品现存量
         if (SalesConstant.AUDIT.equals(scrap.getStatus())) {//审核时

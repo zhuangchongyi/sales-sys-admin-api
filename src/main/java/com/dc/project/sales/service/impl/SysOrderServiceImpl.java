@@ -5,12 +5,13 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.dc.common.lang.annotation.DataScope;
 import com.dc.common.constant.SalesConstant;
 import com.dc.common.exception.ServiceException;
 import com.dc.common.utils.BeanUtil;
 import com.dc.common.utils.CodeUtil;
 import com.dc.common.utils.ObjectMapperUtil;
-import com.dc.common.utils.UserSecurityUtils;
+import com.dc.common.utils.UserSecurityUtil;
 import com.dc.project.sales.dao.SysOrderDao;
 import com.dc.project.sales.entity.SysOrder;
 import com.dc.project.sales.entity.SysOrderSub;
@@ -36,6 +37,7 @@ public class SysOrderServiceImpl extends ServiceImpl<SysOrderDao, SysOrder> impl
     @Autowired
     private ISysOrderSubService orderSubService;
 
+    @DataScope(userAlias = "so", userColumn = "create_id")
     @Override
     public IPage<SysOrder> page(Page page, SysOrder order) {
         return baseMapper.page(page, order);
@@ -142,7 +144,7 @@ public class SysOrderServiceImpl extends ServiceImpl<SysOrderDao, SysOrder> impl
         SysOrder sysQuotation = this.getOne(new QueryWrapper<SysOrder>().select("order_id,status").eq("order_id", order.getOrderId()));
         SalesConstant.verifyAuditStatus(order.getStatus(), sysQuotation.getStatus());
         order.setAuditTime(new Date());
-        order.setAuditBy(UserSecurityUtils.getUsername());
+        order.setAuditBy(UserSecurityUtil.getUsername());
         // TODO<zhuangcy> 校验产品是否可以使用
 
         return this.updateById(order);

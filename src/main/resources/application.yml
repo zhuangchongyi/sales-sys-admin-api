@@ -1,11 +1,18 @@
 spring:
-  application:
-    name: sales-sys-admin
   profiles:
     active: dev
+  # 服务模块
   devtools:
     restart:
+      # 热部署开关
       enabled: true
+  # 文件上传
+  servlet:
+    multipart:
+      # 单个文件大小
+      max-file-size:  10MB
+      # 设置总上传的文件大小
+      max-request-size:  20MB
 
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
@@ -30,3 +37,17 @@ mybatis-plus:
       logic-delete-value: 1
       # 指定删除字段
       logic-delete-field: delFlag
+
+
+sms:
+  debug: false
+  captcha-cache: false
+  timeout: 6
+  # 防止XSS攻击
+  xss:
+    # 过滤开关
+    enabled: true
+    # 排除链接（多个用逗号分隔）
+    excludes: /monitor/*
+    # 匹配链接
+    urlPatterns: /system/*,/basis/*,/fiance/*,/sales/*

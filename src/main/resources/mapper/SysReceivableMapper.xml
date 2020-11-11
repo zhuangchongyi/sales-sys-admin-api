@@ -51,24 +51,25 @@
     receivable_id, receivable_num, total_price, finance_time, order_num, order_time, shipments_num, shipments_time, signback_num, signback_time,has_verifica_price
     from sys_receivable
     where clientele_id=#{clienteleId} and status=#{status}
-    and (total_price - has_verifica_price)>0
+    and total_price != has_verifica_price
     order by create_time asc
     </select>
 
     <select id="getClienteleReceivableList" resultType="com.dc.project.finance.entity.SysReceivable">
-    select
-    receivable_id, receivable_num, total_price, finance_time, order_num, order_time, shipments_num, shipments_time, signback_num, signback_time,has_verifica_price
-    from sys_receivable
-    <where>
-        <if test="clienteleId!=null and clienteleId!=''">
-            clientele_id=#{clienteleId}
-        </if>
-        <if test="orderNum!=null and orderNum!=''">
-            and order_num=#{orderNum}
-        </if>
-         <if test="status!=null and status!=''">and status=#{status}</if>
-    </where>
-    order by create_time asc
+        select
+        receivable_id, receivable_num, total_price, finance_time, order_num, order_time, shipments_num, shipments_time,
+        signback_num, signback_time,has_verifica_price
+        from sys_receivable
+        <where>
+            <if test="clienteleId!=null and clienteleId!=''">
+                clientele_id=#{clienteleId}
+            </if>
+            <if test="orderNum!=null and orderNum!=''">
+                and order_num=#{orderNum}
+            </if>
+            <if test="status!=null and status!=''">and status=#{status}</if>
+        </where>
+        order by create_time asc
     </select>
 
 </mapper>

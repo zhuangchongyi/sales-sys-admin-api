@@ -26,7 +26,6 @@ public class SysWarehouseInitController {
     @Autowired
     private ISysWarehouseInitService warehouseInitService;
 
-
     @RequiresPermissions(value = "warehouse:init:list")
     @GetMapping
     public R page(Page page, SysWarehouseInit warehouseInit) {

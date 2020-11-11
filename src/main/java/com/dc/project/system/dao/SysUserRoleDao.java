@@ -18,4 +18,5 @@ public interface SysUserRoleDao extends BaseMapper<SysUserRole> {
     Page<SysUser> roleUserListPage(Page<SysUser> page, Integer roleId);
 
     List<Integer> findUserRoleByUserId(Integer userId);
+
 }

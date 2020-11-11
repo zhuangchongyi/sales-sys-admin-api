@@ -55,7 +55,7 @@ public class SysReceivableServiceImpl extends ServiceImpl<SysReceivableDao, SysR
             throw new ServiceException("已核销不允许操作");
         }
         receivable.setAuditTime(new Date());
-        receivable.setAuditBy(UserSecurityUtils.getUsername());
+        receivable.setAuditBy(UserSecurityUtil.getUsername());
         return this.updateById(receivable);
     }
 

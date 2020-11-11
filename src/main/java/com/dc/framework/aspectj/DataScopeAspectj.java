@@ -1,8 +1,10 @@
 package com.dc.framework.aspectj;
 
-import com.dc.common.utils.UserSecurityUtils;
+
+import com.dc.common.lang.annotation.DataScope;
+import com.dc.common.constant.CustomConstant;
+import com.dc.common.utils.UserSecurityUtil;
 import com.dc.common.vo.BaseEntity;
-import com.dc.framework.annotation.DataScope;
 import com.dc.project.system.entity.SysRole;
 import com.dc.project.system.entity.SysUser;
 import org.apache.commons.lang3.StringUtils;
@@ -23,40 +25,11 @@ import java.lang.reflect.Method;
 @Aspect
 @Component
 public class DataScopeAspectj {
-    /**
-     * 全部数据权限
-     */
-    public static final String DATA_SCOPE_ALL = "1";
-
-    /**
-     * 自定数据权限
-     */
-    public static final String DATA_SCOPE_CUSTOM = "2";
-
-    /**
-     * 部门数据权限
-     */
-    public static final String DATA_SCOPE_DEPT = "3";
-
-    /**
-     * 部门及以下数据权限
-     */
-    public static final String DATA_SCOPE_DEPT_AND_CHILD = "4";
-
-    /**
-     * 仅本人数据权限
-     */
-    public static final String DATA_SCOPE_SELF = "5";
-
-    /**
-     * 数据权限过滤关键字
-     */
-    public static final String DATA_SCOPE = "dataScope";
 
     /**
      * 配置切入点
      */
-    @Pointcut("@annotation(com.dc.framework.annotation.DataScope)")
+    @Pointcut("@annotation(com.dc.common.lang.annotation.DataScope)")
     public void dataSourcePointcut() {
     }
 
@@ -67,48 +40,74 @@ public class DataScopeAspectj {
      * @throws Exception
      */
     @Before("dataSourcePointcut()")
-    public void doBefore(JoinPoint point) throws Exception {
+    public void doBefore(JoinPoint point) {
         DataScope dataScope = getAnnotation(point);
-        if (null == dataScope){
+        if (null == dataScope) {
             return;
         }
-        SysUser user = UserSecurityUtils.getUser();
-        if (UserSecurityUtils.isAdmin(user.getUserId())){
-            dataScopeFilter(point,user,dataScope);
+        SysUser user = UserSecurityUtil.getUser();
+        if (!UserSecurityUtil.isAdmin(user.getUserId())) {
+            dataScopeFilter(point, user, dataScope);
         }
     }
 
     private void dataScopeFilter(JoinPoint point, SysUser user, DataScope dataScopeAnn) {
         StringBuilder sqlString = new StringBuilder();
-
+        String userAlias = dataScopeAnn.userAlias();
+        String userColumn = dataScopeAnn.userColumn();
         for (SysRole role : user.getRoles()) {
             String dataScope = role.getDataScope();
-            if (DATA_SCOPE_ALL.equals(dataScope)) {
+            if (CustomConstant.DATA_SCOPE_ALL.equals(dataScope)) {// 全部数据权限
                 sqlString = new StringBuilder();
                 break;
-            } else if (DATA_SCOPE_CUSTOM.equals(dataScope)) {
-                sqlString.append(String.format(
-                        " OR {}.dept_id IN ( SELECT dept_id FROM sys_role_dept WHERE role_id = {} ) ", dataScopeAnn.deptAlias(),
-                        role.getRoleId()));
-            } else if (DATA_SCOPE_DEPT.equals(dataScope)) {
-                sqlString.append(String.format(" OR {}.dept_id = {} ", dataScopeAnn.deptAlias(), user.getDeptId()));
-            } else if (DATA_SCOPE_DEPT_AND_CHILD.equals(dataScope)) {
-                sqlString.append(String.format(
-                        " OR {}.dept_id IN ( SELECT dept_id FROM sys_dept WHERE dept_id = {} or find_in_set( {} , ancestors ) )",
-                        dataScopeAnn.deptAlias(), user.getDeptId(), user.getDeptId()));
-            } else if (DATA_SCOPE_SELF.equals(dataScope)) {
-                if (StringUtils.isNotBlank(dataScopeAnn.userAlias())) {
-                    sqlString.append(String.format(" OR {}.user_id = {} ", dataScopeAnn.userAlias(), user.getUserId()));
+            } else if (CustomConstant.DATA_SCOPE_CUSTOM.equals(dataScope)) {// 自定义数据权限
+                if (StringUtils.isEmpty(userAlias)) {
+                    sqlString.append(String.format(
+                            " or %s in ( select user_id from sys_user du join sys_role_dept drd on du.dept_id=drd.dept_id and role_id = %s ) ",
+                            userColumn, role.getRoleId()));
                 } else {
-                    // 数据权限为仅本人且没有userAlias别名不查询任何数据
-                    sqlString.append(" OR 1=0 ");
+                    sqlString.append(String.format(
+                            " or %s.%s in ( select user_id from sys_user du join sys_role_dept drd on du.dept_id=drd.dept_id and role_id = %s ) ",
+                            userAlias, userColumn, role.getRoleId()));
+                }
+            } else if (CustomConstant.DATA_SCOPE_DEPT.equals(dataScope)) {// 本部门数据权限
+                if (StringUtils.isEmpty(userAlias)) {
+                    sqlString.append(String.format(
+                            " or %s in ( select user_id from sys_user du join sys_dept dd on du.dept_id=dd.dept_id and dd.dept_id = %s ) ",
+                            userColumn, user.getDeptId()));
+                } else {
+                    sqlString.append(String.format(
+                            " or %s.%s in ( select user_id from sys_user du join sys_dept dd on du.dept_id=dd.dept_id and dd.dept_id = %s ) ",
+                            userAlias, userColumn, user.getDeptId()));
+                }
+            } else if (CustomConstant.DATA_SCOPE_DEPT_AND_CHILD.equals(dataScope)) {// 部门及部门以下数据权限
+                if (StringUtils.isEmpty(userAlias)) {
+                    sqlString.append(String.format(
+                            " or %s in ( select user_id from sys_user du join sys_dept dd on dd.dept_id=du.dept_id and (dd.dept_id = %s or find_in_set(%s , ancestors )))",
+                            userColumn, user.getDeptId(), user.getDeptId()));
+                } else {
+                    sqlString.append(String.format(
+                            " or %s.%s in ( select user_id from sys_user du join sys_dept dd on dd.dept_id=du.dept_id and (dd.dept_id = %s or find_in_set(%s , ancestors )))",
+                            userAlias, userColumn, user.getDeptId(), user.getDeptId()));
                 }
             }
         }
-
+        //仅本人数据权限
+        if (StringUtils.isEmpty(userAlias)) {
+            sqlString.append(String.format(" or %s = %s ", userColumn, user.getUserId()));
+        } else {
+            sqlString.append(String.format(" or %s.%s = %s ", userAlias, userColumn, user.getUserId()));
+        }
         if (StringUtils.isNotBlank(sqlString.toString())) {
-            BaseEntity baseEntity = (BaseEntity) point.getArgs()[0];
-            baseEntity.getParams().put(DATA_SCOPE, " AND (" + sqlString.substring(4) + ")");
+            Object[] args = point.getArgs();
+            for (int i = 0; i < args.length; i++) {
+                Object arg = args[i];
+                if (arg instanceof BaseEntity) {
+                    BaseEntity baseEntity = (BaseEntity) arg;
+                    baseEntity.getParams().put(CustomConstant.DATA_SCOPE, " and (" + sqlString.substring(4) + ")");
+                    break;
+                }
+            }
         }
     }
 

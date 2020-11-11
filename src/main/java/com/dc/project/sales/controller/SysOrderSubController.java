@@ -35,7 +35,7 @@ public class SysOrderSubController {
         QueryWrapper<SysOrderSub> queryWrapper = new QueryWrapper<>();
         queryWrapper.select(SysOrderSub.class, info -> !info.getColumn().equals("create_time") && !info.getColumn().equals("update_time"));
         queryWrapper.eq(null != orderSub.getOrderId(), "order_id", orderSub.getOrderId());
-        queryWrapper.gt("has_signback_num",0);
+        queryWrapper.gt("has_signback_num", 0);
         queryWrapper.orderByDesc("sub_id");
         return R.success().data(orderSubService.list(queryWrapper));
     }

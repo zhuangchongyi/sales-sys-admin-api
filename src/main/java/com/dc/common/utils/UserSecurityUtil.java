@@ -8,7 +8,7 @@ import org.apache.shiro.SecurityUtils;
  * @Description 获取认证用户工具类
  * @Date 2020/9/12 12:01
  */
-public class UserSecurityUtils {
+public class UserSecurityUtil {
 
     /**
      * 获取用户名称
@@ -17,6 +17,18 @@ public class UserSecurityUtils {
         if (getUser() == null)
             return null;
         return getUser().getUsername();
+    }
+
+    public static String getNickname() {
+        if (getUser() == null)
+            return null;
+        return getUser().getNickname();
+    }
+
+    public static Integer getUserId() {
+        if (getUser() == null)
+            return null;
+        return getUser().getUserId();
     }
 
     /**
@@ -33,7 +45,9 @@ public class UserSecurityUtils {
      * @return 结果
      */
     public static boolean isAdmin(Integer userId) {
-        return (userId != null && 1L == userId) || "admin".equals(getUsername());
+        return (userId != null && 1L == userId) ||
+                "admin".equals(getUsername()) ||
+                "root".equals(getUsername());
     }
 
 

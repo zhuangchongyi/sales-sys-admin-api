@@ -45,6 +45,11 @@ public class SysDept extends BaseEntity implements Serializable {
     private Integer parentId;
 
     /**
+     * 祖级列表
+     */
+    private String ancestors;
+
+    /**
      * 部门类型（0部门 1公司）
      */
     private String deptType;

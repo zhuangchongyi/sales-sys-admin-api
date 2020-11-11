@@ -76,8 +76,9 @@
             <if test="so.status!=null and so.status!=''">
                 and so.status=#{so.status}
             </if>
+            ${so.params.dataScope}
         </where>
-        group by so.order_id order by so.create_time desc
+        order by so.order_id desc
     </select>
 
     <select id="get" resultMap="BaseResultMap">
@@ -100,7 +101,7 @@
                 and so.status=#{so.status}
             </if>
         </where>
-        order by so.create_time desc
+        order by so.order_id desc
     </select>
     <select id="findReturnsOrder" resultType="com.dc.project.sales.entity.SysOrder">
         select

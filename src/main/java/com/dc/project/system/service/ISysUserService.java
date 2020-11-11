@@ -33,8 +33,6 @@ public interface ISysUserService extends IService<SysUser> {
 
     boolean changePassword(Map<String, Object> formMap);
 
-    SysUser findRoleByUsername(String username);
-
     boolean updateStatus(SysUser sysUser);
 
 }

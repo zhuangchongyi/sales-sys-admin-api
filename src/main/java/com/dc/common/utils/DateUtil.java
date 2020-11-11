@@ -9,14 +9,20 @@ import java.util.Date;
  * @Description 日期格式处理工具类
  * @Date 2020/9/14 16:36
  */
-public class DateUtil {
+public class DateUtil extends org.apache.commons.lang3.time.DateUtils {
     public static final String PATH_YYYY_MM = "/yyyy/MM/";
     public static final String YYYYMMDD = "yyyyMMdd";
-    public static final String FORMAT_YYYYMMDDHHMMSS = "yyyy-MM-dd hh:mm:ss";
-    public static final String FORMAT_YYYYMMDD = "yyyy-MM-dd";
-
+    public static final String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd hh:mm:ss";
+    public static final String YYYY_MM_DD = "yyyy-MM-dd";
+    private static String[] parsePatterns = {
+            "yyyy-MM-dd", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm", "yyyy-MM",
+            "yyyy/MM/dd", "yyyy/MM/dd HH:mm:ss", "yyyy/MM/dd HH:mm", "yyyy/MM",
+            "yyyy.MM.dd", "yyyy.MM.dd HH:mm:ss", "yyyy.MM.dd HH:mm", "yyyy.MM"};
 
     public static String getYYYYMMDDString(Date date) {
+        return parseDateToString(YYYYMMDD, date);
+    }
+    public static String getYYYYMMDDHHMMSSString(Date date) {
         return parseDateToString(YYYYMMDD, date);
     }
 
@@ -51,5 +57,19 @@ public class DateUtil {
             return true;
         }
         return false;
+    }
+
+    /**
+     * 日期型字符串转化为日期 格式
+     */
+    public static Date parseDate(Object str) {
+        if (str == null) {
+            return null;
+        }
+        try {
+            return parseDate(str.toString(), parsePatterns);
+        } catch (ParseException e) {
+            return null;
+        }
     }
 }

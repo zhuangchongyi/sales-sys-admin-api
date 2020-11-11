@@ -64,8 +64,7 @@
     <select id="list" resultType="com.dc.project.warehouse.entity.SysRepertory">
         <include refid="commonSql"/>
         <where>
-            sr.warehouse_id=#warehouseId}
-            and ( 1=1
+            sr.warehouse_id=#{warehouseId}
             <if test="materielName!=null and materielName!=''">or sr.materiel_name like
                 concat(concat('%',#{materielName}),'%')
             </if>
@@ -84,7 +83,6 @@
             <if test="outTorque!=null and outTorque!=''">or sr.out_torque like
                 concat(concat('%',#{outTorque}),'%')
             </if>
-            )
         </where>
     </select>
 

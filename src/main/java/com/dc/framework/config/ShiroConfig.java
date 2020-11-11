@@ -1,18 +1,22 @@
 package com.dc.framework.config;
 
+import com.dc.common.constant.CustomConstant;
+import com.dc.framework.config.properties.SmsConfig;
 import com.dc.framework.filter.CustomAuthenticationFilter;
 import com.dc.framework.handler.CustomSessionManager;
 import com.dc.framework.realm.LoginUserRealm;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.session.mgt.SessionManager;
-import org.apache.shiro.spring.LifecycleBeanPostProcessor;
+import org.apache.shiro.session.mgt.eis.MemorySessionDAO;
+import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
@@ -21,9 +25,11 @@ import javax.servlet.Filter;
 import java.util.HashMap;
 import java.util.Map;
 
-@Slf4j
 @Configuration
+@AutoConfigureAfter(ShiroLifecycleBeanPostProcessorConfig.class)
 public class ShiroConfig {
+    @Autowired
+    private SmsConfig config;
 
 
     /**
@@ -54,12 +60,12 @@ public class ShiroConfig {
         DefaultWebSecurityManager manager = new DefaultWebSecurityManager();
         manager.setRealm(loginUserRealm());
         manager.setSessionManager(sessionManager());
-        manager.setCacheManager(getEhCacheManager());
+        manager.setCacheManager(ehCacheManager());
         return manager;
     }
 
     @Bean
-    public EhCacheManager getEhCacheManager() {
+    public EhCacheManager ehCacheManager() {
         EhCacheManager ehcacheManager = new EhCacheManager();
         ehcacheManager.setCacheManagerConfigFile("classpath:ehcache-shiro.xml");
         return ehcacheManager;
@@ -76,16 +82,6 @@ public class ShiroConfig {
         return realm;
     }
 
-
-    /**
-     * 配置LifecycleBeanPostProcessor，可以来自动的调用配置在Spring IOC容器中 Shiro Bean 的生命周期方法
-     *
-     * @return
-     */
-    @Bean
-    public LifecycleBeanPostProcessor lifecycleBeanPostProcessor() {
-        return new LifecycleBeanPostProcessor();
-    }
 
     /**
      * 启用IOC容器中使用Shiro的注解(如@RequiresRoles,@RequiresPermissions)
@@ -120,7 +116,7 @@ public class ShiroConfig {
     public HashedCredentialsMatcher hashedCredentialsMatcher() {
         HashedCredentialsMatcher credentialsMatcher = new HashedCredentialsMatcher();
         credentialsMatcher.setHashAlgorithmName("md5");//散列算法:这里使用MD5算法;
-        credentialsMatcher.setHashIterations(3);//散列的次数
+        credentialsMatcher.setHashIterations(CustomConstant.ENCRYPTION_NUM);//散列的次数
         // true 密码加密用hex编码; false 用base64编码
         credentialsMatcher.setStoredCredentialsHexEncoded(true);
         return credentialsMatcher;
@@ -131,7 +127,18 @@ public class ShiroConfig {
      */
     @Bean
     public SessionManager sessionManager() {
-        return new CustomSessionManager();
+        CustomSessionManager sessionManager = new CustomSessionManager();
+        // 会话过期时间，单位：毫秒(在无操作时开始计时)，默认30分钟
+        sessionManager.setGlobalSessionTimeout(sessionManager.DEFAULT_GLOBAL_SESSION_TIMEOUT * config.getTimeout());
+        sessionManager.setSessionIdCookieEnabled(false);
+        sessionManager.setSessionIdUrlRewritingEnabled(false);
+        sessionManager.setSessionDAO(sessionDao());
+        return sessionManager;
+    }
+
+    @Bean("sessionDao")
+    public SessionDAO sessionDao() {
+        return new MemorySessionDAO();
     }
 
     /**

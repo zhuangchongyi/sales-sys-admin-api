@@ -5,7 +5,7 @@ import com.dc.common.exception.ServiceException;
 import com.dc.common.utils.CodeUtil;
 import com.dc.common.utils.DateUtil;
 import com.dc.common.utils.FTPUtil;
-import com.dc.common.vo.FtpEntity;
+import com.dc.framework.config.properties.FtpConfig;
 import com.dc.project.sales.dao.SysAccessoryDao;
 import com.dc.project.sales.entity.SysAccessory;
 import com.dc.project.sales.service.ISysAccessoryService;
@@ -28,10 +28,10 @@ import java.util.Date;
 public class SysAccessoryServiceImpl extends ServiceImpl<SysAccessoryDao, SysAccessory> implements ISysAccessoryService {
 
     @Autowired
-    private FtpEntity ftpEntity;
+    private FtpConfig ftpConfig;
 
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean upload(Long id, MultipartFile file) {
         try {
@@ -41,9 +41,9 @@ public class SysAccessoryServiceImpl extends ServiceImpl<SysAccessoryDao, SysAcc
             String name = file.getOriginalFilename();
             String fileName = CodeUtil.randomUUIDNotRail() + name.substring(name.indexOf('.'));
             String fileDir = DateUtil.getYYYYMMPathString(new Date());
-            String url = ftpEntity.getUrlPrefix() + fileDir + fileName;
-            String path = ftpEntity.getPath() + fileDir;
-            FTPClient ftpClient = FTPUtil.loginFTP(ftpEntity.getHost(), ftpEntity.getPort(), ftpEntity.getUsername(), ftpEntity.getPassword());
+            String url = ftpConfig.getUrlPrefix() + fileDir + fileName;
+            String path = ftpConfig.getPath() + fileDir;
+            FTPClient ftpClient = FTPUtil.loginFTP(ftpConfig.getHost(), ftpConfig.getPort(), ftpConfig.getUsername(), ftpConfig.getPassword());
             if (null != ftpClient) {
                 boolean success = FTPUtil.uploadFile(ftpClient, path, fileName, file.getInputStream());
                 if (success) {
@@ -65,14 +65,14 @@ public class SysAccessoryServiceImpl extends ServiceImpl<SysAccessoryDao, SysAcc
         throw new ServiceException("上传失败");
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean delete(Long pkId) {
         SysAccessory accessory = this.getById(pkId);
         boolean row = this.removeById(pkId);
         //删除文件
 //        if (null == accessory.getMaterielId()) {
-        FTPClient ftpClient = FTPUtil.loginFTP(ftpEntity.getHost(), ftpEntity.getPort(), ftpEntity.getUsername(), ftpEntity.getPassword());
+        FTPClient ftpClient = FTPUtil.loginFTP(ftpConfig.getHost(), ftpConfig.getPort(), ftpConfig.getUsername(), ftpConfig.getPassword());
         FTPUtil.deleteFile(ftpClient, accessory.getPath(), accessory.getFileName());
 //        }
         return row;

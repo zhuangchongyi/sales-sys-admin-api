@@ -1,6 +1,8 @@
 package com.dc.project.system.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.dc.common.constant.CustomConstant;
 import com.dc.common.vo.TreeSelect;
 import com.dc.project.system.dao.SysDeptDao;
 import com.dc.project.system.entity.SysDept;
@@ -23,12 +25,18 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptDao, SysDept> impleme
 
     @Override
     public List<SysDept> list(SysDept sysDept) {
+        // TODO<zhuangcy> 查询时未以树展示
         return baseMapper.list(sysDept);
     }
 
     @Override
     public List<TreeSelect> treeselect() {
-        return buildDeptTreeSelect(this.list(new SysDept()));
+        QueryWrapper<SysDept> queryWrapper = new QueryWrapper<SysDept>()
+                .select(" dept_id, dept_name, parent_id")
+                .eq("status", CustomConstant.START_STATUS)
+                .orderByAsc("dept_id")
+                .orderByAsc("parent_id");
+        return buildDeptTreeSelect(this.list(queryWrapper));
     }
 
     public List<TreeSelect> buildDeptTreeSelect(List<SysDept> depts) {

@@ -1,5 +1,7 @@
 package com.dc.test;
 
+import com.dc.common.constant.CustomConstant;
+
 import javax.crypto.Cipher;
 import java.io.ByteArrayOutputStream;
 import java.security.*;
@@ -124,7 +126,7 @@ public class TestRSA {
         byte[] decryptedData = out.toByteArray();
         out.close();
         // 解密后的内容
-        return new String(decryptedData, "UTF-8");
+        return new String(decryptedData, CustomConstant.UTF8);
     }
 
     /**
@@ -164,30 +166,30 @@ public class TestRSA {
         return signature.verify(Base64.getDecoder().decode((sign.getBytes())));
     }
 
-    public static void main(String[] args) {
-        try {
-            // 生成密钥对
-            KeyPair keyPair = getKeyPair();
-            String privateKey = new String(Base64.getEncoder().encode(keyPair.getPrivate().getEncoded()));
-            String publicKey = new String(Base64.getEncoder().encode(keyPair.getPublic().getEncoded()));
-            System.out.println("私钥:" + privateKey);
-            System.out.println("公钥:" + publicKey);
-            // RSA加密
-            String data = "待加密的文字内容";
-            String encryptData = encrypt(data, getPublicKey(publicKey));
-            System.out.println("加密后内容:" + encryptData);
-            // RSA解密
-            String decryptData = decrypt(encryptData, getPrivateKey(privateKey));
-            System.out.println("解密后内容:" + decryptData);
-
-            // RSA签名
-            String sign = sign(data, getPrivateKey(privateKey));
-            // RSA验签
-            boolean result = verify(data, getPublicKey(publicKey), sign);
-            System.out.print("验签结果:" + result);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.print("加解密异常");
-        }
-    }
+//    public static void main(String[] args) {
+//        try {
+//            // 生成密钥对
+//            KeyPair keyPair = getKeyPair();
+//            String privateKey = new String(Base64.getEncoder().encode(keyPair.getPrivate().getEncoded()));
+//            String publicKey = new String(Base64.getEncoder().encode(keyPair.getPublic().getEncoded()));
+//            System.out.println("私钥:" + privateKey);
+//            System.out.println("公钥:" + publicKey);
+//            // RSA加密
+//            String data = "待加密的文字内容";
+//            String encryptData = encrypt(data, getPublicKey(publicKey));
+//            System.out.println("加密后内容:" + encryptData);
+//            // RSA解密
+//            String decryptData = decrypt(encryptData, getPrivateKey(privateKey));
+//            System.out.println("解密后内容:" + decryptData);
+//
+//            // RSA签名
+//            String sign = sign(data, getPrivateKey(privateKey));
+//            // RSA验签
+//            boolean result = verify(data, getPublicKey(publicKey), sign);
+//            System.out.print("验签结果:" + result);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            System.out.print("加解密异常");
+//        }
+//    }
 }

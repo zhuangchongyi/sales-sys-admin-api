@@ -2,6 +2,7 @@ package com.dc.project.sales.controller;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.dc.common.lang.annotation.RepeatSubmit;
 import com.dc.common.vo.R;
 import com.dc.project.sales.entity.SysQuotation;
 import com.dc.project.sales.service.ISysQuotationService;
@@ -43,24 +44,28 @@ public class SysQuotationController {
      * @return
      * @throws Exception
      */
+    @RepeatSubmit
     @RequiresPermissions(value = {"sales:quotation:add", "sales:quotation:edit"}, logical = Logical.OR)
     @PostMapping
     public R saveAndUpdate(@RequestBody Map formMap) throws Exception {
         return R.success().data(quotationService.saveAndUpdate(formMap));
     }
 
+    @RepeatSubmit
     @RequiresPermissions(value = "sales:quotation:delete")
     @DeleteMapping("/{quotationId}")
     public R delete(@PathVariable Integer quotationId) {
         return R.success().data(quotationService.delete(quotationId));
     }
 
+    @RepeatSubmit
     @RequiresPermissions(value = "sales:quotation:submit")
     @PutMapping("/submit/{status}")
     public R submit(@RequestBody Integer[] ids, @PathVariable String status) {
         return R.success().data(quotationService.submit(ids, status));
     }
 
+    @RepeatSubmit
     @RequiresPermissions(value = "sales:quotation:audit")
     @PutMapping("/audit")
     public R audit(@RequestBody SysQuotation quotation) {
@@ -72,6 +77,7 @@ public class SysQuotationController {
      *
      * @param formMap {clientele，materielList}
      */
+    @RepeatSubmit
     @RequiresPermissions(value = "sales:quotation:order")
     @PostMapping("/order")
     public R order(@RequestBody Map<String, Object> formMap) throws InvocationTargetException, IllegalAccessException {

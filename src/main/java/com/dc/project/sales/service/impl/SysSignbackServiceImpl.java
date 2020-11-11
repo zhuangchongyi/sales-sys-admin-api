@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.dc.common.lang.annotation.DataScope;
 import com.dc.common.constant.CustomConstant;
 import com.dc.common.constant.SalesConstant;
 import com.dc.common.exception.ServiceException;
@@ -50,6 +51,7 @@ public class SysSignbackServiceImpl extends ServiceImpl<SysSignbackDao, SysSignb
     @Autowired
     private ISysOrderService orderService;
 
+    @DataScope(userAlias = "sign", userColumn = "create_id")
     @Override
     public IPage<SysSignback> page(Page<SysSignback> page, SysSignback sysSignback) {
         return baseMapper.page(page, sysSignback);
@@ -105,6 +107,7 @@ public class SysSignbackServiceImpl extends ServiceImpl<SysSignbackDao, SysSignb
             insertReceivable(signback);
         } else {
             delReceivable(signback.getSignbackNum());
+            sysSignback.setSignbackStatus(CustomConstant.NO_STATUS);
         }
         updateOrderSign(checkStatus, signback, subList);
         if (!this.updateById(sysSignback)) {

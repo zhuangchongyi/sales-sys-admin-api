@@ -64,4 +64,9 @@ public class SysRole extends BaseEntity implements Serializable {
      */
     @TableField(exist = false)
     private Integer[] menuIds;
+    /**
+     * 部门组
+     */
+    @TableField(exist = false)
+    private Integer[] deptIds;
 }

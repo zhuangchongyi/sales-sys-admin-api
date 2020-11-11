@@ -2,6 +2,7 @@ package com.dc.project.sales.controller;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.dc.common.lang.annotation.RepeatSubmit;
 import com.dc.common.vo.R;
 import com.dc.project.sales.entity.SysOrder;
 import com.dc.project.sales.service.ISysOrderService;
@@ -24,7 +25,7 @@ public class SysOrderController {
     @Autowired
     private ISysOrderService orderService;
 
-    @RequiresPermissions(value = "sales:order:list")
+    @RequiresPermissions("sales:order:list")
     @GetMapping
     public R page(Page page, SysOrder order) {
         return R.success().data(orderService.page(page, order));
@@ -47,25 +48,28 @@ public class SysOrderController {
      * @return
      * @throws Exception
      */
+    @RepeatSubmit
     @RequiresPermissions(value = {"sales:order:add", "sales:order:edit"}, logical = Logical.OR)
     @PostMapping
     public R saveAndUpdate(@RequestBody Map formMap) throws Exception {
         return R.success().data(orderService.saveAndUpdate(formMap));
     }
 
+    @RepeatSubmit
     @RequiresPermissions(value = "sales:order:delete")
     @DeleteMapping("/{orderId}")
     public R delete(@PathVariable Integer orderId) {
         return R.success().data(orderService.delete(orderId));
     }
 
-
+    @RepeatSubmit
     @RequiresPermissions(value = "sales:order:submit")
     @PutMapping("/submit/{status}")
     public R submit(@RequestBody Integer[] ids, @PathVariable String status) {
         return R.success().data(orderService.submit(ids, status));
     }
 
+    @RepeatSubmit
     @RequiresPermissions(value = "sales:order:audit")
     @PutMapping("/audit")
     public R audit(@RequestBody SysOrder order) {
@@ -74,6 +78,7 @@ public class SysOrderController {
 
     /**
      * 校验是否可以关闭订单
+     *
      * @param order
      * @return
      */
@@ -82,21 +87,23 @@ public class SysOrderController {
         return R.success().data(orderService.checkCloseOrder(order));
     }
 
-    @RequiresPermissions(value = "sales:order:edit")
+    @RepeatSubmit
+    @RequiresPermissions(value = "sales:order:close")
     @PutMapping("/close")
     public R closeOrder(@RequestBody SysOrder order) {
         return R.success().data(orderService.closeOrder(order));
     }
 
     /**
-     * 查询可退款订单
+     * 查询可退货订单
+     *
      * @param page
      * @param order
      * @return
      */
     @GetMapping("/returns")
     public R findReturnsOrder(Page page, SysOrder order) {
-        return R.success().data(orderService.findReturnsOrder(page,order));
+        return R.success().data(orderService.findReturnsOrder(page, order));
     }
 
 }

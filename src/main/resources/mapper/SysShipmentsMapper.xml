@@ -78,6 +78,7 @@
             <if test="ss.outboundStatus!=null and ss.outboundStatus!=''">
                 and ss.outbound_status=#{ss.outboundStatus}
             </if>
+            ${ss.params.dataScope}
         </where>
         order by ss.create_time desc
     </select>

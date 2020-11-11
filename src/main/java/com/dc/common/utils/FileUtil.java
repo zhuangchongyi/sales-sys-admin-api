@@ -1,5 +1,7 @@
 package com.dc.common.utils;
 
+import com.dc.common.constant.CustomConstant;
+
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.net.URLEncoder;
@@ -90,17 +92,17 @@ public class FileUtil {
         try {
             if (agent.contains("MSIE")) {
                 // IE浏览器
-                filename = URLEncoder.encode(filename, "utf-8");
+                filename = URLEncoder.encode(filename, CustomConstant.UTF8);
                 filename = filename.replace("+", " ");
             } else if (agent.contains("Firefox")) {
                 // 火狐浏览器
                 filename = new String(fileName.getBytes(), "ISO8859-1");
             } else if (agent.contains("Chrome")) {
                 // google浏览器
-                filename = URLEncoder.encode(filename, "utf-8");
+                filename = URLEncoder.encode(filename, CustomConstant.UTF8);
             } else {
                 // 其它浏览器
-                filename = URLEncoder.encode(filename, "utf-8");
+                filename = URLEncoder.encode(filename, CustomConstant.UTF8);
             }
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();

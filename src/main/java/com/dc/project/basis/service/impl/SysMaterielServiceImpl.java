@@ -17,8 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 产品档案表 服务实现类
@@ -36,22 +37,22 @@ public class SysMaterielServiceImpl extends ServiceImpl<SysMaterielDao, SysMater
         return baseMapper.page(page, materiel);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean insert(SysMateriel materiel) {
-        int count = baseMapper.selectCount(new QueryWrapper<SysMateriel>().select("materiel_id").eq("materiel_num", materiel.getMaterielNum()));
-        if (count > 0) throw new ServiceException(String.format("编码不允许重复,%s", materiel.getMaterielNum()));
-        int row = baseMapper.insert(materiel);
-        if (row == 0) throw new ServiceException("添加失败");
+        SysMateriel one = this.getOne(new QueryWrapper<SysMateriel>()
+                .select("materiel_id").eq("materiel_num", materiel.getMaterielNum()), false);
+        if (one != null) throw new ServiceException(String.format("编码不允许重复,%s", materiel.getMaterielNum()));
+        if (!this.save(materiel)) throw new ServiceException("添加失败");
         insertModel(materiel, false);
         return true;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean update(SysMateriel materiel) {
-        SysMateriel res = baseMapper.selectOne(new QueryWrapper<SysMateriel>().select("materiel_id")
-                .eq("materiel_num", materiel.getMaterielNum()));
+        SysMateriel res = this.getOne(new QueryWrapper<SysMateriel>()
+                .select("materiel_id").eq("materiel_num", materiel.getMaterielNum()), false);
         if (null != res && !res.getMaterielId().equals(materiel.getMaterielId()))
             throw new ServiceException(String.format("编码不允许重复,%s", materiel.getMaterielNum()));
         if (!this.updateById(materiel)) throw new ServiceException("修改失败");
@@ -87,18 +88,15 @@ public class SysMaterielServiceImpl extends ServiceImpl<SysMaterielDao, SysMater
         String[] modelNames = materiel.getModelNames();
         int length = modelNames.length;
         if (length != 0) {
+            Integer materielId = materiel.getMaterielId();
             if (delFlag) {
-                materielModelService.remove(new QueryWrapper<SysMaterielModel>().eq("m_id", materiel.getMaterielId()));
+                materielModelService.remove(new QueryWrapper<SysMaterielModel>().eq("m_id", materielId));
             }
-            List<SysMaterielModel> modelList = new ArrayList<>();
-            for (int i = 0; i < length; i++) {
-                SysMaterielModel model = new SysMaterielModel();
-                model.setMId(materiel.getMaterielId());
-                model.setModelName(modelNames[i].trim());
-                if (StringUtils.isNotEmpty(model.getModelName().trim()))
-                    modelList.add(model);
-            }
-            if (!materielModelService.saveBatch(modelList))
+            List<SysMaterielModel> list = Stream.of(modelNames)
+                    .filter(model -> StringUtils.isNotEmpty(model))
+                    .map(model -> new SysMaterielModel().setMId(materielId).setModelName(model))
+                    .collect(Collectors.toList());
+            if (!materielModelService.saveBatch(list))
                 throw new ServiceException("操作失败");
         } else {
             throw new ServiceException("产品未添加型号");

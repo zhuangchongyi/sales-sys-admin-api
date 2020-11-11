@@ -7,7 +7,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dc.common.constant.CustomConstant;
 import com.dc.common.exception.ServiceException;
 import com.dc.common.utils.CodeUtil;
-import com.dc.common.utils.UserSecurityUtils;
+import com.dc.common.utils.UserSecurityUtil;
+import com.dc.common.vo.R;
 import com.dc.project.system.dao.SysUserDao;
 import com.dc.project.system.entity.SysMenu;
 import com.dc.project.system.entity.SysRole;
@@ -24,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 人员表 服务实现类
@@ -42,41 +45,46 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUser> impleme
     @Autowired
     private ISysMenuService menuService;
 
-
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean insert(SysUser sysUser) {
+        String username = sysUser.getUsername();
         QueryWrapper<SysUser> queryWrapper = new QueryWrapper<SysUser>().select("user_id")
-                .eq("username", sysUser.getUsername()).or().eq("user_num", sysUser.getUserNum());
-        int count = this.count(queryWrapper);
-        if (count > 0)//不允许重复添加
+                .eq("username", username).or().eq("user_num", sysUser.getUserNum());
+        SysUser count = this.getOne(queryWrapper, false);
+        if (null != count)//不允许重复添加
             throw new ServiceException("员工编码已存在");
-        if (StringUtils.isEmpty(sysUser.getUsername())) {
+        if (StringUtils.isEmpty(username)) {
             sysUser.setUsername(sysUser.getUserNum());
         } else {
-            if ("admin".equals(sysUser.getUsername())) {
-                throw new ServiceException("登录账号已存在");
-            }
-            QueryWrapper<SysUser> qw = new QueryWrapper<SysUser>().select("user_id").eq("username", sysUser.getUsername());
-            SysUser one = this.getOne(qw);
+            verifyAdmin(username);
+            QueryWrapper<SysUser> qw = new QueryWrapper<SysUser>().select("user_id").eq("username", username);
+            SysUser one = this.getOne(qw, false);
             if (null != one)//不允许编码重复
                 throw new ServiceException("登录账号已存在");
         }
         sysUser.setSalt(new SecureRandomNumberGenerator().nextBytes().toHex());//获取盐值
-        sysUser.setPassword(new Md5Hash(sysUser.getUserNum(), sysUser.getSalt(), CustomConstant.ENCRYPTION_NUM).toString());//默认密码为员工编码，加密3次
+        sysUser.setPassword(new Md5Hash(CustomConstant.DEFAULT_PASSWORD, sysUser.getSalt(), CustomConstant.ENCRYPTION_NUM).toString());//默认密码为员工编码，加密3次
         return this.save(sysUser);
     }
 
+    private void verifyAdmin(String username) {
+        if ("admin".equals(username) || "root".equals(username)) {
+            throw new ServiceException("登录账号已存在");
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean update(SysUser sysUser) {
-        QueryWrapper<SysUser> queryWrapper = new QueryWrapper<SysUser>().select("user_id").eq("username", sysUser.getUsername());
-        SysUser res = this.getOne(queryWrapper);
+        String username = sysUser.getUsername();
+        QueryWrapper<SysUser> queryWrapper = new QueryWrapper<SysUser>().select("user_id").eq("username", username);
+        SysUser res = this.getOne(queryWrapper, false);
         if (null != res && !res.getUserId().equals(sysUser.getUserId()))//不允许编码重复
             throw new ServiceException("登录账号不能重复");
         queryWrapper = new QueryWrapper<SysUser>().select("user_id").eq("user_num", sysUser.getUserNum());
-        res = this.getOne(queryWrapper);
-        if ("admin".equals(sysUser.getUsername())) {
-            throw new ServiceException("登录账号已存在");
-        }
+        res = this.getOne(queryWrapper, false);
+        verifyAdmin(username);
         if (null != res && !res.getUserId().equals(sysUser.getUserId()))//不允许编码重复
             throw new ServiceException("编码不能重复");
         return this.updateById(sysUser);
@@ -101,37 +109,38 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUser> impleme
                 .orderByAsc("parent_id");
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("menus", menuService.buildMenuTreeSelect(menuService.list(queryWrapper)));//所有菜单
-        Integer[] roleIds = userRoleService.userRoleList(userId).toArray(new Integer[]{});
+        Integer[] roleIds = userRoleService.userRoleList(userId).stream().toArray(Integer[]::new);
         resultMap.put("checkedKeys", roleMenuService.findRoleMenuByRoleIds(roleIds));//角色的菜单
         return resultMap;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean addUserRole(SysUser sysUser) {
-        if (null == sysUser.getUserId()) {
+        Integer userId = sysUser.getUserId();
+        if (null == userId) {
             throw new ServiceException("用户不存在");
         }
         Integer[] roleIds = sysUser.getRoleIds();
-        QueryWrapper<SysUserRole> queryWrapper = new QueryWrapper<SysUserRole>().eq("user_id", sysUser.getUserId());
-        int count = userRoleService.count(queryWrapper);
+        QueryWrapper<SysUserRole> queryWrapper = new QueryWrapper<SysUserRole>().eq("user_id", userId);
+        SysUserRole one = userRoleService.getOne(queryWrapper, false);
         int length = roleIds.length;
-        if (length == 0 && count == 0) {
+        if (length == 0) {
             throw new ServiceException("未选择角色");
+        } else if (null != one) {
+            userRoleService.remove(queryWrapper);
         }
-        userRoleService.remove(queryWrapper);
-        for (int i = 0; i < length; i++) {
-            SysUserRole userRole = new SysUserRole();
-            userRole.setRoleId(roleIds[i]);
-            userRole.setUserId(sysUser.getUserId());
-            boolean row = userRoleService.save(userRole);
-            if (!row) {
-                throw new ServiceException("角色修改失败");
-            }
+        List<SysUserRole> userRoles = Stream.of(roleIds)
+                .filter(id -> id != null)
+                .map(id -> new SysUserRole().setRoleId(id).setUserId(userId))
+                .collect(Collectors.toList());
+        if (!userRoles.isEmpty() && !userRoleService.saveBatch(userRoles)) {
+            throw new ServiceException("角色修改失败");
         }
         return true;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean changePassword(Map<String, Object> formMap) {
         String password = (String) formMap.get("password");
@@ -147,33 +156,27 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUser> impleme
             throw new ServiceException("两次输入密码不一致!");
         }
 
-        String username = UserSecurityUtils.getUsername();
-        SysUser one = this.getOne(new QueryWrapper<SysUser>().eq("username", username));
+        String username = UserSecurityUtil.getUsername();
+        SysUser one = this.getOne(new QueryWrapper<SysUser>().eq("username", username),false);
         if (one == null) {
-            throw new ServiceException("请重新登陆！");
+            throw new ServiceException(R.UNAUTHORIZED, "请重新登陆！");
         }
         String pwd = new Md5Hash(password, one.getSalt(), CustomConstant.ENCRYPTION_NUM).toString();
         if (!pwd.equals(one.getPassword())) {
-            throw new ServiceException("原密码输入错误");
+            throw new ServiceException("原始密码输入错误");
         }
         SysUser sysUser = new SysUser().setUserId(one.getUserId())
                 .setPassword(new Md5Hash(newPassword, one.getSalt(), CustomConstant.ENCRYPTION_NUM).toString());
         return this.updateById(sysUser);
     }
 
-    @Override
-    public SysUser findRoleByUsername(String username) {
-        return baseMapper.findRoleByUsername(username);
-    }
-
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean updateStatus(SysUser sysUser) {
         if (CustomConstant.ORDINARY_USER_TYPE.equals(sysUser.getUserType())) {
             userRoleService.remove(new QueryWrapper<SysUserRole>().eq("user_id", sysUser.getUserId()));
         }
-        this.updateById(sysUser);
-        return false;
+        return this.updateById(sysUser);
     }
 
     @Override
@@ -186,6 +189,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUser> impleme
         return baseMapper.list(page, user);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public String resetPassword(Integer userId) {
         SysUser sysUser = this.getById(userId);

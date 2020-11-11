@@ -2,13 +2,16 @@ package com.dc.project.warehouse.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dc.common.constant.SalesConstant;
 import com.dc.common.exception.ServiceException;
+import com.dc.common.lang.annotation.DataScope;
 import com.dc.common.utils.BeanUtil;
 import com.dc.common.utils.BigDecimalUtil;
 import com.dc.common.utils.ObjectMapperUtil;
-import com.dc.common.utils.UserSecurityUtils;
+import com.dc.common.utils.UserSecurityUtil;
 import com.dc.project.warehouse.dao.SysStorageDao;
 import com.dc.project.warehouse.entity.SysRepertory;
 import com.dc.project.warehouse.entity.SysStorage;
@@ -37,6 +40,17 @@ public class SysStorageServiceImpl extends ServiceImpl<SysStorageDao, SysStorage
     private ISysStorageSubService storageSubService;
     @Autowired
     private ISysRepertoryService repertoryService;
+
+    @DataScope(userColumn = "create_id")
+    @Override
+    public IPage<SysStorage> page(Page<SysStorage> page, SysStorage sysStorage) {
+        QueryWrapper<SysStorage> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("inout_type", sysStorage.getInoutType());
+        queryWrapper.like(StringUtils.isNotEmpty(sysStorage.getWarehouseNum()), "warehouse_num", sysStorage.getWarehouseNum())
+                .or().like(StringUtils.isNotEmpty(sysStorage.getWarehouseNum()), "warehouse_name", sysStorage.getWarehouseName())
+                .orderByDesc("create_time");
+        return this.page(page,sysStorage);
+    }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -163,7 +177,7 @@ public class SysStorageServiceImpl extends ServiceImpl<SysStorageDao, SysStorage
         SysStorage one = this.getOne(queryWrapper);
         if (null == one) throw new ServiceException();
         SalesConstant.verifyAuditStatus(one.getStatus(), storage.getStatus());
-        storage.setAuditBy(UserSecurityUtils.getUsername());
+        storage.setAuditBy(UserSecurityUtil.getUsername());
         storage.setAuditTime(new Date());
         // 入库时添加产品现存量
         if (SalesConstant.AUDIT.equals(storage.getStatus())) {//审核时

@@ -14,8 +14,8 @@ import java.util.List;
  */
 public interface ISysRoleMenuService extends IService<SysRoleMenu> {
 
-    int addRoleMenu(SysRole sysRole);
+    boolean addRoleMenu(SysRole sysRole);
 
-    List<Integer> findRoleMenuByRoleIds(Integer[] roleIds);
+    List<Integer> findRoleMenuByRoleIds(Integer... roleIds);
 
 }

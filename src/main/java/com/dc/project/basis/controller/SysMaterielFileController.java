@@ -4,6 +4,7 @@ package com.dc.project.basis.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.dc.common.lang.annotation.RepeatSubmit;
 import com.dc.common.vo.R;
 import com.dc.project.basis.entity.SysMaterielFile;
 import com.dc.project.basis.service.ISysMaterielFileService;
@@ -30,6 +31,7 @@ public class SysMaterielFileController {
         return R.success().data(materielFileService.page(page, queryWrapper));
     }
 
+    @RepeatSubmit
     @PutMapping
     public R update(@RequestBody SysMaterielFile materielFile) {
         UpdateWrapper<SysMaterielFile> queryWrapper = new UpdateWrapper<SysMaterielFile>()
@@ -38,6 +40,7 @@ public class SysMaterielFileController {
         return R.success().data(materielFileService.update(queryWrapper));
     }
 
+    @RepeatSubmit
     @DeleteMapping("/{pkId}")
     public R delete(@PathVariable Long pkId) {
         return R.success().data(materielFileService.delete(pkId));

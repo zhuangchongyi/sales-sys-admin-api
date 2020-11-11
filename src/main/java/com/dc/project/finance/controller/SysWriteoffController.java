@@ -3,10 +3,12 @@ package com.dc.project.finance.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.dc.common.lang.annotation.RepeatSubmit;
 import com.dc.common.vo.R;
 import com.dc.project.finance.entity.SysWriteoff;
 import com.dc.project.finance.service.ISysWriteoffService;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,11 +27,12 @@ public class SysWriteoffController {
     @Autowired
     private ISysWriteoffService writeoffService;
 
+    @RequiresPermissions("finance:writeoff:list")
     @GetMapping
-    public R page(Page<SysWriteoff> page,SysWriteoff writeoff) {
+    public R page(Page<SysWriteoff> page, SysWriteoff writeoff) {
         QueryWrapper<SysWriteoff> queryWrapper = new QueryWrapper<>();
-        queryWrapper.like(StringUtils.isNotEmpty(writeoff.getClienteleNum()),"clientele_num",writeoff.getClienteleNum())
-                .or().like(StringUtils.isNotEmpty(writeoff.getClienteleName()),"clientele_name",writeoff.getClienteleName());
+        queryWrapper.like(StringUtils.isNotEmpty(writeoff.getClienteleNum()), "clientele_num", writeoff.getClienteleNum())
+                .or().like(StringUtils.isNotEmpty(writeoff.getClienteleName()), "clientele_name", writeoff.getClienteleName());
         queryWrapper.orderByDesc("create_time");
         return R.success().data(writeoffService.page(page, queryWrapper));
     }
@@ -39,21 +42,29 @@ public class SysWriteoffController {
         return R.success().data(writeoffService.getById(id));
     }
 
+    @RepeatSubmit
+    @RequiresPermissions("finance:writeoff:add")
     @PostMapping
-    public R add(@RequestBody Map<String,Object> formMap) throws InvocationTargetException, IllegalAccessException {
+    public R add(@RequestBody Map<String, Object> formMap) throws InvocationTargetException, IllegalAccessException {
         return R.success().data(writeoffService.insertAndUpdate(formMap));
     }
 
+    @RepeatSubmit
+    @RequiresPermissions("finance:writeoff:edit")
     @PutMapping
-    public R edit(@RequestBody Map<String,Object> formMap) throws InvocationTargetException, IllegalAccessException {
+    public R edit(@RequestBody Map<String, Object> formMap) throws InvocationTargetException, IllegalAccessException {
         return R.success().data(writeoffService.insertAndUpdate(formMap));
     }
 
+    @RepeatSubmit
+    @RequiresPermissions("finance:writeoff:delete")
     @DeleteMapping("/{id}")
     public R delete(@PathVariable Integer id) {
         return R.success().data(writeoffService.delete(id));
     }
 
+    @RepeatSubmit
+    @RequiresPermissions("finance:writeoff:audit")
     @PutMapping("/audit")
     public R audit(@RequestBody SysWriteoff writeoff) {
         return R.success().data(writeoffService.audit(writeoff));

@@ -2,6 +2,7 @@ package com.dc.project.basis.controller;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.dc.common.lang.annotation.RepeatSubmit;
 import com.dc.common.vo.R;
 import com.dc.project.basis.entity.SysMateriel;
 import com.dc.project.basis.service.ISysMaterielService;
@@ -33,18 +34,21 @@ public class SysMaterielController {
         return R.success().data(materielService.get(materielId));
     }
 
+    @RepeatSubmit
     @RequiresPermissions("basis:materiel:add")
     @PostMapping
     public R add(@RequestBody @Validated SysMateriel materiel) {
         return R.success().data(materielService.insert(materiel));
     }
 
+    @RepeatSubmit
     @RequiresPermissions("basis:materiel:edit")
     @PutMapping
     public R edit(@RequestBody @Validated SysMateriel materiel) {
         return R.success().data(materielService.update(materiel));
     }
 
+    @RepeatSubmit
     @RequiresPermissions("basis:materiel:delete")
     @DeleteMapping("/{materielId}")
     public R delete(@PathVariable Integer materielId) {

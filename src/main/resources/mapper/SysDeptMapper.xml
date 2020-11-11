@@ -19,11 +19,12 @@
         <result column="create_time" property="createTime"/>
         <result column="update_by" property="updateBy"/>
         <result column="update_time" property="updateTime"/>
+        <result column="ancestors" property="ancestors"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        dept_id, dept_num, dept_name, parent_id, dept_type, leader, phone, email, status,address, del_flag, create_by, create_time, update_by, update_time
+        ancestors,dept_id, dept_num, dept_name, parent_id, dept_type, leader, phone, email, status,address, del_flag, create_by, create_time, update_by, update_time
     </sql>
     <select id="list" resultMap="BaseResultMap">
         select
@@ -36,6 +37,7 @@
             <if test="deptType!=null and deptType!=''">and dept_type=#{deptType}</if>
             and del_flag = '0'
         </where>
+        order by create_id desc
     </select>
 
 </mapper>

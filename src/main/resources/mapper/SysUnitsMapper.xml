@@ -23,7 +23,7 @@
     </sql>
     <select id="list" resultMap="BaseResultMap">
         select
-        <include refid="Base_Column_List"/>
+        units_id, units_num, units_name,status, units_type,create_time, create_by, update_time, update_by, remark
         from sys_units
         <where>
             <if test="units.unitsNum!=null and units.unitsNum!=''">and units_num like
