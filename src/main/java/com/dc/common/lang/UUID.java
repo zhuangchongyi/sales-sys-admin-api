@@ -1,6 +1,6 @@
 package com.dc.common.lang;
 
-import com.sun.xml.internal.ws.util.UtilException;
+import com.dc.common.exception.UtilException;
 
 import java.io.Serializable;
 import java.security.MessageDigest;

@@ -2,7 +2,7 @@ package com.dc.framework.handler;
 
 import com.dc.common.exception.RepeatSubmitException;
 import com.dc.common.exception.ServiceException;
-import com.dc.common.exception.UtilsException;
+import com.dc.common.exception.UtilException;
 import com.dc.common.vo.R;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.ShiroException;
@@ -60,7 +60,7 @@ public class GlobalExceptionHandler {
             return R.error().code(ex.getCode()).msg(ex.getMessage());
         } else if (e instanceof RepeatSubmitException) {//重复提交异常
             return R.error().code(R.FAIL_CODE).msg(e.getMessage());
-        } else if (e instanceof UtilsException) { //工具类处理异常
+        } else if (e instanceof UtilException) { //工具类处理异常
             return R.error().code(R.ERROR_CODE).msg(e.getMessage());
         } else {
             return R.error().code(R.ERROR_CODE).msg("(╥╯^╰╥) 系统出错了，请稍后处理！");

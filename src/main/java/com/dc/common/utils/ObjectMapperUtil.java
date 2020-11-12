@@ -1,6 +1,6 @@
 package com.dc.common.utils;
 
-import com.dc.common.exception.UtilsException;
+import com.dc.common.exception.UtilException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -19,7 +19,7 @@ public class ObjectMapperUtil {
         } catch (Exception e) {
             e.printStackTrace();
             //如果报错需要转化为运行时异常
-            throw new UtilsException("对象转换json出现异常");
+            throw new UtilException("对象转换json出现异常");
         }
         return json;
     }
@@ -32,7 +32,7 @@ public class ObjectMapperUtil {
             t = mapper.readValue(json, target);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new UtilsException("json转换对象出现异常");
+            throw new UtilException("json转换对象出现异常");
         }
         return t;
     }

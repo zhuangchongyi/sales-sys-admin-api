@@ -1,6 +1,6 @@
 package com.dc.common.utils;
 
-import com.dc.common.exception.UtilsException;
+import com.dc.common.exception.UtilException;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -52,7 +52,7 @@ public class SnowflakeUtil {
     public SnowflakeUtil(long workerId) {
         // 校验
         if (workerId > maxWorkerId || workerId < 0) {
-            throw new UtilsException(String.format("worker Id can't be greater than %s or less than 0", maxWorkerId));
+            throw new UtilException(String.format("worker Id can't be greater than %s or less than 0", maxWorkerId));
         }
         this.workerId = workerId;
     }
@@ -62,7 +62,7 @@ public class SnowflakeUtil {
         log.info("workerId=" + workerId);
         // 校验
         if (workerId > maxWorkerId || workerId < 0) {
-            throw new UtilsException(String.format("worker Id can't be greater than %s or less than 0", maxWorkerId));
+            throw new UtilException(String.format("worker Id can't be greater than %s or less than 0", maxWorkerId));
         }
         this.workerId = workerId;
     }
@@ -80,7 +80,7 @@ public class SnowflakeUtil {
         long timestamp = getNowTimestamp();
         // 检验时间戳
         if (timestamp < lastTimestamp) {
-            throw new UtilsException(String.format("Clock moved backwards. Refusing to generate id for %s milliseconds", lastTimestamp - timestamp));
+            throw new UtilException(String.format("Clock moved backwards. Refusing to generate id for %s milliseconds", lastTimestamp - timestamp));
         }
         if (timestamp == lastTimestamp) {
             sequence = (sequence + 1) & maxSequence;
