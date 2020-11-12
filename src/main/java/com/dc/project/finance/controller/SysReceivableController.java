@@ -7,7 +7,6 @@ import com.dc.common.lang.annotation.RepeatSubmit;
 import com.dc.common.vo.R;
 import com.dc.project.finance.entity.SysReceivable;
 import com.dc.project.finance.service.ISysReceivableService;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -30,12 +29,7 @@ public class SysReceivableController {
     @RequiresPermissions("finance:receivable:list")
     @GetMapping
     public R page(Page page, SysReceivable receivable) {
-        QueryWrapper<SysReceivable> queryWrapper = new QueryWrapper<>();
-        queryWrapper.like(StringUtils.isNotEmpty(receivable.getReceivableNum()), "receivable_num", receivable.getReceivableNum())
-                .or().like(StringUtils.isNotEmpty(receivable.getClienteleNum()), "clientele_num", receivable.getClienteleNum())
-                .or().like(StringUtils.isNotEmpty(receivable.getClienteleName()), "clientele_name", receivable.getClienteleName());
-        queryWrapper.orderByDesc("create_time");
-        return R.success().data(receivableService.page(page, queryWrapper));
+        return R.success().data(receivableService.page(page, receivable));
     }
 
     @GetMapping("/{id}")

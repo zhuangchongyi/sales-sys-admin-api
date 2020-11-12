@@ -3,14 +3,13 @@ package com.dc.project.finance.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc.common.lang.annotation.RepeatSubmit;
 import com.dc.common.constant.SalesConstant;
 import com.dc.common.exception.ServiceException;
+import com.dc.common.lang.annotation.RepeatSubmit;
 import com.dc.common.utils.CodeUtil;
 import com.dc.common.vo.R;
 import com.dc.project.finance.entity.SysReceipt;
 import com.dc.project.finance.service.ISysReceiptService;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -30,12 +29,7 @@ public class SysReceiptController {
     @RequiresPermissions("finance:receipt:list")
     @GetMapping
     public R page(Page page, SysReceipt receipt) {
-        QueryWrapper<SysReceipt> queryWrapper = new QueryWrapper<>();
-        queryWrapper.like(StringUtils.isNotEmpty(receipt.getReceiptNum()), "receipt_num", receipt.getReceiptNum())
-                .or().like(StringUtils.isNotEmpty(receipt.getClienteleNum()), "clientele_num", receipt.getClienteleNum())
-                .or().like(StringUtils.isNotEmpty(receipt.getClienteleName()), "clientele_name", receipt.getClienteleName());
-        queryWrapper.orderByDesc("create_time");
-        return R.success().data(receiptService.page(page, queryWrapper));
+        return R.success().data(receiptService.page(page, receipt));
     }
 
     @GetMapping("/{id}")

@@ -1,5 +1,7 @@
 package com.dc.project.finance.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc.project.finance.entity.SysWriteoff;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -13,6 +15,7 @@ import java.util.Map;
  * @since 2020-10-26
  */
 public interface ISysWriteoffService extends IService<SysWriteoff> {
+    IPage<SysWriteoff> page(Page<SysWriteoff> page, SysWriteoff writeoff);
 
     boolean insertAndUpdate(Map<String, Object> formMap) throws InvocationTargetException, IllegalAccessException;
 

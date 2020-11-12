@@ -27,7 +27,7 @@ public class CustomAuthenticationFilter extends FormAuthenticationFilter {
     public boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
         if (request instanceof HttpServletRequest) {
             HttpServletRequest req = WebUtils.toHttp(request);
-            log.info(String.format("请求方式：%s, 请求路径：%s", req.getMethod(), req.getServletPath()));
+            log.info("请求方式：{}, 请求路径：{}", req.getMethod(), req.getServletPath());
             if (req.getMethod().toUpperCase().equals("OPTIONS")) {
                 log.info("如果请求的方法是OPTIONS，总是返回true");
                 return true;

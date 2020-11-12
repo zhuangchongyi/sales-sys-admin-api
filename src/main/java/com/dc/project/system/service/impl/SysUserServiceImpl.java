@@ -64,7 +64,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUser> impleme
                 throw new ServiceException("登录账号已存在");
         }
         sysUser.setSalt(new SecureRandomNumberGenerator().nextBytes().toHex());//获取盐值
-        sysUser.setPassword(new Md5Hash(CustomConstant.DEFAULT_PASSWORD, sysUser.getSalt(), CustomConstant.ENCRYPTION_NUM).toString());//默认密码为员工编码，加密3次
+        sysUser.setPassword(new Md5Hash(CustomConstant.DEFAULT_PASSWORD, sysUser.getSalt(), CustomConstant.ENCRYPTION_NUM).toString());
         return this.save(sysUser);
     }
 
@@ -157,7 +157,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUser> impleme
         }
 
         String username = UserSecurityUtil.getUsername();
-        SysUser one = this.getOne(new QueryWrapper<SysUser>().eq("username", username),false);
+        SysUser one = this.getOne(new QueryWrapper<SysUser>().eq("username", username), false);
         if (one == null) {
             throw new ServiceException(R.UNAUTHORIZED, "请重新登陆！");
         }

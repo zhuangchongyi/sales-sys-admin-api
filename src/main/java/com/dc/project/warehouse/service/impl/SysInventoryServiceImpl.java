@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.dc.common.constant.CustomConstant;
 import com.dc.common.constant.SalesConstant;
 import com.dc.common.exception.ServiceException;
 import com.dc.common.lang.annotation.DataScope;
@@ -45,7 +46,8 @@ public class SysInventoryServiceImpl extends ServiceImpl<SysInventoryDao, SysInv
     public IPage<SysInventory> page(Page<SysInventory> page, SysInventory inventory) {
         QueryWrapper<SysInventory> queryWrapper = new QueryWrapper<>();
         queryWrapper.like(StringUtils.isNotEmpty(inventory.getWarehouseName()), "warehouse_name", inventory.getWarehouseName())
-                .or().like(StringUtils.isNotEmpty(inventory.getWarehouseNum()), "warehouse_num", inventory.getWarehouseNum())
+                .like(StringUtils.isNotEmpty(inventory.getWarehouseNum()), "warehouse_num", inventory.getWarehouseNum())
+                .apply(inventory.getParams().get(CustomConstant.DATA_SCOPE).toString().replaceFirst("and", ""))
                 .orderByDesc("create_time");
         return this.page(page, queryWrapper);
     }

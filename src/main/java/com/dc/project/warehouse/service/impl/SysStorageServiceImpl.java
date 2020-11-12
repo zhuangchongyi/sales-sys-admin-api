@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.dc.common.constant.CustomConstant;
 import com.dc.common.constant.SalesConstant;
 import com.dc.common.exception.ServiceException;
 import com.dc.common.lang.annotation.DataScope;
@@ -47,9 +48,10 @@ public class SysStorageServiceImpl extends ServiceImpl<SysStorageDao, SysStorage
         QueryWrapper<SysStorage> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("inout_type", sysStorage.getInoutType());
         queryWrapper.like(StringUtils.isNotEmpty(sysStorage.getWarehouseNum()), "warehouse_num", sysStorage.getWarehouseNum())
-                .or().like(StringUtils.isNotEmpty(sysStorage.getWarehouseNum()), "warehouse_name", sysStorage.getWarehouseName())
+                .like(StringUtils.isNotEmpty(sysStorage.getWarehouseName()), "warehouse_name", sysStorage.getWarehouseName())
+                .apply(sysStorage.getParams().get(CustomConstant.DATA_SCOPE).toString().replaceFirst("and", ""))
                 .orderByDesc("create_time");
-        return this.page(page,sysStorage);
+        return this.page(page, queryWrapper);
     }
 
     @Transactional(rollbackFor = Exception.class)

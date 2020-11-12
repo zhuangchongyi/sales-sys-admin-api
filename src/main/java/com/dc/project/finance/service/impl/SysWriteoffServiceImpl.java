@@ -1,10 +1,13 @@
 package com.dc.project.finance.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dc.common.constant.CustomConstant;
 import com.dc.common.constant.SalesConstant;
 import com.dc.common.exception.ServiceException;
+import com.dc.common.lang.annotation.DataScope;
 import com.dc.common.utils.BeanUtil;
 import com.dc.common.utils.BigDecimalUtil;
 import com.dc.common.utils.ObjectMapperUtil;
@@ -43,6 +46,17 @@ public class SysWriteoffServiceImpl extends ServiceImpl<SysWriteoffDao, SysWrite
     private ISysReceiptService receiptService;
     @Autowired
     private ISysReceivableService receivableService;
+
+    @DataScope(userColumn = "create_id")
+    @Override
+    public IPage<SysWriteoff> page(Page<SysWriteoff> page, SysWriteoff writeoff) {
+        QueryWrapper<SysWriteoff> queryWrapper = new QueryWrapper<>();
+        queryWrapper.like(StringUtils.isNotEmpty(writeoff.getClienteleNum()), "clientele_num", writeoff.getClienteleNum())
+                .like(StringUtils.isNotEmpty(writeoff.getClienteleName()), "clientele_name", writeoff.getClienteleName())
+                .apply(writeoff.getParams().get(CustomConstant.DATA_SCOPE).toString().replaceFirst("and", ""))
+                .orderByDesc("create_time");
+        return this.page(page, queryWrapper);
+    }
 
     @Transactional(rollbackFor = Exception.class)
     @Override

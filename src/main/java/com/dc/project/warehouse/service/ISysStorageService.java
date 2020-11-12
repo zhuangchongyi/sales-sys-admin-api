@@ -14,7 +14,7 @@ import java.util.Map;
  * @since 2020-09-22
  */
 public interface ISysStorageService extends IService<SysStorage> {
-    IPage<SysStorage> page(Page<SysStorage> page,SysStorage sysStorage);
+    IPage<SysStorage> page(Page<SysStorage> page, SysStorage sysStorage);
 
     boolean addAndUpdate(Map formMap) throws Exception;
 

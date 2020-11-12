@@ -48,6 +48,8 @@ public class DataScopeAspectj {
         SysUser user = UserSecurityUtil.getUser();
         if (!UserSecurityUtil.isAdmin(user.getUserId())) {
             dataScopeFilter(point, user, dataScope);
+        } else {
+            verifyParams(point, null);
         }
     }
 
@@ -98,15 +100,22 @@ public class DataScopeAspectj {
         } else {
             sqlString.append(String.format(" or %s.%s = %s ", userAlias, userColumn, user.getUserId()));
         }
-        if (StringUtils.isNotBlank(sqlString.toString())) {
-            Object[] args = point.getArgs();
-            for (int i = 0; i < args.length; i++) {
-                Object arg = args[i];
-                if (arg instanceof BaseEntity) {
-                    BaseEntity baseEntity = (BaseEntity) arg;
-                    baseEntity.getParams().put(CustomConstant.DATA_SCOPE, " and (" + sqlString.substring(4) + ")");
-                    break;
+
+        verifyParams(point, sqlString.toString());
+    }
+
+    private void verifyParams(JoinPoint point, String sql) {
+        Object[] args = point.getArgs();
+        for (int i = 0; i < args.length; i++) {
+            Object arg = args[i];
+            if (arg instanceof BaseEntity) {
+                BaseEntity baseEntity = (BaseEntity) arg;
+                if (StringUtils.isNotBlank(sql)) {
+                    baseEntity.getParams().put(CustomConstant.DATA_SCOPE, " and (" + sql.substring(4) + ")");
+                } else {
+                    baseEntity.getParams().put(CustomConstant.DATA_SCOPE, "and 1=1");
                 }
+                break;
             }
         }
     }

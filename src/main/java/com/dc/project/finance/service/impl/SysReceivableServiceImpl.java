@@ -2,10 +2,13 @@ package com.dc.project.finance.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dc.common.constant.CustomConstant;
 import com.dc.common.constant.SalesConstant;
 import com.dc.common.exception.ServiceException;
+import com.dc.common.lang.annotation.DataScope;
 import com.dc.common.utils.*;
 import com.dc.project.finance.dao.SysReceivableDao;
 import com.dc.project.finance.entity.SysReceivable;
@@ -27,6 +30,17 @@ import java.util.*;
  */
 @Service
 public class SysReceivableServiceImpl extends ServiceImpl<SysReceivableDao, SysReceivable> implements ISysReceivableService {
+
+    @DataScope(userColumn = "create_id")
+    @Override
+    public IPage<SysReceivable> page(Page<SysReceivable> page, SysReceivable receivable) {
+        QueryWrapper<SysReceivable> queryWrapper = new QueryWrapper<>();
+        queryWrapper.like(StringUtils.isNotEmpty(receivable.getClienteleNum()), "clientele_num", receivable.getClienteleNum())
+                .like(StringUtils.isNotEmpty(receivable.getClienteleName()), "clientele_name", receivable.getClienteleName())
+                .apply(receivable.getParams().get(CustomConstant.DATA_SCOPE).toString().replaceFirst("and", ""))
+                .orderByDesc("create_time");
+        return this.page(page, queryWrapper);
+    }
 
     @Transactional(rollbackFor = Exception.class)
     @Override

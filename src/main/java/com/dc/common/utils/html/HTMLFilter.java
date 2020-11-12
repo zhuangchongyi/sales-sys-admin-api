@@ -8,7 +8,6 @@ import java.util.regex.Pattern;
 
 /**
  * HTML过滤器，用于去除XSS漏洞隐患。
- *
  */
 public final class HTMLFilter {
     /**
@@ -228,6 +227,7 @@ public final class HTMLFilter {
             //
             s = regexReplace(P_END_ARROW, "", s);
             s = regexReplace(P_BODY_TO_END, "<$1>", s);
+            // 因为半个'>'不给输入有点烦注释掉这一行
             //s = regexReplace(P_XML_CONTENT, "$1<$2", s);
 
         } else {

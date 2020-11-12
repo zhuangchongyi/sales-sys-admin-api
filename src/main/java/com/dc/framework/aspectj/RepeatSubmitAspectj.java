@@ -30,13 +30,13 @@ public class RepeatSubmitAspectj {
     public Object doBefore(ProceedingJoinPoint joinPoint) throws Throwable {
         String key = getRepeatSubmitKey(joinPoint);
         boolean success = KEYS.add(key);
-        log.info(String.format("设置重复提交key=%s", key));
+        log.info("设置重复提交key={}", key);
         if (success) {
             try {
                 return joinPoint.proceed();
             } finally {
                 KEYS.remove(key);
-                log.info(String.format("删除重复提交key=%s", key));
+                log.info("删除重复提交key={}", key);
             }
         } else {
             throw new RepeatSubmitException();

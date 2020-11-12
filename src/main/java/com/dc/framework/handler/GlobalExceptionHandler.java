@@ -29,7 +29,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ShiroException.class)
     public R shiroException(Exception e, HttpServletRequest request, HttpServletResponse response) {
-        log.info(String.format("请求方式：%s, 请求路径：%s, 异常信息：%s", request.getMethod(), request.getServletPath(), e.getMessage()));
+        log.info("请求方式：{}, 请求路径：{}, 异常信息：{}", request.getMethod(), request.getServletPath(), e.getMessage());
         if (e instanceof UnknownAccountException) {
             return R.error().code(R.AUTH_FAIL_CODE).msg("登录账号不存在");
         } else if (e instanceof IncorrectCredentialsException) {
@@ -51,7 +51,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public R exception(Exception e, HttpServletRequest request, HttpServletResponse response) {
-        log.info(String.format("请求方式：%s, 请求路径：%s, 异常信息：%s", request.getMethod(), request.getServletPath(), e.getMessage()));
+        log.info("请求方式：{}, 请求路径：{}, 异常信息：{}", request.getMethod(), request.getServletPath(), e.getMessage());
         log.error("异常信息: ", e);
         if (e instanceof MethodArgumentNotValidException) { //字段校验异常
             return R.error().msg(e.getMessage());
@@ -69,7 +69,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMessageConversionException.class)
     public R httpException(Exception e, HttpServletRequest request, HttpServletResponse response) {
-        log.info(String.format("请求方式：%s, 请求路径：%s, 异常信息：%s", request.getMethod(), request.getServletPath(), e.getMessage()));
+        log.info("请求方式：{}, 请求路径：{}, 异常信息：{}", request.getMethod(), request.getServletPath(), e.getMessage());
         log.error("异常信息: ", e);
         return R.error().code(R.ERROR_CODE).msg("消息转换异常");
     }

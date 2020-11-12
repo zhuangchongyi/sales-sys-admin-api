@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.dc.common.constant.CustomConstant;
 import com.dc.common.constant.SalesConstant;
 import com.dc.common.exception.ServiceException;
 import com.dc.common.lang.annotation.DataScope;
@@ -46,9 +47,10 @@ public class SysScrapServiceImpl extends ServiceImpl<SysScrapDao, SysScrap> impl
     public IPage<SysScrap> page(Page<SysScrap> page, SysScrap scrap) {
         QueryWrapper<SysScrap> queryWrapper = new QueryWrapper<>();
         queryWrapper.like(StringUtils.isNotEmpty(scrap.getWarehouseName()), "warehouse_name", scrap.getWarehouseName())
-                .or().like(StringUtils.isNotEmpty(scrap.getWarehouseNum()), "warehouse_num", scrap.getWarehouseNum())
+                .like(StringUtils.isNotEmpty(scrap.getWarehouseNum()), "warehouse_num", scrap.getWarehouseNum())
+                .apply(scrap.getParams().get(CustomConstant.DATA_SCOPE).toString().replaceFirst("and", ""))
                 .orderByDesc("create_time");
-        return this.page(page, scrap);
+        return this.page(page, queryWrapper);
     }
 
     @Transactional(rollbackFor = Exception.class)

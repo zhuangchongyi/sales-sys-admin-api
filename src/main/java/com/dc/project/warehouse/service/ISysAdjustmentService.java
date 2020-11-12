@@ -15,7 +15,7 @@ import java.util.Map;
  */
 public interface ISysAdjustmentService extends IService<SysAdjustment> {
 
-    IPage<SysAdjustment> page(Page<SysAdjustment> page,SysAdjustment adjustment);
+    IPage<SysAdjustment> page(Page<SysAdjustment> page, SysAdjustment adjustment);
 
     boolean addAndUpdate(Map formMap) throws Exception;
 

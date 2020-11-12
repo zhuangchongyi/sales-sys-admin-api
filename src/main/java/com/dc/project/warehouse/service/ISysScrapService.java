@@ -14,7 +14,7 @@ import java.util.Map;
  * @since 2020-09-25
  */
 public interface ISysScrapService extends IService<SysScrap> {
-    IPage<SysScrap> page(Page<SysScrap> page,SysScrap sysScrap);
+    IPage<SysScrap> page(Page<SysScrap> page, SysScrap sysScrap);
 
     boolean addAndUpdate(Map formMap) throws Exception;
 

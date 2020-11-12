@@ -15,7 +15,7 @@ import java.util.Map;
  */
 public interface ISysInventoryService extends IService<SysInventory> {
 
-    IPage<SysInventory> page(Page<SysInventory> page,SysInventory inventory);
+    IPage<SysInventory> page(Page<SysInventory> page, SysInventory inventory);
 
     boolean addAndUpdate(Map formMap) throws Exception;
 

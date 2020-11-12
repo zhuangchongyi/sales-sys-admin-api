@@ -1,13 +1,11 @@
 package com.dc.project.finance.controller;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc.common.lang.annotation.RepeatSubmit;
 import com.dc.common.vo.R;
 import com.dc.project.finance.entity.SysWriteoff;
 import com.dc.project.finance.service.ISysWriteoffService;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -30,11 +28,7 @@ public class SysWriteoffController {
     @RequiresPermissions("finance:writeoff:list")
     @GetMapping
     public R page(Page<SysWriteoff> page, SysWriteoff writeoff) {
-        QueryWrapper<SysWriteoff> queryWrapper = new QueryWrapper<>();
-        queryWrapper.like(StringUtils.isNotEmpty(writeoff.getClienteleNum()), "clientele_num", writeoff.getClienteleNum())
-                .or().like(StringUtils.isNotEmpty(writeoff.getClienteleName()), "clientele_name", writeoff.getClienteleName());
-        queryWrapper.orderByDesc("create_time");
-        return R.success().data(writeoffService.page(page, queryWrapper));
+        return R.success().data(writeoffService.page(page, writeoff));
     }
 
     @GetMapping("/{id}")

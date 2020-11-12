@@ -2,9 +2,13 @@ package com.dc.project.finance.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.dc.common.constant.CustomConstant;
 import com.dc.common.constant.SalesConstant;
 import com.dc.common.exception.ServiceException;
+import com.dc.common.lang.annotation.DataScope;
 import com.dc.common.utils.BigDecimalUtil;
 import com.dc.common.utils.UserSecurityUtil;
 import com.dc.project.finance.dao.SysReceiptDao;
@@ -28,6 +32,17 @@ import java.util.List;
  */
 @Service
 public class SysReceiptServiceImpl extends ServiceImpl<SysReceiptDao, SysReceipt> implements ISysReceiptService {
+
+    @DataScope(userColumn = "create_id")
+    @Override
+    public IPage<SysReceipt> page(Page<SysReceipt> page, SysReceipt receipt) {
+        QueryWrapper<SysReceipt> queryWrapper = new QueryWrapper<>();
+        queryWrapper.like(StringUtils.isNotEmpty(receipt.getClienteleNum()), "clientele_num", receipt.getClienteleNum())
+                .like(StringUtils.isNotEmpty(receipt.getClienteleName()), "clientele_name", receipt.getClienteleName())
+                .apply(receipt.getParams().get(CustomConstant.DATA_SCOPE).toString().replaceFirst("and", ""))
+                .orderByDesc("create_time");
+        return this.page(page, queryWrapper);
+    }
 
     @Transactional(rollbackFor = Exception.class)
     @Override

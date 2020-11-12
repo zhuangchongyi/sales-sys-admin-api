@@ -29,7 +29,7 @@ public class LoginController {
 
     @GetMapping("/logout")
     public R logout() {
-        log.info("退出登录，销毁sessionId=" + SecurityUtils.getSubject().getSession().getId());
+        log.info("退出登录，销毁sessionId={}", SecurityUtils.getSubject().getSession().getId());
         SecurityUtils.getSubject().logout();
         return R.success().msg("退出成功");
     }

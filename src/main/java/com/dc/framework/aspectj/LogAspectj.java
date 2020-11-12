@@ -34,7 +34,7 @@ public class LogAspectj {
     }
 
     @AfterThrowing(pointcut = "logPointcut()")
-    public void doAfterThrowing(JoinPoint point) throws Throwable{
+    public void doAfterThrowing(JoinPoint point) throws Throwable {
         System.out.println("操作失败时执行");
     }
 

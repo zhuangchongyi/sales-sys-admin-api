@@ -22,6 +22,7 @@ public class DateUtil extends org.apache.commons.lang3.time.DateUtils {
     public static String getYYYYMMDDString(Date date) {
         return parseDateToString(YYYYMMDD, date);
     }
+
     public static String getYYYYMMDDHHMMSSString(Date date) {
         return parseDateToString(YYYYMMDD, date);
     }

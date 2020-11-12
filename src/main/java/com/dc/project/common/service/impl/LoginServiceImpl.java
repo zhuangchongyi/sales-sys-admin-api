@@ -77,7 +77,7 @@ public class LoginServiceImpl implements ILoginService {
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("token", SecurityUtils.getSubject().getSession().getId());
         resultMap.put("loginTime", LocalDateTime.now().format(DateTimeFormatter.ofPattern(DateUtil.YYYY_MM_DD_HH_MM_SS)));
-        log.info(String.format("%s登录成功", loginUser.getUsername()));
+        log.info("{}登录成功", loginUser.getUsername());
         // 异步任务处理日志
         AsyncManager.me().execute(AsyncFactory.testTimerTask("用户登录成功"));
         return resultMap;
@@ -98,7 +98,7 @@ public class LoginServiceImpl implements ILoginService {
                 //清除该用户以前登录时保存的session
                 SysUser user = (SysUser) coll.getPrimaryPrincipal();
                 if (username.equals(user.getUsername())) {
-                    log.info(String.format("%s已登录，强制退出sessionId=%s", username, session.getId()));
+                    log.info("{}已登录，强制退出sessionId={}", username, session.getId());
                     sessionDAO.delete(session);
                     return;
                 }
@@ -140,10 +140,10 @@ public class LoginServiceImpl implements ILoginService {
         String verifyKey = CustomConstant.CAPTCHA_CODE_KEY + uuid;
         if (config.isCaptchaCache()) {
             Cache<String, String> captchaCache = ehCacheManager.getCache("captchaCache");
-            captchaCache.put(verifyKey,verifyCode);
+            captchaCache.put(verifyKey, verifyCode);
             //captchaCache.put(verifyKey, verifyCode);
         }
-        log.info(verifyKey+"=="+verifyCode);
+        log.info("{}=={}", verifyKey, verifyCode);
         // 生成图片
         int w = 111, h = 36;
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -155,7 +155,7 @@ public class LoginServiceImpl implements ILoginService {
             data.put("img", Base64.encode(stream.toByteArray()));
             return R.success().data(data);
         } catch (Exception e) {
-            log.error(String.format("生成验证码失败，%s", e.getMessage()));
+            log.error("生成验证码失败，{}", e.getMessage());
             return R.error().msg("获取验证码失败");
         } finally {
             try {
