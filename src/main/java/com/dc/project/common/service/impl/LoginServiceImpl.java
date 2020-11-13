@@ -3,7 +3,9 @@ package com.dc.project.common.service.impl;
 import com.dc.common.constant.CustomConstant;
 import com.dc.common.exception.ServiceException;
 import com.dc.common.utils.Base64;
-import com.dc.common.utils.*;
+import com.dc.common.utils.IdUtil;
+import com.dc.common.utils.UserSecurityUtil;
+import com.dc.common.utils.VerifyCodeUtil;
 import com.dc.common.vo.LoginUser;
 import com.dc.common.vo.R;
 import com.dc.common.vo.UserInfo;
@@ -30,8 +32,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -76,7 +76,7 @@ public class LoginServiceImpl implements ILoginService {
         SecurityUtils.getSubject().login(token);
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("token", SecurityUtils.getSubject().getSession().getId());
-        resultMap.put("loginTime", LocalDateTime.now().format(DateTimeFormatter.ofPattern(DateUtil.YYYY_MM_DD_HH_MM_SS)));
+        resultMap.put("loginTime", SecurityUtils.getSubject().getSession().getStartTimestamp());
         log.info("{}登录成功", loginUser.getUsername());
         // 异步任务处理日志
         AsyncManager.me().execute(AsyncFactory.testTimerTask("用户登录成功"));

@@ -48,8 +48,6 @@ public class DataScopeAspectj {
         SysUser user = UserSecurityUtil.getUser();
         if (!UserSecurityUtil.isAdmin(user.getUserId())) {
             dataScopeFilter(point, user, dataScope);
-        } else {
-            verifyParams(point, null);
         }
     }
 

@@ -9,10 +9,7 @@ import com.dc.common.constant.CustomConstant;
 import com.dc.common.constant.SalesConstant;
 import com.dc.common.exception.ServiceException;
 import com.dc.common.lang.annotation.DataScope;
-import com.dc.common.utils.BeanUtil;
-import com.dc.common.utils.BigDecimalUtil;
-import com.dc.common.utils.ObjectMapperUtil;
-import com.dc.common.utils.UserSecurityUtil;
+import com.dc.common.utils.*;
 import com.dc.project.warehouse.dao.SysAdjustmentDao;
 import com.dc.project.warehouse.entity.SysAdjustment;
 import com.dc.project.warehouse.entity.SysAdjustmentSub;
@@ -46,10 +43,12 @@ public class SysAdjustmentServiceImpl extends ServiceImpl<SysAdjustmentDao, SysA
     @Override
     public IPage<SysAdjustment> page(Page<SysAdjustment> page, SysAdjustment adjustment) {
         QueryWrapper<SysAdjustment> queryWrapper = new QueryWrapper<>();
-        queryWrapper.like(StringUtils.isNotEmpty(adjustment.getWarehouseName()), "warehouse_name", adjustment.getWarehouseName())
-                .like(StringUtils.isNotEmpty(adjustment.getWarehouseNum()), "warehouse_num", adjustment.getWarehouseNum())
-                .apply(adjustment.getParams().get(CustomConstant.DATA_SCOPE).toString().replaceFirst("and", ""))
-                .orderByDesc("create_time");
+        queryWrapper.lambda()
+                .like(StringUtils.isNotEmpty(adjustment.getWarehouseName()), SysAdjustment::getWarehouseName, adjustment.getWarehouseName())
+                .like(StringUtils.isNotEmpty(adjustment.getWarehouseNum()), SysAdjustment::getWarehouseNum, adjustment.getWarehouseNum())
+                .apply(null != adjustment.getParams().get(CustomConstant.DATA_SCOPE),
+                        ObjectUtil.toString(adjustment.getParams().get(CustomConstant.DATA_SCOPE)).replaceFirst("and", ""))
+                .orderByDesc(SysAdjustment::getCreateTime);
         return this.page(page, queryWrapper);
     }
 

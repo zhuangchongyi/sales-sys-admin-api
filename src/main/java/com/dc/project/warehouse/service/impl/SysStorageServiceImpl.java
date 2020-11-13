@@ -9,10 +9,7 @@ import com.dc.common.constant.CustomConstant;
 import com.dc.common.constant.SalesConstant;
 import com.dc.common.exception.ServiceException;
 import com.dc.common.lang.annotation.DataScope;
-import com.dc.common.utils.BeanUtil;
-import com.dc.common.utils.BigDecimalUtil;
-import com.dc.common.utils.ObjectMapperUtil;
-import com.dc.common.utils.UserSecurityUtil;
+import com.dc.common.utils.*;
 import com.dc.project.warehouse.dao.SysStorageDao;
 import com.dc.project.warehouse.entity.SysRepertory;
 import com.dc.project.warehouse.entity.SysStorage;
@@ -47,10 +44,12 @@ public class SysStorageServiceImpl extends ServiceImpl<SysStorageDao, SysStorage
     public IPage<SysStorage> page(Page<SysStorage> page, SysStorage sysStorage) {
         QueryWrapper<SysStorage> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("inout_type", sysStorage.getInoutType());
-        queryWrapper.like(StringUtils.isNotEmpty(sysStorage.getWarehouseNum()), "warehouse_num", sysStorage.getWarehouseNum())
-                .like(StringUtils.isNotEmpty(sysStorage.getWarehouseName()), "warehouse_name", sysStorage.getWarehouseName())
-                .apply(sysStorage.getParams().get(CustomConstant.DATA_SCOPE).toString().replaceFirst("and", ""))
-                .orderByDesc("create_time");
+        queryWrapper.lambda()
+                .like(StringUtils.isNotEmpty(sysStorage.getWarehouseName()), SysStorage::getWarehouseName, sysStorage.getWarehouseName())
+                .like(StringUtils.isNotEmpty(sysStorage.getWarehouseNum()), SysStorage::getWarehouseNum, sysStorage.getWarehouseNum())
+                .apply(null != sysStorage.getParams().get(CustomConstant.DATA_SCOPE),
+                        ObjectUtil.toString(sysStorage.getParams().get(CustomConstant.DATA_SCOPE)).replaceFirst("and", ""))
+                .orderByDesc(SysStorage::getCreateTime);
         return this.page(page, queryWrapper);
     }
 

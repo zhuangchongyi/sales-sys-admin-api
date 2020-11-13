@@ -9,10 +9,7 @@ import com.dc.common.constant.CustomConstant;
 import com.dc.common.constant.SalesConstant;
 import com.dc.common.exception.ServiceException;
 import com.dc.common.lang.annotation.DataScope;
-import com.dc.common.utils.BeanUtil;
-import com.dc.common.utils.BigDecimalUtil;
-import com.dc.common.utils.ObjectMapperUtil;
-import com.dc.common.utils.UserSecurityUtil;
+import com.dc.common.utils.*;
 import com.dc.project.warehouse.dao.SysScrapDao;
 import com.dc.project.warehouse.entity.SysRepertory;
 import com.dc.project.warehouse.entity.SysScrap;
@@ -46,10 +43,12 @@ public class SysScrapServiceImpl extends ServiceImpl<SysScrapDao, SysScrap> impl
     @Override
     public IPage<SysScrap> page(Page<SysScrap> page, SysScrap scrap) {
         QueryWrapper<SysScrap> queryWrapper = new QueryWrapper<>();
-        queryWrapper.like(StringUtils.isNotEmpty(scrap.getWarehouseName()), "warehouse_name", scrap.getWarehouseName())
-                .like(StringUtils.isNotEmpty(scrap.getWarehouseNum()), "warehouse_num", scrap.getWarehouseNum())
-                .apply(scrap.getParams().get(CustomConstant.DATA_SCOPE).toString().replaceFirst("and", ""))
-                .orderByDesc("create_time");
+        queryWrapper.lambda()
+                .like(StringUtils.isNotEmpty(scrap.getWarehouseName()), SysScrap::getWarehouseName, scrap.getWarehouseName())
+                .like(StringUtils.isNotEmpty(scrap.getWarehouseNum()), SysScrap::getWarehouseNum, scrap.getWarehouseNum())
+                .apply(null != scrap.getParams().get(CustomConstant.DATA_SCOPE),
+                        ObjectUtil.toString(scrap.getParams().get(CustomConstant.DATA_SCOPE)).replaceFirst("and", ""))
+                .orderByDesc(SysScrap::getCreateTime);
         return this.page(page, queryWrapper);
     }
 

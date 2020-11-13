@@ -11,6 +11,7 @@ import com.dc.common.lang.annotation.DataScope;
 import com.dc.common.utils.BeanUtil;
 import com.dc.common.utils.BigDecimalUtil;
 import com.dc.common.utils.ObjectMapperUtil;
+import com.dc.common.utils.ObjectUtil;
 import com.dc.project.finance.dao.SysWriteoffDao;
 import com.dc.project.finance.entity.SysReceipt;
 import com.dc.project.finance.entity.SysReceivable;
@@ -51,10 +52,12 @@ public class SysWriteoffServiceImpl extends ServiceImpl<SysWriteoffDao, SysWrite
     @Override
     public IPage<SysWriteoff> page(Page<SysWriteoff> page, SysWriteoff writeoff) {
         QueryWrapper<SysWriteoff> queryWrapper = new QueryWrapper<>();
-        queryWrapper.like(StringUtils.isNotEmpty(writeoff.getClienteleNum()), "clientele_num", writeoff.getClienteleNum())
-                .like(StringUtils.isNotEmpty(writeoff.getClienteleName()), "clientele_name", writeoff.getClienteleName())
-                .apply(writeoff.getParams().get(CustomConstant.DATA_SCOPE).toString().replaceFirst("and", ""))
-                .orderByDesc("create_time");
+        queryWrapper.lambda()
+                .like(StringUtils.isNotEmpty(writeoff.getClienteleNum()), SysWriteoff::getClienteleNum, writeoff.getClienteleNum())
+                .like(StringUtils.isNotEmpty(writeoff.getClienteleName()), SysWriteoff::getClienteleName, writeoff.getClienteleName())
+                .apply(null != writeoff.getParams().get(CustomConstant.DATA_SCOPE),
+                        ObjectUtil.toString(writeoff.getParams().get(CustomConstant.DATA_SCOPE)).replaceFirst("and", ""))
+                .orderByDesc(SysWriteoff::getCreateTime);
         return this.page(page, queryWrapper);
     }
 

@@ -35,10 +35,13 @@ public class SysReceivableServiceImpl extends ServiceImpl<SysReceivableDao, SysR
     @Override
     public IPage<SysReceivable> page(Page<SysReceivable> page, SysReceivable receivable) {
         QueryWrapper<SysReceivable> queryWrapper = new QueryWrapper<>();
-        queryWrapper.like(StringUtils.isNotEmpty(receivable.getClienteleNum()), "clientele_num", receivable.getClienteleNum())
-                .like(StringUtils.isNotEmpty(receivable.getClienteleName()), "clientele_name", receivable.getClienteleName())
-                .apply(receivable.getParams().get(CustomConstant.DATA_SCOPE).toString().replaceFirst("and", ""))
-                .orderByDesc("create_time");
+        queryWrapper.lambda()
+                .like(StringUtils.isNotEmpty(receivable.getReceivableNum()), SysReceivable::getReceivableNum, receivable.getReceivableNum())
+                .like(StringUtils.isNotEmpty(receivable.getClienteleNum()), SysReceivable::getClienteleNum, receivable.getClienteleNum())
+                .like(StringUtils.isNotEmpty(receivable.getClienteleName()), SysReceivable::getClienteleName, receivable.getClienteleName())
+                .apply(null != receivable.getParams().get(CustomConstant.DATA_SCOPE),
+                        ObjectUtil.toString(receivable.getParams().get(CustomConstant.DATA_SCOPE)).replaceFirst("and", ""))
+                .orderByDesc(SysReceivable::getCreateTime);
         return this.page(page, queryWrapper);
     }
 

@@ -9,10 +9,7 @@ import com.dc.common.constant.CustomConstant;
 import com.dc.common.constant.SalesConstant;
 import com.dc.common.exception.ServiceException;
 import com.dc.common.lang.annotation.DataScope;
-import com.dc.common.utils.BeanUtil;
-import com.dc.common.utils.BigDecimalUtil;
-import com.dc.common.utils.ObjectMapperUtil;
-import com.dc.common.utils.UserSecurityUtil;
+import com.dc.common.utils.*;
 import com.dc.project.warehouse.dao.SysInventoryDao;
 import com.dc.project.warehouse.entity.*;
 import com.dc.project.warehouse.service.*;
@@ -45,10 +42,12 @@ public class SysInventoryServiceImpl extends ServiceImpl<SysInventoryDao, SysInv
     @Override
     public IPage<SysInventory> page(Page<SysInventory> page, SysInventory inventory) {
         QueryWrapper<SysInventory> queryWrapper = new QueryWrapper<>();
-        queryWrapper.like(StringUtils.isNotEmpty(inventory.getWarehouseName()), "warehouse_name", inventory.getWarehouseName())
-                .like(StringUtils.isNotEmpty(inventory.getWarehouseNum()), "warehouse_num", inventory.getWarehouseNum())
-                .apply(inventory.getParams().get(CustomConstant.DATA_SCOPE).toString().replaceFirst("and", ""))
-                .orderByDesc("create_time");
+        queryWrapper.lambda()
+                .like(StringUtils.isNotEmpty(inventory.getWarehouseName()), SysInventory::getWarehouseName, inventory.getWarehouseName())
+                .like(StringUtils.isNotEmpty(inventory.getWarehouseNum()), SysInventory::getWarehouseNum, inventory.getWarehouseNum())
+                .apply(null != inventory.getParams().get(CustomConstant.DATA_SCOPE),
+                        ObjectUtil.toString(inventory.getParams().get(CustomConstant.DATA_SCOPE)).replaceFirst("and", ""))
+                .orderByDesc(SysInventory::getCreateTime);
         return this.page(page, queryWrapper);
     }
 

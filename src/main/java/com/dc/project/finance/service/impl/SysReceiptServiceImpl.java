@@ -10,6 +10,7 @@ import com.dc.common.constant.SalesConstant;
 import com.dc.common.exception.ServiceException;
 import com.dc.common.lang.annotation.DataScope;
 import com.dc.common.utils.BigDecimalUtil;
+import com.dc.common.utils.ObjectUtil;
 import com.dc.common.utils.UserSecurityUtil;
 import com.dc.project.finance.dao.SysReceiptDao;
 import com.dc.project.finance.entity.SysReceipt;
@@ -37,10 +38,13 @@ public class SysReceiptServiceImpl extends ServiceImpl<SysReceiptDao, SysReceipt
     @Override
     public IPage<SysReceipt> page(Page<SysReceipt> page, SysReceipt receipt) {
         QueryWrapper<SysReceipt> queryWrapper = new QueryWrapper<>();
-        queryWrapper.like(StringUtils.isNotEmpty(receipt.getClienteleNum()), "clientele_num", receipt.getClienteleNum())
-                .like(StringUtils.isNotEmpty(receipt.getClienteleName()), "clientele_name", receipt.getClienteleName())
-                .apply(receipt.getParams().get(CustomConstant.DATA_SCOPE).toString().replaceFirst("and", ""))
-                .orderByDesc("create_time");
+        queryWrapper.lambda()
+                .like(StringUtils.isNotEmpty(receipt.getReceiptNum()), SysReceipt::getReceiptNum, receipt.getReceiptNum())
+                .like(StringUtils.isNotEmpty(receipt.getClienteleNum()), SysReceipt::getClienteleNum, receipt.getClienteleNum())
+                .like(StringUtils.isNotEmpty(receipt.getClienteleName()), SysReceipt::getClienteleName, receipt.getClienteleName())
+                .apply(null != receipt.getParams().get(CustomConstant.DATA_SCOPE),
+                        ObjectUtil.toString(receipt.getParams().get(CustomConstant.DATA_SCOPE)).replaceFirst("and", ""))
+                .orderByDesc(SysReceipt::getCreateTime);
         return this.page(page, queryWrapper);
     }
 
