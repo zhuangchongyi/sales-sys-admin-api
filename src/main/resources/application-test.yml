@@ -28,3 +28,12 @@ spring:
       max-lifetime: 1800000
       connection-timeout: 10000
       connection-test-query: SELECT 1
+
+sms:
+  ftp:
+    host: 192.168.131.250
+    port: 21
+    username: zhuangcy
+    password: zhuangcy
+    path: /home/zhuangcy/ftp
+    urlPrefix: http://192.168.131.250:80

@@ -2,11 +2,9 @@ package com.dc.framework.config.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 
 @Configuration
-@PropertySource("ftp.properties")
-@ConfigurationProperties(prefix = "ftp")
+@ConfigurationProperties(prefix = "sms.ftp")
 public class FtpConfig {
     /**
      * 主机地址
