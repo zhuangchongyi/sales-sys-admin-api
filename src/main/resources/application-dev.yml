@@ -34,7 +34,7 @@ sms:
   ftp:
     host: 127.0.0.1
     port: 21
-    username: zhuangcy
-    password: zhuangcy
+    username: DELL
+    password: 000000
     path: /images
     urlPrefix: http://127.0.0.1:80
