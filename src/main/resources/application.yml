@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: prod
+    active: dev
   # 服务模块
   devtools:
     restart:
