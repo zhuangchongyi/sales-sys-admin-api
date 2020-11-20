@@ -1,7 +1,7 @@
 package com.dc.framework.async;
 
 
-import com.dc.common.utils.SpringUtils;
+import com.dc.common.utils.SpringUtil;
 import com.dc.common.utils.ThreadsUtil;
 
 import java.util.TimerTask;
@@ -20,7 +20,7 @@ public class AsyncManager {
     /**
      * 异步操作任务调度线程池
      */
-    private ScheduledExecutorService executor = SpringUtils.getBean("scheduledExecutorService");
+    private ScheduledExecutorService executor = SpringUtil.getBean("scheduledExecutorService");
 
     /**
      * 单例模式

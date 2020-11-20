@@ -3,6 +3,7 @@ package com.dc.framework.filter;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.web.util.WebUtils;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -47,7 +48,7 @@ public class XssFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        log.info("XssFilter doFilter");
+        log.info("XssFilter doFilter,请求方式：{}, 请求路径：{}", WebUtils.toHttp(request).getMethod(), WebUtils.toHttp(request).getServletPath());
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse resp = (HttpServletResponse) response;
         if (handleExcludeURL(req, resp)) {

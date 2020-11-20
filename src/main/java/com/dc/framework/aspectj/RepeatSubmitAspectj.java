@@ -27,7 +27,7 @@ public class RepeatSubmitAspectj {
     }
 
     @Around("repeatSubmitPointcut()")
-    public Object doBefore(ProceedingJoinPoint joinPoint) throws Throwable {
+    public Object doAround(ProceedingJoinPoint joinPoint) throws Throwable {
         String key = getRepeatSubmitKey(joinPoint);
         boolean success = KEYS.add(key);
         log.info("设置重复提交key={}", key);

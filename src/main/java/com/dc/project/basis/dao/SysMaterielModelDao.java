@@ -3,6 +3,8 @@ package com.dc.project.basis.dao;
 import com.dc.project.basis.entity.SysMaterielModel;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
+import java.util.List;
+
 /**
  * 产品型号关联表 Mapper 接口
  *
@@ -10,5 +12,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @since 2020-09-03
  */
 public interface SysMaterielModelDao extends BaseMapper<SysMaterielModel> {
+
+    List<String> findModelNames(Integer id);
 
 }

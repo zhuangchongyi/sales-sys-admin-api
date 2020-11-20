@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
  * spring工具类 方便在非spring管理环境中获取bean
  */
 @Component
-public final class SpringUtils implements BeanFactoryPostProcessor {
+public final class SpringUtil implements BeanFactoryPostProcessor {
     /**
      * Spring应用上下文环境
      */
@@ -19,7 +19,7 @@ public final class SpringUtils implements BeanFactoryPostProcessor {
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-        SpringUtils.beanFactory = beanFactory;
+        SpringUtil.beanFactory = beanFactory;
     }
 
     /**

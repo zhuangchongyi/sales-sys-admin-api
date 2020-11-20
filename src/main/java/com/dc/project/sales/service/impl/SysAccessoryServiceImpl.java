@@ -5,7 +5,7 @@ import com.dc.common.exception.ServiceException;
 import com.dc.common.utils.CodeUtil;
 import com.dc.common.utils.DateUtil;
 import com.dc.common.utils.FTPUtil;
-import com.dc.framework.config.properties.FtpConfig;
+import com.dc.framework.config.properties.FtpProperties;
 import com.dc.project.sales.dao.SysAccessoryDao;
 import com.dc.project.sales.entity.SysAccessory;
 import com.dc.project.sales.service.ISysAccessoryService;
@@ -28,24 +28,26 @@ import java.util.Date;
 public class SysAccessoryServiceImpl extends ServiceImpl<SysAccessoryDao, SysAccessory> implements ISysAccessoryService {
 
     @Autowired
-    private FtpConfig ftpConfig;
+    private FtpProperties ftpProperties;
 
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean upload(Long id, MultipartFile file) {
-        try {
-            if (null == id || null == file) {
-                throw new ServiceException("上传失败");
-            }
+        if (null != id && null != file) {
             String name = file.getOriginalFilename();
             String fileName = CodeUtil.randomUUIDNotRail() + name.substring(name.indexOf('.'));
             String fileDir = DateUtil.getYYYYMMPathString(new Date());
-            String url = ftpConfig.getUrlPrefix() + fileDir + fileName;
-            String path = ftpConfig.getPath() + fileDir;
-            FTPClient ftpClient = FTPUtil.loginFTP(ftpConfig.getHost(), ftpConfig.getPort(), ftpConfig.getUsername(), ftpConfig.getPassword());
+            String url = ftpProperties.getUrlPrefix() + fileDir + fileName;
+            String path = ftpProperties.getPath() + fileDir;
+            FTPClient ftpClient = FTPUtil.loginFTP(ftpProperties.getHost(), ftpProperties.getPort(), ftpProperties.getUsername(), ftpProperties.getPassword());
             if (null != ftpClient) {
-                boolean success = FTPUtil.uploadFile(ftpClient, path, fileName, file.getInputStream());
+                boolean success = false;
+                try {
+                    success = FTPUtil.uploadFile(ftpClient, path, fileName, file.getInputStream());
+                } catch (IOException e) {
+                    throw new ServiceException("上传失败", e);
+                }
                 if (success) {
                     SysAccessory accessory = new SysAccessory();
                     accessory.setSubId(id)
@@ -59,8 +61,8 @@ public class SysAccessoryServiceImpl extends ServiceImpl<SysAccessoryDao, SysAcc
                     return true;
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } else {
+            throw new ServiceException("上传失败");
         }
         throw new ServiceException("上传失败");
     }
@@ -68,13 +70,14 @@ public class SysAccessoryServiceImpl extends ServiceImpl<SysAccessoryDao, SysAcc
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean delete(Long pkId) {
-        SysAccessory accessory = this.getById(pkId);
-        boolean row = this.removeById(pkId);
+//        SysAccessory accessory = this.getById(pkId);
+        if (!this.removeById(pkId))
+            throw new ServiceException("已删除");
         //删除文件
 //        if (null == accessory.getMaterielId()) {
-        FTPClient ftpClient = FTPUtil.loginFTP(ftpConfig.getHost(), ftpConfig.getPort(), ftpConfig.getUsername(), ftpConfig.getPassword());
-        FTPUtil.deleteFile(ftpClient, accessory.getPath(), accessory.getFileName());
+//        FTPClient ftpClient = FTPUtil.loginFTP(ftpProperties.getHost(), ftpProperties.getPort(), ftpProperties.getUsername(), ftpProperties.getPassword());
+//        FTPUtil.deleteFile(ftpClient, accessory.getPath(), accessory.getFileName());
 //        }
-        return row;
+        return true;
     }
 }

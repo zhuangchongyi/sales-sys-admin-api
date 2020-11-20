@@ -2,10 +2,12 @@ package com.dc.project.sales.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.dc.project.open.vo.OrderVo;
 import com.dc.project.sales.entity.SysSignback;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,4 +29,6 @@ public interface ISysSignbackService extends IService<SysSignback> {
     IPage<SysSignback> findOrderByClienteleId(Page page, SysSignback sysSignback);
 
     IPage<Map<String, Object>> findFinanceOrder(Page page, SysSignback sysSignback);
+
+    List<OrderVo> listSign(Integer clienteleId);
 }

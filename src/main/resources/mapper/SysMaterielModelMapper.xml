@@ -12,5 +12,10 @@
     <sql id="Base_Column_List">
         m_id, model_name
     </sql>
+    <select id="findModelNames" resultType="java.lang.String">
+        select model_name
+        from sys_materiel_model
+        where m_id=#{id}
+    </select>
 
 </mapper>

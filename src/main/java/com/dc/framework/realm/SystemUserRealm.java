@@ -18,11 +18,11 @@ import java.util.Set;
 
 /**
  * @Author zhuangcy
- * @Description 实现AuthorizingRealm接口用户用户认证
+ * @Description 系统用户认证
  * @Date 2020/8/14 12:11
  */
 @Slf4j(topic = "sys-user")
-public class LoginUserRealm extends AuthorizingRealm {
+public class SystemUserRealm extends AuthorizingRealm {
     @Autowired
     private ILoginService loginService;
 
@@ -35,12 +35,12 @@ public class LoginUserRealm extends AuthorizingRealm {
         // 查询用户权限明细
         UserInfo info = loginService.getInfo();
         // 添加角色权限
-        SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
         if (null == info) {
             throw new AuthenticationException("用户角色权限认证失败");
         }
         Set<String> roles = info.getRoles();
         Set<String> permissions = info.getPermissions();
+        SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
         authorizationInfo.addRoles(roles);
         authorizationInfo.addStringPermissions(permissions);
         return authorizationInfo;
@@ -60,20 +60,23 @@ public class LoginUserRealm extends AuthorizingRealm {
         if (user == null) {
             //登录用户不存在
             throw new UnknownAccountException();
-        } else {
-            if (!UserSecurityUtil.isAdmin(user.getUserId())) {
-                // 登录用户已被禁用
-                if (CustomConstant.STOP_STATUS.equals(user.getStartStatus())) {
-                    throw new DisabledAccountException();
-                } else if (CustomConstant.ORDINARY_USER_TYPE.equals(user.getUserType())) {
-                    throw new LockedAccountException();
-                }
+        } else if (!UserSecurityUtil.isAdmin(user.getUserId())) {
+            // 登录用户已被禁用
+            if (CustomConstant.STOP_STATUS.equals(user.getStartStatus())) {
+                throw new DisabledAccountException();
+                // 表示不是系统用户
+            } else if (CustomConstant.ORDINARY_USER_TYPE.equals(user.getUserType())) {
+                throw new LockedAccountException();
             }
-            SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(user, user.getPassword(), getName());
-            //设置盐，用来核对密码
-            authenticationInfo.setCredentialsSalt(ByteSource.Util.bytes(user.getSalt()));
-            return authenticationInfo;
         }
+        SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(user, user.getPassword(), getName());
+        //设置盐，用来核对密码
+        authenticationInfo.setCredentialsSalt(ByteSource.Util.bytes(user.getSalt()));
+        return authenticationInfo;
     }
 
+    @Override
+    public String getName() {
+        return LoginType.LOGIN_TYPE_SYSTEM;
+    }
 }

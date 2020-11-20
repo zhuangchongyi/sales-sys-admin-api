@@ -3,8 +3,10 @@ package com.dc.project.sales.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.dc.project.open.vo.OrderVo;
 import com.dc.project.sales.entity.SysShipments;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,4 +32,6 @@ public interface ISysShipmentsService extends IService<SysShipments> {
     boolean audit(SysShipments shipment);
 
     boolean auditOutbound(SysShipments shipments);
+
+    List<OrderVo> listShipment(Integer clienteleId);
 }

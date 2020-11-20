@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ConfigurationProperties(prefix = "sms.ftp")
-public class FtpConfig {
+public class FtpProperties {
     /**
      * 主机地址
      */

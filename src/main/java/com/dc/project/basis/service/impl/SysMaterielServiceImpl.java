@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dc.common.constant.CustomConstant;
 import com.dc.common.exception.ServiceException;
+import com.dc.project.open.vo.ItemVo;
 import com.dc.common.vo.MaterielVo;
 import com.dc.project.basis.dao.SysMaterielDao;
 import com.dc.project.basis.entity.SysMateriel;
@@ -101,5 +102,16 @@ public class SysMaterielServiceImpl extends ServiceImpl<SysMaterielDao, SysMater
         } else {
             throw new ServiceException("产品未添加型号");
         }
+    }
+
+
+    @Override
+    public List<ItemVo> listItem(Page page) {
+        return baseMapper.listItem(page);
+    }
+
+    @Override
+    public ItemVo detailItem(Integer id) {
+        return baseMapper.detailItem(id);
     }
 }

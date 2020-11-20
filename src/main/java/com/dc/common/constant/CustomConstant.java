@@ -76,7 +76,10 @@ public class CustomConstant {
      * 验证码缓存 Key值
      */
     public static final String CAPTCHA_CODE_KEY = "captcha_code_key:";
-
+    /**
+     * 验证码缓存名称
+     */
+    public static final String CAPTCHA_CACHE_NAME = "captchaCache";
 
     /**
      * 全部数据权限

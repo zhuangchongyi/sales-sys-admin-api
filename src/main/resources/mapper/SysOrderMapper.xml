@@ -86,7 +86,12 @@
         where so.order_id=#{orderId}
     </select>
     <select id="list" resultMap="BaseResultMap">
-        <include refid="orderSql"/>
+        select
+        so.order_id, so.order_num, so.delivery_time, so.order_time, so.clientele_id, so.clientele_num,
+        so.clientele_name, so.category_id, so.personnel_id, so.pay_condition, so.status, so.remark, so.legal_person,
+        so.leader, so.email, so.phone, so.mobilephone, so.abbreviation, so.certificate_num, so.address, so.taxrate,
+        so.taxamount, so.total_price
+        from sys_order so
         <where>
             <if test="so.orderNum!=null and so.orderNum!=''">so.order_num like
                 concat(concat('%',#{so.orderNum}),'%')
@@ -100,6 +105,8 @@
             <if test="so.status!=null and so.status!=''">
                 and so.status=#{so.status}
             </if>
+            and so.order_id
+            in (select order_id from sys_order_sub where number>(has_outbound_num+has_shipment_num+has_signback_num))
         </where>
         order by so.order_id desc
     </select>
@@ -125,6 +132,24 @@
             </if>
         </where>
         group by so.order_id order by so.create_time desc
+    </select>
+
+
+    <resultMap id="OrderResultMap" type="com.dc.project.open.vo.OrderVo">
+        <id column="order_id" property="orderId"/>
+        <result column="order_num" property="orderNum"/>
+        <result column="order_time" property="orderTime"/>
+        <result column="clientele_id" property="clienteleId"/>
+        <result column="clientele_num" property="clienteleNum"/>
+        <result column="clientele_name" property="clienteleName"/>
+        <result column="total_price" property="totalPrice"/>
+        <result column="address" property="address"/>
+    </resultMap>
+    <select id="listOrder" resultMap="OrderResultMap">
+        select
+        order_id, order_num, order_time, clientele_id, clientele_num, clientele_name,mobilephone, address,total_price
+        from sys_order
+        where clientele_id=#{clienteleId}
     </select>
 
 </mapper>

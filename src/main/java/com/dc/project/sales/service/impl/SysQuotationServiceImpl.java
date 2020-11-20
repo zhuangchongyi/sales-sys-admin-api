@@ -5,11 +5,12 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.dc.common.lang.annotation.DataScope;
 import com.dc.common.constant.SalesConstant;
 import com.dc.common.exception.ServiceException;
+import com.dc.common.lang.annotation.DataScope;
 import com.dc.common.utils.*;
 import com.dc.common.vo.MaterielVo;
+import com.dc.project.basis.entity.SysClientele;
 import com.dc.project.basis.service.ISysClienteleService;
 import com.dc.project.basis.service.ISysMaterielFileService;
 import com.dc.project.basis.service.ISysMaterielService;
@@ -215,12 +216,12 @@ public class SysQuotationServiceImpl extends ServiceImpl<SysQuotationDao, SysQuo
         if (StringUtils.isEmpty(clienteleNum) || StringUtils.isEmpty(clienteleName)) {
             throw new ServiceException("客户编码或名称不能为空");
         } else {
-//            SysClientele clientele = clienteleService.getOne(new QueryWrapper<SysClientele>()
-//                    .eq("clientele_num", clienteleNum).eq("clientele_name", clienteleName));
-//            if (null == clientele) {
-//                throw new ServiceException(String.format("客户档案不存在该客户(编码%s,名称%s)", clienteleNum, clienteleName));
-//            }
-//           sysOrder.setClienteleId(clientele.getClienteleId());
+            SysClientele clientele = clienteleService.getOne(new QueryWrapper<SysClientele>()
+                    .lambda().eq(SysClientele::getClienteleNum, clienteleNum).eq(SysClientele::getClienteleName, clienteleName));
+            if (null == clientele) {
+                throw new ServiceException(String.format("客户档案不存在该客户(编码%s,名称%s)", clienteleNum, clienteleName));
+            }
+            sysOrder.setClienteleId(clientele.getClienteleId());
             sysOrder.setOrderTime(new Date());
             sysOrder.setAuditBy(null);
             sysOrder.setAuditTime(null);

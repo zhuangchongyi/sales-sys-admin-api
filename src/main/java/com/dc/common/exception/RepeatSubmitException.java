@@ -13,7 +13,7 @@ public class RepeatSubmitException extends RuntimeException {
     }
 
     public RepeatSubmitException() {
-        super("不允许重复提交，请稍后再试");
+        super("重复提交，请稍后再试");
     }
 
 }

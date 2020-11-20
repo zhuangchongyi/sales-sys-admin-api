@@ -10,6 +10,7 @@ import com.dc.common.constant.CustomConstant;
 import com.dc.common.constant.SalesConstant;
 import com.dc.common.exception.ServiceException;
 import com.dc.common.utils.*;
+import com.dc.project.open.vo.OrderVo;
 import com.dc.project.finance.service.ISysReceiptService;
 import com.dc.project.finance.service.ISysReceivableService;
 import com.dc.project.sales.dao.SysShipmentsDao;
@@ -161,15 +162,15 @@ public class SysShipmentsServiceImpl extends ServiceImpl<SysShipmentsDao, SysShi
         if (null == one) throw new ServiceException("发货单不存在");
         Integer shipmentsId = one.getShipmentsId();
         Integer orderId = one.getOrderId();
-        String nowShipmentsStatus = one.getShipmentsStatus();//当前发货状态
-        String nowOutboundStatus = one.getOutboundStatus();//当前出库状态
         String nowAuditStatus = one.getAuditStatus();//当前出库审核状态
         String nowStatus = one.getStatus();//当前发货审核状态
         if (SalesConstant.AUDIT.equals(checkStatus) || SalesConstant.RATIFY.equals(checkStatus)) { //审核时
             if (SalesConstant.AUDIT.equals(nowStatus)) {
                 throw new ServiceException("已审核");
-            } else if (SalesConstant.RATIFY.equals(nowAuditStatus)) {
+            } else if (SalesConstant.RATIFY.equals(nowStatus)) {
                 throw new ServiceException("已特批");
+            } else if (SalesConstant.AUDIT.equals(nowAuditStatus)) {
+                throw new ServiceException("已出库");
             }
             // 表示通知已发货
             shipments.setShipmentsStatus(CustomConstant.YES_STATUS);
@@ -189,7 +190,7 @@ public class SysShipmentsServiceImpl extends ServiceImpl<SysShipmentsDao, SysShi
             shipments.setShipmentsStatus(CustomConstant.NO_STATUS);
         }
         //回写订单子表
-        this.updateOrderSubs(checkStatus, nowShipmentsStatus, nowOutboundStatus, shipmentsId, orderId);
+        this.updateOrderSubs(checkStatus, one.getShipmentsStatus(), one.getOutboundStatus(), shipmentsId, orderId);
         shipments.setAuditTime(new Date());
         shipments.setAuditBy(UserSecurityUtil.getUsername());
         return this.updateById(shipments);
@@ -230,6 +231,11 @@ public class SysShipmentsServiceImpl extends ServiceImpl<SysShipmentsDao, SysShi
         shipments.setAuditTime(new Date());
         shipments.setAuditBy(UserSecurityUtil.getUsername());
         return this.updateById(shipments);
+    }
+
+    @Override
+    public List<OrderVo> listShipment(Integer clienteleId) {
+        return baseMapper.listShipment(clienteleId);
     }
 
     /**

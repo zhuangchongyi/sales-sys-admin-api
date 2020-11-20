@@ -52,11 +52,7 @@ public class SysDeptController {
         if (null != one)
             throw new ServiceException(String.format("%s部门编码已使用", dept.getDeptNum()));
 
-        SysDept info = deptService.getById(dept.getParentId());
-        if (CustomConstant.STOP_STATUS.equals(info.getStatus())) {
-            throw new ServiceException(String.format("%s部门已停用，不允许修改", info.getDeptNum()));
-        }
-        dept.setAncestors(info.getAncestors() + "," + dept.getParentId());
+        setDepeAncestors(dept);
         return R.success().data(deptService.save(dept));
     }
 
@@ -68,12 +64,20 @@ public class SysDeptController {
                 .eq("parent_id", dept.getParentId()).eq("dept_num", dept.getDeptNum()), false);
         if (null != res && !res.getDeptId().equals(dept.getDeptId()))
             throw new ServiceException(String.format("%s部门编码已使用", dept.getDeptNum()));
-        SysDept info = deptService.getById(dept.getParentId());
-        if (CustomConstant.STOP_STATUS.equals(info.getStatus())) {
-            throw new ServiceException(String.format("%s部门已停用，不允许修改", info.getDeptNum()));
-        }
-        dept.setAncestors(info.getAncestors() + "," + dept.getParentId());
+        setDepeAncestors(dept);
         return R.success().data(deptService.updateById(dept));
+    }
+
+    private void setDepeAncestors(SysDept dept) {
+        Integer parentId = dept.getParentId();
+        SysDept info = deptService.getById(parentId);
+        if (null != info) {
+            if (CustomConstant.STOP_STATUS.equals(info.getStatus())) {
+                throw new ServiceException(String.format("%s部门已停用，不允许修改", info.getDeptNum()));
+            } else {
+                dept.setAncestors(info.getAncestors() + "," + parentId);
+            }
+        }
     }
 
     @RepeatSubmit
@@ -99,6 +103,7 @@ public class SysDeptController {
      * @return
      */
     @GetMapping("/selectTree")
+
     public R selectTree() {
         return R.success().data(deptService.treeselect());
     }

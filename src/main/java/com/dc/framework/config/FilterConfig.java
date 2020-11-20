@@ -1,6 +1,5 @@
 package com.dc.framework.config;
 
-import com.dc.framework.filter.RepeatableFilter;
 import com.dc.framework.filter.XssFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,14 +41,14 @@ public class FilterConfig {
         return registration;
     }
 
-    @Bean
-    public FilterRegistrationBean<Filter> someFilterRegistration() {
-        FilterRegistrationBean<Filter> registration = new FilterRegistrationBean<>();
-        registration.setFilter(new RepeatableFilter());
-        registration.addUrlPatterns("/*");
-        registration.setName("repeatableFilter");
-        registration.setOrder(FilterRegistrationBean.LOWEST_PRECEDENCE);
-        return registration;
-    }
+//    @Bean
+//    public FilterRegistrationBean<Filter> someFilterRegistration() {
+//        FilterRegistrationBean<Filter> registration = new FilterRegistrationBean<>();
+//        registration.setFilter(new RepeatableFilter());
+//        registration.addUrlPatterns("/*");
+//        registration.setName("repeatableFilter");
+//        registration.setOrder(FilterRegistrationBean.LOWEST_PRECEDENCE);
+//        return registration;
+//    }
 
 }

@@ -2,7 +2,7 @@ package com.dc.project.common.controller;
 
 import com.dc.common.constant.CustomConstant;
 import com.dc.common.exception.ServiceException;
-import com.dc.framework.config.properties.FtpConfig;
+import com.dc.framework.config.properties.FtpProperties;
 import com.dc.common.utils.FTPUtil;
 import com.dc.common.utils.FileUtil;
 import com.dc.project.basis.entity.SysMaterielFile;
@@ -29,7 +29,7 @@ public class CommonController {
     @Autowired
     private ISysAccessoryService accessoryService;
     @Autowired
-    private FtpConfig ftpConfig;
+    private FtpProperties ftpProperties;
 
     /**
      * 下载图纸
@@ -60,13 +60,11 @@ public class CommonController {
     public void download(HttpServletRequest request, HttpServletResponse response, String name, String path, String fileName) throws IOException {
         response.setCharacterEncoding(CustomConstant.UTF8);
         response.setContentType("application/force-download");
-        response.setHeader("Content-Disposition", "attachment;fileName=" +
-                FileUtil.setFileDownloadHeader(request, name));
-        FTPClient ftpClient = FTPUtil.loginFTP(ftpConfig.getHost(), ftpConfig.getPort(), ftpConfig.getUsername(), ftpConfig.getPassword());
+        response.setHeader("Content-Disposition", "attachment;fileName=" + FileUtil.setFileDownloadHeader(request, name));
+        FTPClient ftpClient = FTPUtil.loginFTP(ftpProperties.getHost(), ftpProperties.getPort(), ftpProperties.getUsername(), ftpProperties.getPassword());
         if (null != ftpClient) {
             boolean success = FTPUtil.downloadFile(ftpClient, path, fileName, response.getOutputStream());
             if (!success) throw new ServiceException("下载失败");
-            log.info("===========下载成功=========");
         }
     }
 

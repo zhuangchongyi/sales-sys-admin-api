@@ -11,7 +11,8 @@ import com.dc.common.vo.R;
 import com.dc.common.vo.UserInfo;
 import com.dc.framework.async.AsyncFactory;
 import com.dc.framework.async.AsyncManager;
-import com.dc.framework.config.properties.SmsConfig;
+import com.dc.framework.config.properties.SmsProperties;
+import com.dc.framework.realm.CustomUserToken;
 import com.dc.project.common.service.ILoginService;
 import com.dc.project.system.entity.SysUser;
 import com.dc.project.system.service.ISysMenuService;
@@ -19,7 +20,6 @@ import com.dc.project.system.service.ISysUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.session.Session;
@@ -51,7 +51,7 @@ public class LoginServiceImpl implements ILoginService {
     @Resource
     private SessionDAO sessionDAO;
     @Autowired
-    private SmsConfig config;
+    private SmsProperties config;
     //验证码缓存
     //private CustomLRUCache<String, String> captchaCache = new CustomLRUCache(50);
     @Autowired
@@ -64,7 +64,7 @@ public class LoginServiceImpl implements ILoginService {
             String key = CustomConstant.CAPTCHA_CODE_KEY + loginUser.getUuid();
             //String cacheCode = captchaCache.get(key);
             //captchaCache.remove(key);
-            Cache<String, String> captchaCache = ehCacheManager.getCache("captchaCache");
+            Cache<String, String> captchaCache = ehCacheManager.getCache(CustomConstant.CAPTCHA_CACHE_NAME);
             String cacheCode = captchaCache.get(key);
             captchaCache.remove(key);
             if (StringUtils.isEmpty(code) || StringUtils.isEmpty(cacheCode) || !code.toLowerCase().equals(cacheCode.toLowerCase())) {
@@ -72,7 +72,7 @@ public class LoginServiceImpl implements ILoginService {
             }
         }
         this.verifyUserSession(loginUser.getUsername());
-        UsernamePasswordToken token = new UsernamePasswordToken(loginUser.getUsername(), loginUser.getPassword());
+        CustomUserToken token = new CustomUserToken(loginUser.getUsername(), loginUser.getPassword());
         SecurityUtils.getSubject().login(token);
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("token", SecurityUtils.getSubject().getSession().getId());
@@ -96,7 +96,10 @@ public class LoginServiceImpl implements ILoginService {
             SimplePrincipalCollection coll = (SimplePrincipalCollection) attribute;
             if (coll != null) {
                 //清除该用户以前登录时保存的session
-                SysUser user = (SysUser) coll.getPrimaryPrincipal();
+                Object principal = coll.getPrimaryPrincipal();
+                if (!(principal instanceof SysUser))
+                    continue;
+                SysUser user = (SysUser) principal;
                 if (username.equals(user.getUsername())) {
                     log.info("{}已登录，强制退出sessionId={}", username, session.getId());
                     sessionDAO.delete(session);
@@ -139,7 +142,7 @@ public class LoginServiceImpl implements ILoginService {
         // 存入缓存
         String verifyKey = CustomConstant.CAPTCHA_CODE_KEY + uuid;
         if (config.isCaptchaCache()) {
-            Cache<String, String> captchaCache = ehCacheManager.getCache("captchaCache");
+            Cache<String, String> captchaCache = ehCacheManager.getCache(CustomConstant.CAPTCHA_CACHE_NAME);
             captchaCache.put(verifyKey, verifyCode);
             //captchaCache.put(verifyKey, verifyCode);
         }

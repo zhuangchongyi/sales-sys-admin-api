@@ -9,8 +9,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author zhuangcy
  * @date 2020/11/4 9:43
  * @description 自定义缓存类（LRU算法：最近最久未使用算法）
- * TODO<zhuangcy> 感觉还可以做一个全局缓存管理器，让spring管理
- * 用ConcurrentHashMap做缓存也行
  */
 public class CustomLRUCache<K, V> {
     // 缓存最大容量

@@ -12,6 +12,7 @@ import com.dc.common.utils.BeanUtil;
 import com.dc.common.utils.BigDecimalUtil;
 import com.dc.common.utils.CodeUtil;
 import com.dc.common.utils.ObjectMapperUtil;
+import com.dc.project.open.vo.OrderVo;
 import com.dc.project.finance.entity.SysReceivable;
 import com.dc.project.finance.service.ISysReceivableService;
 import com.dc.project.sales.dao.SysSignbackDao;
@@ -185,5 +186,10 @@ public class SysSignbackServiceImpl extends ServiceImpl<SysSignbackDao, SysSignb
     @Override
     public IPage<Map<String, Object>> findFinanceOrder(Page page, SysSignback sysSignback) {
         return baseMapper.findFinanceOrder(page, sysSignback);
+    }
+
+    @Override
+    public List<OrderVo> listSign(Integer clienteleId) {
+        return baseMapper.listSign(clienteleId);
     }
 }

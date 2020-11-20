@@ -12,6 +12,7 @@ import com.dc.common.utils.BeanUtil;
 import com.dc.common.utils.CodeUtil;
 import com.dc.common.utils.ObjectMapperUtil;
 import com.dc.common.utils.UserSecurityUtil;
+import com.dc.project.open.vo.OrderVo;
 import com.dc.project.sales.dao.SysOrderDao;
 import com.dc.project.sales.entity.SysOrder;
 import com.dc.project.sales.entity.SysOrderSub;
@@ -61,7 +62,7 @@ public class SysOrderServiceImpl extends ServiceImpl<SysOrderDao, SysOrder> impl
             if (null == order.getClienteleId() || !this.updateById(order)) throw new ServiceException("修改失败");
         }
         //修改子表
-        saveAndUpdateQuotationSub(order, ObjectMapperUtil.toObject(materielListForm.toString(), List.class));
+        saveAndUpdateSub(order, ObjectMapperUtil.toObject(materielListForm.toString(), List.class));
         // 删除子表
         List<Long> delSubIds = ObjectMapperUtil.toObject(delSubIdsForm.toString(), List.class);
         if (!delSubIds.isEmpty()) {
@@ -73,7 +74,7 @@ public class SysOrderServiceImpl extends ServiceImpl<SysOrderDao, SysOrder> impl
         return result;
     }
 
-    private void saveAndUpdateQuotationSub(SysOrder order, List<Map> materielList) throws InvocationTargetException, IllegalAccessException {
+    private void saveAndUpdateSub(SysOrder order, List<Map> materielList) throws InvocationTargetException, IllegalAccessException {
         if (null == materielList && materielList.isEmpty())
             throw new ServiceException("保存失败,未添加产品");
         for (Map map : materielList) {
@@ -86,7 +87,7 @@ public class SysOrderServiceImpl extends ServiceImpl<SysOrderDao, SysOrder> impl
                     throw new ServiceException("保存失败");
                 }
             } else {
-                if (!orderSubService.save(orderSub)) {
+                if (!orderSubService.updateById(orderSub)) {
                     throw new ServiceException("修改失败");
                 }
             }
@@ -167,24 +168,26 @@ public class SysOrderServiceImpl extends ServiceImpl<SysOrderDao, SysOrder> impl
     }
 
     @Override
-    public String checkCloseOrder(SysOrder order) {
+    public List<String> checkCloseOrder(SysOrder order) {
         if (null == order.getOrderId()) {
             throw new ServiceException("参数错误");
         }
-//        if (SalesConstant.CLOSE.equals(order.getStatus())) {
-//            List<SysOrderSub> list = orderSubService.list(new QueryWrapper<SysOrderSub>().eq("order_id", order.getOrderId()));
-//            String[] arr = new String[list.size()];
-//            for (SysOrderSub sub : list) {
-//                int num = sub.getNumber() - sub.getHasSignbackNum() - sub.getHasOutboundNum() - sub.getHasSignbackNum();
-//                if (num > 0) {
-//                    sb.append(String.format("%s %s %s 含有未发货数量%s",
-//                            sub.getMaterielNum(), sub.getMaterielName(), sub.getModelName(), num)).append(";\n");
-//                }
-//            }
-//            String checkStr = sb.toString();
-//            if (checkStr.length() != 0)
-//                return checkStr;
-//        }
-        return null;
+        List<String> result = new ArrayList<>();
+        if (SalesConstant.CLOSE.equals(order.getStatus())) {
+            List<SysOrderSub> list = orderSubService.list(new QueryWrapper<SysOrderSub>().eq("order_id", order.getOrderId()));
+            for (SysOrderSub sub : list) {
+                int num = sub.getNumber() - sub.getHasSignbackNum() - sub.getHasOutboundNum() - sub.getHasSignbackNum();
+                if (num > 0) {
+                    result.add(String.format("%s %s %s 含有未发货数量%s",
+                            sub.getMaterielNum(), sub.getMaterielName(), sub.getModelName(), num));
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<OrderVo> listOrder(Integer clienteleId) {
+        return baseMapper.listOrder(clienteleId);
     }
 }

@@ -104,8 +104,7 @@ public class DataScopeAspectj {
 
     private void verifyParams(JoinPoint point, String sql) {
         Object[] args = point.getArgs();
-        for (int i = 0; i < args.length; i++) {
-            Object arg = args[i];
+        for (Object arg : args) {
             if (arg instanceof BaseEntity) {
                 BaseEntity baseEntity = (BaseEntity) arg;
                 if (StringUtils.isNotBlank(sql)) {

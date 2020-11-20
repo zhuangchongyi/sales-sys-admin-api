@@ -1,13 +1,18 @@
 package com.dc.framework.config;
 
 import com.dc.common.constant.CustomConstant;
-import com.dc.framework.config.properties.SmsConfig;
+import com.dc.framework.config.properties.SmsProperties;
 import com.dc.framework.filter.CustomAuthenticationFilter;
 import com.dc.framework.handler.CustomSessionManager;
-import com.dc.framework.realm.LoginUserRealm;
+import com.dc.framework.realm.CustomModularRealmAuthenticator;
+import com.dc.framework.realm.CustomModularRealmAuthorizer;
+import com.dc.framework.realm.SystemUserRealm;
+import com.dc.framework.realm.WxUserRealm;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
+import org.apache.shiro.authc.pam.AtLeastOneSuccessfulStrategy;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.session.mgt.eis.MemorySessionDAO;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
@@ -22,14 +27,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 
 import javax.servlet.Filter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Configuration
 @AutoConfigureAfter(ShiroLifecycleBeanPostProcessorConfig.class)
 public class ShiroConfig {
     @Autowired
-    private SmsConfig config;
+    private SmsProperties smsProperties;
 
 
     /**
@@ -39,10 +46,20 @@ public class ShiroConfig {
     public ShiroFilterFactoryBean shiroFilterFactoryBean() {
         ShiroFilterFactoryBean factoryBean = new ShiroFilterFactoryBean();
         factoryBean.setSecurityManager(securityManager());
+        // 系统放行的请求
         Map<String, String> filterChainDefinitionMap = new HashMap<>();
         filterChainDefinitionMap.put("/auth/login", "anon");
         filterChainDefinitionMap.put("/auth/getCode", "anon");
-        // 对所有用户认证
+        // 第三方放行请求
+        filterChainDefinitionMap.put("/open/auth/login", "anon");
+        filterChainDefinitionMap.put("/open/item/list", "anon");
+        filterChainDefinitionMap.put("/open/item/detail/*", "anon");
+        // swagger放行
+        filterChainDefinitionMap.put("/swagger-ui/**", "anon");
+        filterChainDefinitionMap.put("/swagger-resources/**", "anon");
+        filterChainDefinitionMap.put("/v3/api-docs", "anon");
+
+        // 对所有请求进行认证
         filterChainDefinitionMap.put("/**", "customAuthenticationFilter");
         factoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
         //自定义过滤器
@@ -58,28 +75,57 @@ public class ShiroConfig {
     @Bean
     public SecurityManager securityManager() {
         DefaultWebSecurityManager manager = new DefaultWebSecurityManager();
-        manager.setRealm(loginUserRealm());
+
+        manager.setAuthenticator(customModularRealmAuthenticator());
+        manager.setAuthorizer(customModularRealmAuthorizer());
+        List<Realm> realms = new ArrayList<>();
+        realms.add(systemUserRealm());
+        realms.add(wxUserRealm());
+        manager.setRealms(realms);
+
         manager.setSessionManager(sessionManager());
         manager.setCacheManager(ehCacheManager());
         return manager;
     }
 
-    @Bean
-    public EhCacheManager ehCacheManager() {
-        EhCacheManager ehcacheManager = new EhCacheManager();
-        ehcacheManager.setCacheManagerConfigFile("classpath:ehcache-shiro.xml");
-        return ehcacheManager;
-    }
-
     /**
-     * 注入自定义的Realm类
+     * 系统用户Realm类
      */
     @Bean
-    public LoginUserRealm loginUserRealm() {
-        LoginUserRealm realm = new LoginUserRealm();
+    public SystemUserRealm systemUserRealm() {
+        SystemUserRealm realm = new SystemUserRealm();
         //密文匹配的时候，这里需要设置credentialsMatcher()，否则无法匹配
         realm.setCredentialsMatcher(hashedCredentialsMatcher());
         return realm;
+    }
+
+    /**
+     * 微信用户Realm类
+     */
+    @Bean
+    public WxUserRealm wxUserRealm() {
+        WxUserRealm realm = new WxUserRealm();
+        return realm;
+    }
+
+    /**
+     * 自定义的Realm管理，主要针对多realm
+     *
+     * @return
+     */
+    @Bean
+    public CustomModularRealmAuthenticator customModularRealmAuthenticator() {
+        CustomModularRealmAuthenticator authenticator = new CustomModularRealmAuthenticator();
+        // 设置realm判断条件
+        authenticator.setAuthenticationStrategy(new AtLeastOneSuccessfulStrategy());
+        return authenticator;
+    }
+
+    @Bean
+    public CustomModularRealmAuthorizer customModularRealmAuthorizer() {
+        CustomModularRealmAuthorizer authenticator = new CustomModularRealmAuthorizer();
+        // 设置realm判断条件
+        return authenticator;
     }
 
 
@@ -122,6 +168,13 @@ public class ShiroConfig {
         return credentialsMatcher;
     }
 
+    @Bean
+    public EhCacheManager ehCacheManager() {
+        EhCacheManager ehcacheManager = new EhCacheManager();
+        ehcacheManager.setCacheManagerConfigFile("classpath:ehcache-shiro.xml");
+        return ehcacheManager;
+    }
+
     /**
      * 自定义sessionManager
      */
@@ -129,7 +182,7 @@ public class ShiroConfig {
     public SessionManager sessionManager() {
         CustomSessionManager sessionManager = new CustomSessionManager();
         // 会话过期时间，单位：毫秒(在无操作时开始计时)，默认30分钟
-        sessionManager.setGlobalSessionTimeout(sessionManager.DEFAULT_GLOBAL_SESSION_TIMEOUT * config.getTimeout());
+        sessionManager.setGlobalSessionTimeout(sessionManager.DEFAULT_GLOBAL_SESSION_TIMEOUT * smsProperties.getTimeout());
         sessionManager.setSessionIdCookieEnabled(false);
         sessionManager.setSessionIdUrlRewritingEnabled(false);
         sessionManager.setSessionDAO(sessionDao());

@@ -36,8 +36,9 @@ public class OnlineController {
                 .map(session -> {
                     SimplePrincipalCollection attribute = (SimplePrincipalCollection) session.getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY);
                     if (attribute != null) {
-                        SysUser user = (SysUser) attribute.getPrimaryPrincipal();
-                        if (user != null) {
+                        Object principal = attribute.getPrimaryPrincipal();
+                        if (principal instanceof SysUser) {
+                            SysUser user = (SysUser) principal;
                             Map<String, Object> map = new HashMap<>();
                             map.put("id", session.getId());
                             map.put("username", user.getUsername());
@@ -58,7 +59,11 @@ public class OnlineController {
 
     @GetMapping("/count")
     public R count() {
-        return R.success().data(sessionDAO.getActiveSessions().size());
+        return R.success().data(sessionDAO.getActiveSessions().stream().filter(predicate->{
+            SimplePrincipalCollection attribute = (SimplePrincipalCollection) predicate.getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY);
+            Object principal = attribute.getPrimaryPrincipal();
+            return principal instanceof SysUser;
+        }).count());
     }
 
     @RepeatSubmit

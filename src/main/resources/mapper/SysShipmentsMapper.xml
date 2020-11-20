@@ -121,4 +121,22 @@
         where ss.shipments_id=#{shipmentsId}
     </select>
 
+
+    <resultMap id="OrderResultMap" type="com.dc.project.open.vo.OrderVo">
+        <id column="order_id" property="orderId"/>
+        <result column="order_num" property="orderNum"/>
+        <result column="order_time" property="orderTime"/>
+        <result column="clientele_id" property="clienteleId"/>
+        <result column="clientele_num" property="clienteleNum"/>
+        <result column="clientele_name" property="clienteleName"/>
+        <result column="total_price" property="totalPrice"/>
+        <result column="address" property="address"/>
+    </resultMap>
+    <select id="listShipment" resultMap="OrderResultMap">
+        select
+        shipments_id, order_id, shipments_num, order_num, shipments_time, outbound_time,mobilephone, address
+        from sys_shipments
+        where clientele_id=#{clienteleId}
+    </select>
+
 </mapper>

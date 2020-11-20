@@ -3,8 +3,10 @@ package com.dc.project.sales.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.dc.project.open.vo.OrderVo;
 import com.dc.project.sales.entity.SysOrder;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,5 +36,8 @@ public interface ISysOrderService extends IService<SysOrder> {
 
     IPage<SysOrder> findReturnsOrder(Page page, SysOrder order);
 
-    String checkCloseOrder(SysOrder order);
+    List<String> checkCloseOrder(SysOrder order);
+
+    List<OrderVo> listOrder(Integer clienteleId);
+
 }

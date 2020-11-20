@@ -56,7 +56,7 @@ public class SysCategoryController {
         if (count != null)
             throw new ServiceException("编码不允许重复");
         SysCategory info = categoryService.getById(category.getParentId());
-        if (CustomConstant.STOP_STATUS.equals(info.getStatus())) {
+        if (info != null && CustomConstant.STOP_STATUS.equals(info.getStatus())) {
             throw new ServiceException(String.format("%s类别已停用，不允许新增", info.getCategoryNum()));
         }
         return R.success().data(categoryService.save(category));
@@ -72,7 +72,7 @@ public class SysCategoryController {
         if (null != res && !res.getCategoryId().equals(category.getCategoryId()))
             throw new ServiceException("编码不允许重复");
         SysCategory info = categoryService.getById(category.getParentId());
-        if (CustomConstant.STOP_STATUS.equals(info.getStatus())) {
+        if (info != null && CustomConstant.STOP_STATUS.equals(info.getStatus())) {
             throw new ServiceException(String.format("%s类别已停用，不允许修改", info.getCategoryNum()));
         }
         return R.success().data(categoryService.updateById(category));

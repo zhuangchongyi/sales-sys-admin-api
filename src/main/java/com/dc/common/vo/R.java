@@ -3,7 +3,7 @@ package com.dc.common.vo;
 import java.io.Serializable;
 
 /**
- * @Author zhuangchongyi
+ * @Author zhuangcy
  * @Description 请求响应返回实体对象
  * @Date 2020/9/3 10:05
  */
@@ -30,6 +30,10 @@ public class R implements Serializable {
      * 未认证code
      */
     public static final int AUTH_FAIL_CODE = 401;
+    /**
+     * 请求方式错误
+     */
+    public static final int REQUEST_FAIL_CODE = 402;
     /**
      * 未授权code
      */

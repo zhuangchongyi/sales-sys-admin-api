@@ -5,7 +5,7 @@ import com.dc.common.exception.ServiceException;
 import com.dc.common.utils.CodeUtil;
 import com.dc.common.utils.DateUtil;
 import com.dc.common.utils.FTPUtil;
-import com.dc.framework.config.properties.FtpConfig;
+import com.dc.framework.config.properties.FtpProperties;
 import com.dc.project.basis.dao.SysMaterielFileDao;
 import com.dc.project.basis.entity.SysMaterielFile;
 import com.dc.project.basis.service.ISysMaterielFileService;
@@ -29,24 +29,26 @@ import java.util.Date;
 @Slf4j
 public class SysMaterielFileServiceImpl extends ServiceImpl<SysMaterielFileDao, SysMaterielFile> implements ISysMaterielFileService {
     @Autowired
-    private FtpConfig ftpConfig;
+    private FtpProperties ftpProperties;
 
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean upload(Integer materielId, MultipartFile file) {
-        try {
-            if (null == materielId || null == file) {
-                throw new ServiceException("上传失败");
-            }
+        if (null != materielId && null != file) {
             String name = file.getOriginalFilename();
             String fileName = CodeUtil.randomUUIDNotRail() + name.substring(name.indexOf('.'));
             String fileDir = DateUtil.getYYYYMMPathString(new Date());
-            String url = ftpConfig.getUrlPrefix() + fileDir + fileName;
-            String path = ftpConfig.getPath() + fileDir;
-            FTPClient ftpClient = FTPUtil.loginFTP(ftpConfig.getHost(), ftpConfig.getPort(), ftpConfig.getUsername(), ftpConfig.getPassword());
+            String url = ftpProperties.getUrlPrefix() + fileDir + fileName;
+            String path = ftpProperties.getPath() + fileDir;
+            FTPClient ftpClient = FTPUtil.loginFTP(ftpProperties.getHost(), ftpProperties.getPort(), ftpProperties.getUsername(), ftpProperties.getPassword());
             if (null != ftpClient) {
-                boolean success = FTPUtil.uploadFile(ftpClient, path, fileName, file.getInputStream());
+                boolean success = false;
+                try {
+                    success = FTPUtil.uploadFile(ftpClient, path, fileName, file.getInputStream());
+                } catch (IOException e) {
+                    throw new ServiceException("上传失败");
+                }
                 if (success) {
                     SysMaterielFile materielFile = new SysMaterielFile();
                     materielFile.setMaterielId(materielId)
@@ -60,8 +62,8 @@ public class SysMaterielFileServiceImpl extends ServiceImpl<SysMaterielFileDao, 
                     return true;
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } else {
+            throw new ServiceException("上传失败");
         }
         throw new ServiceException("上传失败");
     }
@@ -69,12 +71,13 @@ public class SysMaterielFileServiceImpl extends ServiceImpl<SysMaterielFileDao, 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean delete(Long pkId) {
-        SysMaterielFile materielFile = baseMapper.selectById(pkId);
-        int row = baseMapper.deleteById(pkId);
+//        SysMaterielFile materielFile = baseMapper.selectById(pkId);
+        if (!this.removeById(pkId))
+            throw new ServiceException("已删除");
         //删除文件
-        FTPClient ftpClient = FTPUtil.loginFTP(ftpConfig.getHost(), ftpConfig.getPort(), ftpConfig.getUsername(), ftpConfig.getPassword());
-        FTPUtil.deleteFile(ftpClient, materielFile.getPath(), materielFile.getFileName());
-        return row > 0;
+//        FTPClient ftpClient = FTPUtil.loginFTP(ftpProperties.getHost(), ftpProperties.getPort(), ftpProperties.getUsername(), ftpProperties.getPassword());
+//        FTPUtil.deleteFile(ftpClient, materielFile.getPath(), materielFile.getFileName());
+        return true;
     }
 
 }

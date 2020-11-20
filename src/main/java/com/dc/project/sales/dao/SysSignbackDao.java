@@ -3,9 +3,11 @@ package com.dc.project.sales.dao;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.dc.project.open.vo.OrderVo;
 import com.dc.project.sales.entity.SysSignback;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,4 +25,6 @@ public interface SysSignbackDao extends BaseMapper<SysSignback> {
     IPage<SysSignback> findOrderByClienteleId(Page<SysSignback> page, @Param("sign") SysSignback sysSignback);
 
     IPage<Map<String, Object>> findFinanceOrder(Page page, @Param("sign") SysSignback sysSignback);
+
+    List<OrderVo> listSign(Integer clienteleId);
 }
