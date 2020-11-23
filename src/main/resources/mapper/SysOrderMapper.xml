@@ -144,10 +144,11 @@
         <result column="clientele_name" property="clienteleName"/>
         <result column="total_price" property="totalPrice"/>
         <result column="address" property="address"/>
+        <result column="status" property="status"/>
     </resultMap>
     <select id="listOrder" resultMap="OrderResultMap">
         select
-        order_id, order_num, order_time, clientele_id, clientele_num, clientele_name,mobilephone, address,total_price
+        order_num, order_time, clientele_id, clientele_num, clientele_name,mobilephone, address,total_price,status
         from sys_order
         where clientele_id=#{clienteleId}
     </select>

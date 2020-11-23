@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
  * @author zhuangchongyi
  * @since 2020-08-28
  */
-@Slf4j(topic = "sys-user")
+@Slf4j
 @Service
 public class LoginServiceImpl implements ILoginService {
     @Autowired

@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Controller
-@Slf4j(topic = "sys-user")
+@Slf4j
 public class CommonController {
     @Autowired
     private ISysMaterielFileService materielFileService;

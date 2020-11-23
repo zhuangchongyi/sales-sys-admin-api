@@ -140,7 +140,8 @@
     <select id="listItem" resultMap="ItemResultMap">
         select
         m.materiel_id, m.materiel_num, m.materiel_name, m.specification, m.need_torque, m.out_torque, m.price,
-        c.category_id,c.category_num,c.category_name
+        c.category_id,c.category_num,c.category_name,
+        ( select url from sys_materiel_file where materiel_id=m.materiel_id order by create_time desc limit 1) url
         from sys_materiel m
         left join sys_category c on c.category_id=m.category_id and c.category='0'
         where m.del_flag='0' and m.status='0'

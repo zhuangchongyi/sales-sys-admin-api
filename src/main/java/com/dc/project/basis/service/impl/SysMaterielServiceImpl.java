@@ -94,7 +94,7 @@ public class SysMaterielServiceImpl extends ServiceImpl<SysMaterielDao, SysMater
                 materielModelService.remove(new QueryWrapper<SysMaterielModel>().eq("m_id", materielId));
             }
             List<SysMaterielModel> list = Stream.of(modelNames)
-                    .filter(model -> StringUtils.isNotEmpty(model))
+                    .filter(StringUtils::isNotEmpty)
                     .map(model -> new SysMaterielModel().setMId(materielId).setModelName(model))
                     .collect(Collectors.toList());
             if (!materielModelService.saveBatch(list))

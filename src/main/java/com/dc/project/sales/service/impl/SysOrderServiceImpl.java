@@ -12,6 +12,7 @@ import com.dc.common.utils.BeanUtil;
 import com.dc.common.utils.CodeUtil;
 import com.dc.common.utils.ObjectMapperUtil;
 import com.dc.common.utils.UserSecurityUtil;
+import com.dc.project.basis.service.ISysMaterielService;
 import com.dc.project.open.vo.OrderVo;
 import com.dc.project.sales.dao.SysOrderDao;
 import com.dc.project.sales.entity.SysOrder;
@@ -37,6 +38,8 @@ import java.util.*;
 public class SysOrderServiceImpl extends ServiceImpl<SysOrderDao, SysOrder> implements ISysOrderService {
     @Autowired
     private ISysOrderSubService orderSubService;
+    @Autowired
+    private ISysMaterielService materielService;
 
     @DataScope(userAlias = "so", userColumn = "create_id")
     @Override
@@ -81,7 +84,8 @@ public class SysOrderServiceImpl extends ServiceImpl<SysOrderDao, SysOrder> impl
             SysOrderSub orderSub = new SysOrderSub();
             BeanUtils.populate(orderSub, map);
             orderSub.setOrderId(order.getOrderId());
-            // TODO<zhuangcy> 校验产品是否可以使用
+            // 校验产品是否可以使用
+            materielService.verifyStatus(orderSub.getMaterielId());
             if (null == orderSub.getSubId()) {
                 if (!orderSubService.save(orderSub)) {
                     throw new ServiceException("保存失败");
@@ -146,8 +150,6 @@ public class SysOrderServiceImpl extends ServiceImpl<SysOrderDao, SysOrder> impl
         SalesConstant.verifyAuditStatus(order.getStatus(), sysQuotation.getStatus());
         order.setAuditTime(new Date());
         order.setAuditBy(UserSecurityUtil.getUsername());
-        // TODO<zhuangcy> 校验产品是否可以使用
-
         return this.updateById(order);
     }
 

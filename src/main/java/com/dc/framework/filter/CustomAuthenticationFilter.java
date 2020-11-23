@@ -38,9 +38,8 @@ public class CustomAuthenticationFilter extends FormAuthenticationFilter {
 
     @Override
     protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
-        log.info("shiroFilter拦截");
-        ServletUtil.renderString(WebUtils.toHttp(response),
-                ObjectMapperUtil.toJSON(R.error().code(R.UNAUTHORIZED).msg("请求失败，未认证授权")));
+        log.info("shiro拦截，请求方式：{}, 请求路径：{}", WebUtils.toHttp(request).getMethod(), WebUtils.toHttp(request).getServletPath());
+        ServletUtil.renderString(WebUtils.toHttp(response), ObjectMapperUtil.toJSON(R.error().code(R.UNAUTHORIZED).msg("请求失败，未认证授权")));
         //return false 拦截， true 放行
         return false;
     }

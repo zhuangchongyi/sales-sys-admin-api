@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  * @date 2020/11/3 17:22
  * @description 在线用户监控
  */
-@Slf4j(topic = "sys-user")
+@Slf4j
 @RestController
 @RequestMapping("/monitor/online")
 public class OnlineController {

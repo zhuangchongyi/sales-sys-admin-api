@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
  * @Description 用户认证控制层
  * @Date 2020/8/28 14:30
  */
-@Slf4j(topic = "sys-user")
+@Slf4j
 @RestController
 @RequestMapping("/auth")
 public class LoginController {

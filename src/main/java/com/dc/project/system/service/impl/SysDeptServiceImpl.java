@@ -25,7 +25,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptDao, SysDept> impleme
 
     @Override
     public List<SysDept> list(SysDept sysDept) {
-        // TODO<zhuangcy> 查询时未以树展示
+        // 查询时以树展示
         return baseMapper.list(sysDept);
     }
 

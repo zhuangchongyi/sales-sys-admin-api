@@ -54,7 +54,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuDao, SysMenu> impleme
 
     @Override
     public List<RouterVo> getRouters() {
-        List<SysMenu> menus = null;
+        List<SysMenu> menus = new ArrayList<>();
         if (UserSecurityUtil.isAdmin(null)) {
             menus = baseMapper.findMenuTreeAll();
         } else {

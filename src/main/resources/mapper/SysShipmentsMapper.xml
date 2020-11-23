@@ -131,10 +131,13 @@
         <result column="clientele_name" property="clienteleName"/>
         <result column="total_price" property="totalPrice"/>
         <result column="address" property="address"/>
+        <result column="shipments_num" property="shipmentsNum"/>
+        <result column="shipments_time" property="shipmentsTime"/>
+        <result column="shipments_status" property="status"/>
     </resultMap>
     <select id="listShipment" resultMap="OrderResultMap">
         select
-        shipments_id, order_id, shipments_num, order_num, shipments_time, outbound_time,mobilephone, address
+        shipments_num, order_num, shipments_time,mobilephone, address,clientele_id, clientele_name,shipments_status
         from sys_shipments
         where clientele_id=#{clienteleId}
     </select>

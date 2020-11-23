@@ -21,7 +21,7 @@ import java.util.Set;
  * @Description 系统用户认证
  * @Date 2020/8/14 12:11
  */
-@Slf4j(topic = "sys-user")
+@Slf4j
 public class SystemUserRealm extends AuthorizingRealm {
     @Autowired
     private ILoginService loginService;

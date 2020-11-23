@@ -161,10 +161,13 @@
         <result column="clientele_name" property="clienteleName"/>
         <result column="total_price" property="totalPrice"/>
         <result column="address" property="address"/>
+        <result column="signback_num" property="signNum"/>
+        <result column="signback_time" property="signTime"/>
+        <result column="signback_status" property="status"/>
     </resultMap>
     <select id="listSign" resultMap="OrderResultMap">
         select
-        signback_id, order_id, shipments_id, signback_num, shipments_num, order_num, signback_time, mobilephone
+        signback_num, shipments_num, order_num, signback_time, mobilephone,clientele_id, clientele_name,address,signback_status
         from sys_signback
         where clientele_id=#{clienteleId}
     </select>

@@ -13,6 +13,7 @@ import org.apache.shiro.authc.pam.AtLeastOneSuccessfulStrategy;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
+import org.apache.shiro.session.mgt.AbstractSessionManager;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.session.mgt.eis.MemorySessionDAO;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
@@ -182,7 +183,7 @@ public class ShiroConfig {
     public SessionManager sessionManager() {
         CustomSessionManager sessionManager = new CustomSessionManager();
         // 会话过期时间，单位：毫秒(在无操作时开始计时)，默认30分钟
-        sessionManager.setGlobalSessionTimeout(sessionManager.DEFAULT_GLOBAL_SESSION_TIMEOUT * smsProperties.getTimeout());
+        sessionManager.setGlobalSessionTimeout(AbstractSessionManager.DEFAULT_GLOBAL_SESSION_TIMEOUT * smsProperties.getTimeout());
         sessionManager.setSessionIdCookieEnabled(false);
         sessionManager.setSessionIdUrlRewritingEnabled(false);
         sessionManager.setSessionDAO(sessionDao());

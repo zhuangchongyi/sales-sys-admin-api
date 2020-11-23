@@ -1,12 +1,11 @@
 package com.dc.framework.realm;
 
-import com.dc.project.basis.service.ISysClienteleService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.dc.common.vo.OpenUser;
+import com.dc.project.basis.entity.SysClientele;
+import com.dc.project.basis.service.ISysClienteleService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
@@ -21,7 +20,7 @@ import java.util.Set;
  * @Description 微信用户认证
  * @Date 2020/8/14 12:11
  */
-@Slf4j(topic = "sys-user")
+@Slf4j
 public class WxUserRealm extends AuthorizingRealm {
     @Autowired
     private ISysClienteleService clienteleService;
@@ -53,14 +52,14 @@ public class WxUserRealm extends AuthorizingRealm {
             return null;
         }
 
-//        QueryWrapper<SysClientele> queryWrapper = new QueryWrapper<>();
-//        queryWrapper.lambda().eq(SysClientele::getClienteleNum, principal);
-//        SysClientele one = clienteleService.getOne(queryWrapper, false);
-//        if (null == one) {
-//            throw new UnknownAccountException();
-//        } else {
-//            Object credentials = authenticationToken.getCredentials();//密码
-//        }
+        QueryWrapper<SysClientele> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(SysClientele::getClienteleNum, principal);
+        SysClientele one = clienteleService.getOne(queryWrapper, false);
+        if (null == one) {
+            throw new UnknownAccountException();
+        } else {
+            Object credentials = authenticationToken.getCredentials();//密码
+        }
         OpenUser user = new OpenUser();
         user.setUsername(principal.toString());
         user.setPassword(authenticationToken.getPrincipal().toString());
