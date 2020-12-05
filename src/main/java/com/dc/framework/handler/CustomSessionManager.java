@@ -1,6 +1,7 @@
 package com.dc.framework.handler;
 
 
+import com.dc.common.constant.CustomConstant;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.web.servlet.ShiroHttpServletRequest;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
@@ -16,7 +17,6 @@ import java.io.Serializable;
  * @Date 2020/9/27 10:29
  */
 public class CustomSessionManager extends DefaultWebSessionManager {
-    private static final String AUTHORIZATION = "Authorization";
     private static final String REFERENCED_SESSION_ID_SOURCE = "Stateless request";
 
     public CustomSessionManager() {
@@ -25,7 +25,8 @@ public class CustomSessionManager extends DefaultWebSessionManager {
 
     @Override
     protected Serializable getSessionId(ServletRequest request, ServletResponse response) {
-        String sessionId = WebUtils.toHttp(request).getHeader(AUTHORIZATION);//如果请求头中有 Authorization 则其值为sessionId
+        //如果请求头中有 Authorization 则其值为sessionId
+        String sessionId = WebUtils.toHttp(request).getHeader(CustomConstant.AUTHORIZATION);
         if (StringUtils.isNotEmpty(sessionId)) {
             request.setAttribute(ShiroHttpServletRequest.REFERENCED_SESSION_ID_SOURCE, REFERENCED_SESSION_ID_SOURCE);
             request.setAttribute(ShiroHttpServletRequest.REFERENCED_SESSION_ID, sessionId);

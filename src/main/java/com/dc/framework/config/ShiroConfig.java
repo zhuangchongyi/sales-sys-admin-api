@@ -53,8 +53,8 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/auth/getCode", "anon");
         // 第三方放行请求
         filterChainDefinitionMap.put("/open/auth/login", "anon");
-        filterChainDefinitionMap.put("/open/item/list", "anon");
-        filterChainDefinitionMap.put("/open/item/detail/*", "anon");
+        filterChainDefinitionMap.put("/open/item/**", "anon");
+        filterChainDefinitionMap.put("/open/category/**", "anon");
         // swagger放行
         filterChainDefinitionMap.put("/swagger-ui/**", "anon");
         filterChainDefinitionMap.put("/swagger-resources/**", "anon");

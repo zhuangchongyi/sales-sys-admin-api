@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.project.open.dao.OrderAddressDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.dc.project.open.entity.OrderAddress">
+        <id column="pk_id" property="pkId"/>
+        <result column="clientele_id" property="clienteleId"/>
+        <result column="order_id" property="orderId"/>
+        <result column="order_num" property="orderNum"/>
+        <result column="order_time" property="orderTime"/>
+        <result column="province" property="province"/>
+        <result column="city" property="city"/>
+        <result column="district" property="district"/>
+        <result column="detail" property="detail"/>
+        <result column="address" property="address"/>
+        <result column="phone" property="phone"/>
+        <result column="recipient" property="recipient"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        pk_id, clientele_id, order_id, order_num, order_time, province, city, district, detail, address, phone, recipient
+    </sql>
+
+</mapper>

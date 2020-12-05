@@ -13,8 +13,13 @@ import java.util.List;
  */
 public interface SysMaterielFileDao extends BaseMapper<SysMaterielFile> {
 
+    /**
+     * 查询产品url
+     *
+     * @param id 产品id
+     * @return
+     */
     List<String> findMaterielUrl(Integer id);
 
-    String oneMaterielUrl(Integer id);
 
 }

@@ -6,6 +6,7 @@ import com.dc.project.open.service.IAuthService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,7 +31,7 @@ public class AuthController {
      */
     @ApiOperation(value = "登录接口")
     @PostMapping("/login")
-    public R login(@RequestBody OpenUser user) {
+    public R login(@RequestBody @Validated OpenUser user) {
         return R.success().data(authService.login(user));
     }
 

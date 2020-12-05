@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: prod
+    active: dev
   # 服务模块
   devtools:
     restart:
@@ -15,7 +15,7 @@ spring:
       max-request-size: 20MB
 
   jackson:
-    date-format: yyyy-MM-dd HH:mm:ss
+    date-format: yyyy-MM-dd
     time-zone: GMT+8
     serialization:
       write-dates-as-timestamps: false
@@ -38,6 +38,12 @@ mybatis-plus:
       # 指定删除字段
       logic-delete-field: delFlag
 
+logging:
+  level:
+    com.dc: debug
+    org.springfromework.web: info
+    com.ulisesbocchio.jasyptspringboot: warn
+
 
 sms:
   captcha-cache: false
@@ -58,3 +64,4 @@ sms:
     url: https://zhuangcy.top
     email: 1909017815@qq.com
     version: 1.0.0
+    protocols: http,https

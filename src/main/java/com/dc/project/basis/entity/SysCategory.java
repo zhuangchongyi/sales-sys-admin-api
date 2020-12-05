@@ -70,6 +70,11 @@ public class SysCategory extends BaseEntity {
     private String remark;
 
     /**
+     * 备注
+     */
+    private String url;
+
+    /**
      * 子分类
      */
     @TableField(exist = false)

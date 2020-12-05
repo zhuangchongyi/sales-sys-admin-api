@@ -24,18 +24,21 @@ import java.util.Set;
 public class WxUserRealm extends AuthorizingRealm {
     @Autowired
     private ISysClienteleService clienteleService;
+    private Set<String> roles = new HashSet<>();
+    private Set<String> permissions = new HashSet<>();
+
+    {
+        roles.add("wx");
+        permissions.add("open:*:*");
+    }
 
     /**
      * 角色权限认证
      */
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
-        log.info("WX 开始角色认证------------");
+        log.info("WX 开始权限认证------------");
         SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
-        Set<String> roles = new HashSet<>();
-        roles.add("wx");
-        Set<String> permissions = new HashSet<>();
-        permissions.add("open:*:*");
         authorizationInfo.addRoles(roles);
         authorizationInfo.addStringPermissions(permissions);
         return authorizationInfo;
@@ -47,23 +50,32 @@ public class WxUserRealm extends AuthorizingRealm {
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
         log.info("WX 开始用户认证------------");
-        Object principal = authenticationToken.getPrincipal();// 用户名
+        Object principal = authenticationToken.getPrincipal();
         if (null == principal) {
             return null;
         }
 
         QueryWrapper<SysClientele> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(SysClientele::getClienteleNum, principal);
+        queryWrapper.lambda()
+                .select(SysClientele.class, info ->
+                        !info.getColumn().equals("create_id") &&
+                                !info.getColumn().equals("create_by") &&
+                                !info.getColumn().equals("create_time") &&
+                                !info.getColumn().equals("update_id") &&
+                                !info.getColumn().equals("update_by"))
+                .eq(SysClientele::getClienteleNum, principal);
         SysClientele one = clienteleService.getOne(queryWrapper, false);
         if (null == one) {
             throw new UnknownAccountException();
         } else {
-            Object credentials = authenticationToken.getCredentials();//密码
+            Object credentials = authenticationToken.getCredentials();
+
         }
         OpenUser user = new OpenUser();
         user.setUsername(principal.toString());
-        user.setPassword(authenticationToken.getPrincipal().toString());
-        SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(user, authenticationToken.getPrincipal(), getName());
+        user.setPassword(authenticationToken.getCredentials().toString());
+        user.setClientele(one);
+        SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(user, authenticationToken.getCredentials(), getName());
         return authenticationInfo;
     }
 

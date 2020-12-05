@@ -10,4 +10,5 @@ public interface IItemService {
 
     ItemVo detail(Integer id);
 
+    List<ItemVo> list(Page tPage, Integer categoryId);
 }

@@ -3,9 +3,10 @@ package com.dc.project.basis.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.dc.project.open.vo.ItemVo;
 import com.dc.common.vo.MaterielVo;
 import com.dc.project.basis.entity.SysMateriel;
+import com.dc.project.basis.entity.SysMaterielModel;
+import com.dc.project.open.vo.ItemVo;
 
 import java.util.List;
 
@@ -35,4 +36,9 @@ public interface ISysMaterielService extends IService<SysMateriel> {
 
     ItemVo detailItem(Integer id);
 
+    List<SysMaterielModel> models(SysMateriel materiel);
+
+    boolean models(List<SysMaterielModel> models);
+
+    List<ItemVo> listItemByCategoryId(Page page, Integer categoryId);
 }

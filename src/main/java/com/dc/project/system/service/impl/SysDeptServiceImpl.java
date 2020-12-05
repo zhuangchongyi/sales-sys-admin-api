@@ -107,6 +107,6 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptDao, SysDept> impleme
      * 判断是否有子节点
      */
     private boolean hasChild(List<SysDept> list, SysDept t) {
-        return getChildList(list, t).size() > 0 ? true : false;
+        return getChildList(list, t).size() > 0;
     }
 }

@@ -3,6 +3,7 @@ package com.dc.project.sales.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.dc.project.open.entity.CartItem;
 import com.dc.project.open.vo.OrderVo;
 import com.dc.project.sales.entity.SysOrder;
 
@@ -40,4 +41,5 @@ public interface ISysOrderService extends IService<SysOrder> {
 
     List<OrderVo> listOrder(Integer clienteleId);
 
+    boolean addOrder(List<CartItem> cartItems);
 }

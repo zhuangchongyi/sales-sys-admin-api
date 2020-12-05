@@ -4,6 +4,7 @@ import com.dc.common.lang.annotation.RepeatSubmit;
 import com.dc.common.vo.R;
 import com.dc.project.system.entity.SysUser;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.apache.shiro.subject.SimplePrincipalCollection;
@@ -29,6 +30,7 @@ public class OnlineController {
     @Autowired
     private SessionDAO sessionDAO;
 
+    @RequiresPermissions("monitor:online:list")
     @GetMapping
     public R list() {
         Collection<Session> sessions = sessionDAO.getActiveSessions();
@@ -52,20 +54,21 @@ public class OnlineController {
                     return null;
                 })
                 .filter(Objects::nonNull)
-                .sorted((o1, o2) -> o2.get("startTimestamp").toString().compareTo(o1.get("startTimestamp").toString()))
+                    .sorted((o1, o2) -> o2.get("startTimestamp").toString().compareTo(o1.get("startTimestamp").toString()))
                 .collect(Collectors.toList());
         return R.success().data(mapList);
     }
 
     @GetMapping("/count")
     public R count() {
-        return R.success().data(sessionDAO.getActiveSessions().stream().filter(predicate->{
+        return R.success().data(sessionDAO.getActiveSessions().stream().filter(predicate -> {
             SimplePrincipalCollection attribute = (SimplePrincipalCollection) predicate.getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY);
             Object principal = attribute.getPrimaryPrincipal();
             return principal instanceof SysUser;
         }).count());
     }
 
+    @RequiresPermissions("monitor:online:kickout")
     @RepeatSubmit
     @DeleteMapping
     public R kickOut(String id) {

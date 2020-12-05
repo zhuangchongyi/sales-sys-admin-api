@@ -389,6 +389,7 @@ public class SysShipmentsServiceImpl extends ServiceImpl<SysShipmentsDao, SysShi
             //本次发货金额<=未核销的收款-未核销的应收款
             BigDecimal decimal = BigDecimalUtil.sub(receiptPrice, receivePrice);
             if (BigDecimalUtil.compareTo(shipmentPrice, decimal) > 0) {
+                decimal = BigDecimalUtil.compareTo(decimal, BigDecimalUtil.ZERO) <= 0 ? BigDecimalUtil.ZERO : decimal;
                 throw new ServiceException(String.format("审核失败，客户本次发货金额(%s)大于客户收款可用金额(%s)，请前往特批", shipmentPrice, decimal));
             }
         }

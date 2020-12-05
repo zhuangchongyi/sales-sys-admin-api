@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.project.open.dao.CartItemDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.dc.project.open.entity.CartItem">
+        <id column="cart_item_id" property="cartItemId"/>
+        <result column="item_id" property="itemId"/>
+        <result column="item_name" property="itemName"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="category_name" property="categoryName"/>
+        <result column="url" property="url"/>
+        <result column="specification" property="specification"/>
+        <result column="model_name" property="modelName"/>
+        <result column="price" property="price"/>
+        <result column="number" property="number"/>
+        <result column="clientele_id" property="clienteleId"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        cart_item_id, item_id, item_name, category_id, category_name, url, specification, model_name, price, number, clientele_id
+    </sql>
+
+</mapper>

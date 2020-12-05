@@ -11,6 +11,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SalesConstant {
     /**
+     * 系统订单
+     */
+    public static final String ORDER_TYPE_MOBILE = "MOBILE";
+    /**
+     * 移动端订单
+     */
+    public static final String ORDER_TYPE_SYSTEM = "SYSTEM";
+
+    /**
      * 销售报价单号前缀
      */
     public static final String SALES_QUOTATION_NO = "QN";

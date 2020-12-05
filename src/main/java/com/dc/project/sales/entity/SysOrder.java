@@ -150,6 +150,16 @@ public class SysOrder extends BaseEntity {
      */
     private BigDecimal totalPrice;
 
+    /**
+     * 订单类型
+     */
+    private String orderType;
+
+    /**
+     * 支付状态（1表示支付）
+     */
+    private Integer payStatus;
+
     @TableField(exist = false)
     private String personnelName;
     @TableField(exist = false)
@@ -177,6 +187,14 @@ public class SysOrder extends BaseEntity {
      * 累计收款金额
      */
     private BigDecimal receiptPrice;
+
+    public void setPayStatus(Integer payStatus) {
+        this.payStatus = payStatus;
+    }
+
+    public void setOrderType(String orderType) {
+        this.orderType = orderType;
+    }
 
     public void setShipmentPrice(BigDecimal shipmentPrice) {
         this.shipmentPrice = shipmentPrice;

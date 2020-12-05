@@ -22,10 +22,7 @@
         pk_id, materiel_id, file_name, name, url, path, remark
     </sql>
     <select id="findMaterielUrl" resultType="java.lang.String">
-        select url from sys_materiel_file where materiel_id=#{id} order by create_time desc
-    </select>
-    <select id="oneMaterielUrl" resultType="java.lang.String">
-        select url from sys_materiel_file where materiel_id=#{id} order by create_time desc limit 1
+        select url from sys_materiel_file where materiel_id=#{id} order by pk_id asc
     </select>
 
 </mapper>

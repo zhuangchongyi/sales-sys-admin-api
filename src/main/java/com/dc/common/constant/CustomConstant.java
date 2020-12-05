@@ -6,6 +6,8 @@ package com.dc.common.constant;
  * @Date 2020/10/12 12:20
  */
 public class CustomConstant {
+    public static final String AUTHORIZATION = "Authorization";
+
     /**
      * 密码加密次数
      */

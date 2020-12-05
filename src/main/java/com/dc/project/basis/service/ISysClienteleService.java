@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.dc.project.basis.entity.SysClientele;
 
+import java.util.List;
+
 /**
  * 部门表 服务类
  *
@@ -17,4 +19,7 @@ public interface ISysClienteleService extends IService<SysClientele> {
 
     SysClientele get(Integer clienteleId);
 
+    SysClientele getClientele();
+
+    boolean addSupplier(List<Integer> clienteles);
 }

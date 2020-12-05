@@ -16,11 +16,12 @@
         <result column="status" property="status"/>
         <result column="del_flag" property="delFlag"/>
         <result column="remark" property="remark"/>
+        <result column="url" property="url"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        category_id, category_num, category_name, parent_id, category, status, del_flag, create_by, create_time, update_by, update_time,remark
+        category_id, category_num, category_name, parent_id, category, status, del_flag, create_by, create_time, update_by, update_time,remark,url
     </sql>
 
     <select id="list" resultMap="BaseResultMap">

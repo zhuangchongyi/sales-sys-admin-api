@@ -34,7 +34,7 @@ public class ItemController {
             @ApiParam(name = "current", value = "页码", required = true)
             @NotNull(message = "页码不能为空") Integer current,
             @ApiParam(name = "size", value = "条数", required = true)
-            @NotNull(message = "条数不能为空") Integer size) {
+            @NotNull(message = "页数不能为空") Integer size) {
         return R.success().data(itemService.list(new Page<>(current, size)));
     }
 
@@ -47,5 +47,16 @@ public class ItemController {
         return R.success().data(itemService.detail(id));
     }
 
+    @ApiOperation(value = "分类商品分页列表")
+    @GetMapping("/category")
+    public R itemByCategory(
+            @ApiParam(name = "id", value = "分类id", required = true)
+            @NotNull(message = "分类id") Integer id,
+            @ApiParam(name = "current", value = "页码", required = true)
+            @NotNull(message = "页码不能为空") Integer current,
+            @ApiParam(name = "size", value = "条数", required = true)
+            @NotNull(message = "页数不能为空") Integer size) {
+        return R.success().data(itemService.list(new Page<>(current, size), id));
+    }
 
 }

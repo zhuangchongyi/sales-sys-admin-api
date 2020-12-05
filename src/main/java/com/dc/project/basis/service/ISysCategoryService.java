@@ -18,4 +18,5 @@ public interface ISysCategoryService extends IService<SysCategory> {
 
     List<TreeSelect> treeselect(SysCategory category);
 
+    List<TreeSelect> buildCategoryTreeSelect(List<SysCategory> categorys);
 }

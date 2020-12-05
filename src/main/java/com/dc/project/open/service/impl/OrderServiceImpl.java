@@ -1,7 +1,6 @@
 package com.dc.project.open.service.impl;
 
 import com.dc.project.open.service.IOrderService;
-import com.dc.project.open.vo.OrderDetailVo;
 import com.dc.project.open.vo.OrderVo;
 import com.dc.project.sales.service.ISysOrderService;
 import com.dc.project.sales.service.ISysShipmentsService;
@@ -40,18 +39,4 @@ public class OrderServiceImpl implements IOrderService {
         return signbackService.listSign(clienteleId);
     }
 
-    @Override
-    public List<OrderDetailVo> listOrderDetail(Integer id) {
-        return null;
-    }
-
-    @Override
-    public List<OrderDetailVo> listShipmentDetail(Integer id) {
-        return null;
-    }
-
-    @Override
-    public List<OrderDetailVo> listSignDetail(Integer id) {
-        return null;
-    }
 }

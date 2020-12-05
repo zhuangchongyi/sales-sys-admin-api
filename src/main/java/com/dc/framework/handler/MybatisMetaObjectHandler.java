@@ -17,8 +17,6 @@ public class MybatisMetaObjectHandler implements MetaObjectHandler {
         this.setFieldValByName("createTime", date, metaObject);
         this.setFieldValByName("createBy", username, metaObject);
         this.setFieldValByName("createId", userId, metaObject);
-        this.setFieldValByName("updateTime", date, metaObject);
-        this.setFieldValByName("updateBy", username, metaObject);
     }
 
     @Override

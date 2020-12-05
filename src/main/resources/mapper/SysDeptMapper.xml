@@ -45,7 +45,7 @@
                 <if test="status!=null and status!=''">and status=#{status}</if>
                 <if test="deptType!=null and deptType!=''">and dept_type=#{deptType}</if>
             </where>
-             ))
+            ))
         </where>
         order by create_id desc
     </select>

@@ -52,13 +52,14 @@ public class SysRepertoryServiceImpl extends ServiceImpl<SysRepertoryDao, SysRep
     private void update(SysRepertory one) {
         if (one.getNumber() == 0 || one.getTotalPrice().compareTo(BigDecimalUtil.ZERO) <= 0) {
             if (!this.removeById(one.getPkId())) throw new ServiceException("修改库存失败");
+        } else {
+            UpdateWrapper<SysRepertory> uw = new UpdateWrapper<>();
+            uw.set("price", one.getPrice());
+            uw.set("total_price", one.getTotalPrice());
+            uw.set("number", one.getNumber());
+            uw.eq("pk_id", one.getPkId());
+            if (!this.update(uw)) throw new ServiceException("修改库存失败");
         }
-        UpdateWrapper<SysRepertory> uw = new UpdateWrapper<>();
-        uw.set("price", one.getPrice());
-        uw.set("total_price", one.getTotalPrice());
-        uw.set("number", one.getNumber());
-        uw.eq("pk_id", one.getPkId());
-        if (!this.update(uw)) throw new ServiceException("修改库存失败");
     }
 
     @Override

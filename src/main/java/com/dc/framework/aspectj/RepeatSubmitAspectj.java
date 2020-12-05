@@ -19,7 +19,6 @@ import java.util.concurrent.ConcurrentSkipListSet;
 @Aspect
 @Component
 public class RepeatSubmitAspectj {
-    // 线程安全set
     private static final Set<String> KEYS = new ConcurrentSkipListSet<>();
 
     @Pointcut("@annotation(com.dc.common.lang.annotation.RepeatSubmit)")
@@ -49,7 +48,6 @@ public class RepeatSubmitAspectj {
         Object[] args = point.getArgs();
         for (Object object : args) {
             if (object != null) {
-                builder.append(object.getClass().toString());
                 builder.append(object.toString());
             }
         }

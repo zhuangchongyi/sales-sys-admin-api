@@ -63,17 +63,23 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuDao, SysMenu> impleme
                 menus = baseMapper.findMenuTreeByRoleIds(roleIds);
             }
         }
-        return buildMenus(getChildPerms(menus, 0));
+//        long start = System.currentTimeMillis();
+//        List<SysMenu> list = TreeUtil.getTree(menus, map);
+
+        List<SysMenu> list = getChildPerms(menus, 0);
+        return buildMenus(list);
 
     }
 
     @Override
     public Set<String> getMenuPermission(Integer userId) {
         List<String> permission = baseMapper.getMenuPermission(userId);
-        if (permission.isEmpty())
-            return null;
-        Set<String> permsSet = permission.stream()
-                .filter(perm -> StringUtils.isNotEmpty(perm))
+        Set<String> permsSet = new HashSet<>();
+        if (permission.isEmpty()) {
+            return permsSet;
+        }
+        permsSet = permission.stream()
+                .filter(StringUtils::isNotEmpty)
                 .collect(Collectors.toSet());
         return permsSet;
     }
@@ -161,7 +167,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuDao, SysMenu> impleme
      * 判断是否有子节点
      */
     private boolean hasChild(List<SysMenu> list, SysMenu t) {
-        return getChildList(list, t).size() > 0 ? true : false;
+        return getChildList(list, t).size() > 0;
     }
 
     /**

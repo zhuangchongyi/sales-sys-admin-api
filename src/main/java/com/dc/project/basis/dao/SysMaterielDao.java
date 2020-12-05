@@ -30,4 +30,5 @@ public interface SysMaterielDao extends BaseMapper<SysMateriel> {
 
     ItemVo detailItem(Integer id);
 
+    List<ItemVo> listItemByCategoryId(Page page, @Param("categoryId") Integer categoryId);
 }

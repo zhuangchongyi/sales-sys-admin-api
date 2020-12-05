@@ -1,5 +1,6 @@
 package com.dc.framework.config;
 
+import com.dc.common.constant.CustomConstant;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +15,8 @@ import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 @EnableOpenApi
@@ -33,23 +36,27 @@ public class SwaggerConfig {
     private String email;
     @Value("${sms.swagger.version}")
     private String version;
+    @Value("${sms.swagger.protocols}")
+    private String[] protocols;
 
     @Bean
     public Docket createRestApi() {
         return new Docket(DocumentationType.OAS_30)
-                .apiInfo(apiInfo())
                 .enable(enable)
+                .apiInfo(apiInfo())
                 .select()
                 .apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
                 .paths(PathSelectors.any())
                 .build()
+                //支持的通讯协议集合
+                .protocols(new HashSet<>(Arrays.asList(protocols)))
                 .securitySchemes(securitySchemes())
                 .securityContexts(securityContexts());
     }
 
     private List<SecurityScheme> securitySchemes() {
         List<SecurityScheme> apiKeyList = new ArrayList();
-        apiKeyList.add(new ApiKey("Authorization", "Authorization", "header"));
+        apiKeyList.add(new ApiKey(CustomConstant.AUTHORIZATION, CustomConstant.AUTHORIZATION, "header"));
         return apiKeyList;
     }
 
@@ -58,7 +65,6 @@ public class SwaggerConfig {
         securityContexts.add(
                 SecurityContext.builder()
                         .securityReferences(defaultAuth())
-//                        .forPaths(PathSelectors.regex("^(?!auth).*$"))
                         .build());
         return securityContexts;
     }
@@ -68,7 +74,7 @@ public class SwaggerConfig {
                 new AuthorizationScope("global", "accessEverything")
         };
         List<SecurityReference> securityReferences = new ArrayList<>();
-        securityReferences.add(new SecurityReference("Authorization", authorizationScopes));
+        securityReferences.add(new SecurityReference(CustomConstant.AUTHORIZATION, authorizationScopes));
         return securityReferences;
     }
 

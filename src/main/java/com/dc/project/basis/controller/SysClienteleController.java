@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * 部门表 前端控制器
  *
@@ -76,6 +78,13 @@ public class SysClienteleController {
         return R.success().data(clienteleService
                 .getOne(new QueryWrapper<SysClientele>().select("clientele_id,clientele_num,clientele_name")
                         .eq("clientele_id", clienteleId), false));
+    }
+
+    @RepeatSubmit
+    @RequiresPermissions("basis:clientele:supplier")
+    @PostMapping("/supplier")
+    public R addSupplier(@RequestBody List<Integer> clienteles) {
+        return R.success().data(clienteleService.addSupplier(clienteles));
     }
 
 }

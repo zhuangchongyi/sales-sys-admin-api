@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.math.BigDecimal;
+
 /**
  * 产品型号关联表
  *
@@ -31,4 +33,9 @@ public class SysMaterielModel {
      * 型号
      */
     private String modelName;
+
+    /**
+     * 价格
+     */
+    private BigDecimal price;
 }

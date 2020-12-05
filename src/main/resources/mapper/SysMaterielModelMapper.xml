@@ -4,16 +4,18 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.dc.project.basis.entity.SysMaterielModel">
-        <id column="m_id" property="mId"/>
+        <id column="pk_id" property="pkId"/>
+        <result column="m_id" property="mId"/>
         <result column="model_name" property="modelName"/>
+        <result column="price" property="price"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        m_id, model_name
+        pk_id,m_id, model_name,price
     </sql>
-    <select id="findModelNames" resultType="java.lang.String">
-        select model_name
+    <select id="findModelNames" resultMap="BaseResultMap">
+        select pk_id,model_name,price
         from sys_materiel_model
         where m_id=#{id}
     </select>

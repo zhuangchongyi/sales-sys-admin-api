@@ -5,11 +5,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc.common.lang.annotation.RepeatSubmit;
 import com.dc.common.vo.R;
 import com.dc.project.basis.entity.SysMateriel;
+import com.dc.project.basis.entity.SysMaterielModel;
 import com.dc.project.basis.service.ISysMaterielService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 产品档案表 前端控制器
@@ -60,5 +63,15 @@ public class SysMaterielController {
         return R.success().data(materielService.list(page, materiel));
     }
 
+    @GetMapping("/models")
+    public R models(SysMateriel materiel) {
+        return R.success().data(materielService.models(materiel));
+    }
+
+    @RepeatSubmit
+    @PutMapping("/models")
+    public R models(@RequestBody List<SysMaterielModel> models) {
+        return R.success().data(materielService.models(models));
+    }
 }
 

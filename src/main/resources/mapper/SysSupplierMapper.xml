@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.project.purchase.dao.SysSupplierDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.dc.project.purchase.entity.SysSupplier">
+        <id column="supplier_id" property="supplierId"/>
+        <result column="create_id" property="createId"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="supplier_num" property="supplierNum"/>
+        <result column="supplier_name" property="supplierName"/>
+        <result column="leader" property="leader"/>
+        <result column="email" property="email"/>
+        <result column="phone" property="phone"/>
+        <result column="mobilephone" property="mobilephone"/>
+        <result column="address" property="address"/>
+        <result column="personnel_id" property="personnelId"/>
+        <result column="personnel_name" property="personnelName"/>
+        <result column="status" property="status"/>
+        <result column="clientele_id" property="clienteleId"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        supplier_id, supplier_num, supplier_name, leader, email, phone, mobilephone, address, personnel_id,
+        personnel_name, status, clientele_id, remark,create_id, create_by, create_time, update_by, update_time
+    </sql>
+
+</mapper>

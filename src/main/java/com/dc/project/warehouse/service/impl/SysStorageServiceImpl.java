@@ -102,6 +102,7 @@ public class SysStorageServiceImpl extends ServiceImpl<SysStorageDao, SysStorage
 
     private void update(SysStorage sysStorage) {
         UpdateWrapper<SysStorage> uw = new UpdateWrapper<>();
+        uw.set(StringUtils.isNotEmpty(sysStorage.getInoutType()), "inout_type", sysStorage.getInoutType());
         uw.set(StringUtils.isNotEmpty(sysStorage.getSourceCompany()), "source_company", sysStorage.getSourceCompany());
         uw.set(StringUtils.isNotEmpty(sysStorage.getSourceType()), "source_type", sysStorage.getSourceType());
         uw.set(null != sysStorage.getStorageTime(), "storage_time", sysStorage.getStorageTime());
@@ -173,18 +174,26 @@ public class SysStorageServiceImpl extends ServiceImpl<SysStorageDao, SysStorage
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean audit(SysStorage storage) {
-        QueryWrapper<SysStorage> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("status").eq("storage_id", storage.getStorageId());
-        SysStorage one = this.getOne(queryWrapper);
+        SysStorage one = this.getById(storage.getStorageId());
         if (null == one) throw new ServiceException();
         SalesConstant.verifyAuditStatus(one.getStatus(), storage.getStatus());
         storage.setAuditBy(UserSecurityUtil.getUsername());
         storage.setAuditTime(new Date());
-        // 入库时添加产品现存量
-        if (SalesConstant.AUDIT.equals(storage.getStatus())) {//审核时
-            repertoryService.saveAndUpdate(transformRepertory(storage, SalesConstant.AUDIT));
-        } else {//反审核时
-            repertoryService.saveAndUpdate(transformRepertory(storage, SalesConstant.NO_AUDIT));
+        // 产品入库
+        if ("0".equals(one.getInoutType())) {
+            //审核时
+            if (SalesConstant.AUDIT.equals(storage.getStatus())) {
+                repertoryService.saveAndUpdate(transformRepertory(storage, SalesConstant.AUDIT));
+            } else {//反审核时
+                repertoryService.saveAndUpdate(transformRepertory(storage, SalesConstant.NO_AUDIT));
+            }
+        } else { // 其他出库
+            //审核时
+            if (SalesConstant.AUDIT.equals(storage.getStatus())) {
+                repertoryService.saveAndUpdate(transformRepertory(storage, SalesConstant.NO_AUDIT));
+            } else {//反审核时
+                repertoryService.saveAndUpdate(transformRepertory(storage, SalesConstant.AUDIT));
+            }
         }
         return this.updateById(storage);
     }

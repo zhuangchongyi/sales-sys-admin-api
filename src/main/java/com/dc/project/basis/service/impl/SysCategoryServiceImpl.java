@@ -32,6 +32,7 @@ public class SysCategoryServiceImpl extends ServiceImpl<SysCategoryDao, SysCateg
         return buildCategoryTreeSelect(this.list(category));
     }
 
+    @Override
     public List<TreeSelect> buildCategoryTreeSelect(List<SysCategory> categorys) {
         List<SysCategory> categoryTrees = buildCategoryTree(categorys);
         return categoryTrees.stream().map(TreeSelect::new).collect(Collectors.toList());
@@ -100,6 +101,6 @@ public class SysCategoryServiceImpl extends ServiceImpl<SysCategoryDao, SysCateg
      * 判断是否有子节点
      */
     private boolean hasChild(List<SysCategory> list, SysCategory t) {
-        return getChildList(list, t).size() > 0 ? true : false;
+        return getChildList(list, t).size() > 0;
     }
 }

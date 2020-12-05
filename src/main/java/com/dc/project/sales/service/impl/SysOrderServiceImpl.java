@@ -8,11 +8,13 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dc.common.lang.annotation.DataScope;
 import com.dc.common.constant.SalesConstant;
 import com.dc.common.exception.ServiceException;
-import com.dc.common.utils.BeanUtil;
-import com.dc.common.utils.CodeUtil;
-import com.dc.common.utils.ObjectMapperUtil;
-import com.dc.common.utils.UserSecurityUtil;
+import com.dc.common.utils.*;
+import com.dc.project.basis.entity.SysClientele;
+import com.dc.project.basis.service.ISysClienteleService;
 import com.dc.project.basis.service.ISysMaterielService;
+import com.dc.project.open.entity.CartItem;
+import com.dc.project.open.entity.OrderAddress;
+import com.dc.project.open.service.IOrderAddressService;
 import com.dc.project.open.vo.OrderVo;
 import com.dc.project.sales.dao.SysOrderDao;
 import com.dc.project.sales.entity.SysOrder;
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -40,6 +43,10 @@ public class SysOrderServiceImpl extends ServiceImpl<SysOrderDao, SysOrder> impl
     private ISysOrderSubService orderSubService;
     @Autowired
     private ISysMaterielService materielService;
+    @Autowired
+    private ISysClienteleService clienteleService;
+    @Autowired
+    private IOrderAddressService orderAddressService;
 
     @DataScope(userAlias = "so", userColumn = "create_id")
     @Override
@@ -59,6 +66,7 @@ public class SysOrderServiceImpl extends ServiceImpl<SysOrderDao, SysOrder> impl
         BeanUtil.register();
         BeanUtils.populate(order, ObjectMapperUtil.toObject(clienteleForm.toString(), Map.class));
         if (null == order.getOrderId()) { //保存主表
+            order.setOrderType(SalesConstant.ORDER_TYPE_SYSTEM);
             order.setOrderNum(CodeUtil.getCode(SalesConstant.SALES_ORDER_NO));
             if (null == order.getClienteleId() || !this.save(order)) throw new ServiceException("保存失败");
         } else { // 修改主表
@@ -192,4 +200,52 @@ public class SysOrderServiceImpl extends ServiceImpl<SysOrderDao, SysOrder> impl
     public List<OrderVo> listOrder(Integer clienteleId) {
         return baseMapper.listOrder(clienteleId);
     }
+
+    @Override
+    public boolean addOrder(List<CartItem> cartItems) {
+        // 查询客户信息
+        SysClientele clientele = clienteleService.getById(cartItems.get(0).getClienteleId());
+        if (null == clientele) {
+            throw new ServiceException("客户不存在");
+        }
+        // 添加主表
+        SysOrder order = new SysOrder();
+        BeanUtil.copyBeanProp(order, clientele);
+        order.setOrderNum(CodeUtil.getCode(SalesConstant.SALES_ORDER_NO));
+        Date date = new Date();
+        order.setPayCondition("移动端支付");
+        order.setOrderTime(date);
+        order.setDeliveryTime(date);
+        order.setOrderType(SalesConstant.ORDER_TYPE_MOBILE);
+        order.setStatus(SalesConstant.SUBMIT);
+        BigDecimal total = BigDecimalUtil.ZERO;
+        for (CartItem item : cartItems) {
+            total = BigDecimalUtil.add(total, BigDecimalUtil.mul(item.getPrice(), item.getNumber()));
+        }
+        order.setTotalPrice(total);
+        if (!this.save(order)) {
+            throw new ServiceException("订单保存失败");
+        }
+        // 添加子表
+        List<SysOrderSub> orderSubs = new ArrayList<>();
+        BeanUtil.copyBeanProp(orderSubs, cartItems);
+        for (SysOrderSub sub : orderSubs) {
+            sub.setOrderId(order.getOrderId());
+            // 校验产品库存(暂时不做校验)
+            if (!orderSubService.save(sub)) {
+                throw new ServiceException("订单明细保存失败");
+            }
+        }
+        // 添加客户订单表地址
+        OrderAddress orderAddress = new OrderAddress();
+        orderAddress.setClienteleId(order.getClienteleId());
+        orderAddress.setOrderId(order.getOrderId());
+        orderAddress.setOrderNum(order.getOrderNum());
+        orderAddress.setOrderTime(date);
+        if (!orderAddressService.save(orderAddress)) {
+            throw new ServiceException("订单地址保存失败");
+        }
+        return true;
+    }
+
 }

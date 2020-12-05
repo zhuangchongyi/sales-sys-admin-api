@@ -27,6 +27,11 @@ public class TreeSelect implements Serializable {
      */
     private String label;
 
+    /**
+     * 图片url
+     */
+    private String url;
+
     public TreeSelect() {
     }
 
@@ -51,6 +56,7 @@ public class TreeSelect implements Serializable {
     public TreeSelect(SysCategory category) {
         this.id = category.getCategoryId();
         this.label = category.getCategoryName();
+        this.url = category.getUrl();
         this.children = category.getChildren().stream().map(TreeSelect::new).collect(Collectors.toList());
     }
 }

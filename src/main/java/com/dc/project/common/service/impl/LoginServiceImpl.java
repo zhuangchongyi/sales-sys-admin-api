@@ -14,6 +14,7 @@ import com.dc.framework.async.AsyncManager;
 import com.dc.framework.config.properties.SmsProperties;
 import com.dc.framework.realm.CustomUserToken;
 import com.dc.project.common.service.ILoginService;
+import com.dc.project.system.entity.SysRole;
 import com.dc.project.system.entity.SysUser;
 import com.dc.project.system.service.ISysMenuService;
 import com.dc.project.system.service.ISysUserService;
@@ -119,11 +120,11 @@ public class LoginServiceImpl implements ILoginService {
         SysUser sysUser = userService.findByUsername(UserSecurityUtil.getUsername());
         Set<String> roles = new HashSet<>();
         Set<String> permissions = new HashSet<>();
-        if (UserSecurityUtil.isAdmin(null)) {
+        if (UserSecurityUtil.isAdmin(UserSecurityUtil.getUserId())) {
             roles.add("admin");
             permissions.add("*:*:*");
         } else {
-            roles = sysUser.getRoles().stream().map(role -> role.getRoleNum()).collect(Collectors.toSet());
+            roles = sysUser.getRoles().stream().map(SysRole::getRoleNum).collect(Collectors.toSet());
             permissions = menuService.getMenuPermission(sysUser.getUserId());
         }
         UserInfo userInfo = new UserInfo();
@@ -152,7 +153,7 @@ public class LoginServiceImpl implements ILoginService {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         try {
             VerifyCodeUtil.outputImage(w, h, stream, verifyCode);
-            HashMap<String, Object> data = new HashMap<>();
+            HashMap<String, Object> data = new HashMap<>(3);
             data.put("verify", config.isCaptchaCache());
             data.put("uuid", uuid);
             data.put("img", Base64.encode(stream.toByteArray()));

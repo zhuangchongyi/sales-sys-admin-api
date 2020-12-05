@@ -24,4 +24,10 @@ public class ItemServiceImpl implements IItemService {
     public ItemVo detail(Integer id) {
         return materielService.detailItem(id);
     }
+
+    @Override
+    public List<ItemVo> list(Page page, Integer categoryId) {
+        return materielService.listItemByCategoryId(page, categoryId);
+    }
+
 }

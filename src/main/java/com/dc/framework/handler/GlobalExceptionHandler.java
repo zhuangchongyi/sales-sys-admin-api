@@ -12,7 +12,6 @@ import org.springframework.core.NestedRuntimeException;
 import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -21,8 +20,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
-import java.util.List;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * @Author zhuangchongyi
@@ -107,24 +108,25 @@ public class GlobalExceptionHandler {
     public R methodArgumentNotValidException(MethodArgumentNotValidException e, HttpServletRequest request) {
         log.info("请求方式：{}, 请求路径：{}, 异常信息：{}", request.getMethod(), request.getServletPath(), e.getMessage());
         log.error("异常信息: ", e);
-        BindingResult result = e.getBindingResult();
-        String message = "校验异常";
-        if (result.hasErrors()) {
-            List<ObjectError> errors = result.getAllErrors();
-            if (errors.size() > 0) {
-                FieldError fieldError = (FieldError) errors.get(0);
-                message = fieldError.getDefaultMessage();
-            }
+        BindingResult bindingResult = e.getBindingResult();
+        StringBuilder sb = new StringBuilder("校验失败：");
+        for (FieldError fieldError : bindingResult.getFieldErrors()) {
+            sb.append(fieldError.getField()).append("：").append(fieldError.getDefaultMessage()).append(", ");
         }
-        return R.error().msg(message);
+        String msg = sb.toString();
+        return R.error().msg(msg);
 
     }
-
 
     @ExceptionHandler(ValidationException.class)
     public R validationException(ValidationException e, HttpServletRequest request) {
         log.info("请求方式：{}, 请求路径：{}, 异常信息：{}", request.getMethod(), request.getServletPath(), e.getMessage());
         log.error("异常信息: ", e);
+        if (e instanceof ConstraintViolationException) {
+            ConstraintViolationException ex = (ConstraintViolationException) e;
+            String msg = Arrays.toString(ex.getConstraintViolations().stream().map(c -> c.getMessage()).collect(Collectors.toList()).toArray());
+            return R.error().msg(msg);
+        }
         return R.error().msg(e.getMessage());
 
     }

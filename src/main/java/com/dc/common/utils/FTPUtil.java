@@ -193,7 +193,7 @@ public class FTPUtil {
     public static boolean uploadFile(FTPClient ftpClient, String path, String fileName, InputStream inputStream) {
         try {
             log.info("开始上传文件");
-            ftpClient.setFileType(ftpClient.BINARY_FILE_TYPE);
+            ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
             createDirecroty(ftpClient, path);
             ftpClient.makeDirectory(path);
             ftpClient.changeWorkingDirectory(path);

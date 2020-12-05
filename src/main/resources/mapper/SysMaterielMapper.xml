@@ -45,7 +45,8 @@
         left join sys_category c on c.category_id=m.category_id and c.category='0'
         left join sys_materiel_model mm on mm.m_id=m.materiel_id
         <where>
-            <if test="mat.materielNum!=null and mat.materielNum!=''">m.materiel_num like
+            m.del_flag='0'
+            <if test="mat.materielNum!=null and mat.materielNum!=''">and m.materiel_num like
                 concat(concat('%',#{mat.materielNum}),'%')
             </if>
             <if test="mat.materielName!=null and mat.materielName!=''">and m.materiel_name like
@@ -66,7 +67,7 @@
         from sys_materiel m
         left join sys_category c on c.category_id=m.category_id and c.category='0'
         left join sys_materiel_model mm on mm.m_id=m.materiel_id
-        where m.materiel_id=#{materielId}
+        where m.materiel_id=#{materielId} and del_flag='0'
         group by m.materiel_id
     </select>
     <select id="list" resultType="com.dc.common.vo.MaterielVo">
@@ -103,58 +104,67 @@
     </select>
 
 
-    <resultMap id="detailResultMap" type="com.dc.project.open.vo.ItemVo">
+    <resultMap id="oneItemResultMap" type="com.dc.project.open.vo.ItemVo">
         <id column="materiel_id" property="itemId"/>
-        <result column="materiel_num" property="itemNum"/>
         <result column="materiel_name" property="itemName"/>
         <result column="specification" property="specification"/>
-        <result column="need_torque" property="needTorque"/>
-        <result column="out_torque" property="outTorque"/>
         <result column="price" property="price"/>
         <result column="max_price" property="maxPrice"/>
         <result column="min_price" property="minPrice"/>
         <result column="category_id" property="categoryId"/>
-        <result column="category_num" property="categoryNum"/>
         <result column="category_name" property="categoryName"/>
         <collection property="modelNames" column="materiel_id"
                     select="com.dc.project.basis.dao.SysMaterielModelDao.findModelNames"/>
         <collection property="urls" column="materiel_id"
                     select="com.dc.project.basis.dao.SysMaterielFileDao.findMaterielUrl"/>
     </resultMap>
-    <resultMap id="ItemResultMap" type="com.dc.project.open.vo.ItemVo">
+    <resultMap id="listItemResultMap" type="com.dc.project.open.vo.ItemVo">
         <id column="materiel_id" property="itemId"/>
-        <result column="materiel_num" property="itemNum"/>
         <result column="materiel_name" property="itemName"/>
         <result column="specification" property="specification"/>
-        <result column="need_torque" property="needTorque"/>
-        <result column="out_torque" property="outTorque"/>
         <result column="price" property="price"/>
         <result column="max_price" property="maxPrice"/>
         <result column="min_price" property="minPrice"/>
         <result column="category_id" property="categoryId"/>
-        <result column="category_num" property="categoryNum"/>
         <result column="category_name" property="categoryName"/>
-        <collection property="url" column="materiel_id"
-                    select="com.dc.project.basis.dao.SysMaterielFileDao.oneMaterielUrl"/>
+        <collection property="modelNames" column="materiel_id"
+                    select="com.dc.project.basis.dao.SysMaterielModelDao.findModelNames"/>
+        <collection property="modelNames" column="materiel_id"
+                    select="com.dc.project.basis.dao.SysMaterielModelDao.findModelNames"/>
+        <collection property="urls" column="materiel_id"
+                    select="com.dc.project.basis.dao.SysMaterielFileDao.findMaterielUrl"/>
     </resultMap>
-    <select id="listItem" resultMap="ItemResultMap">
+    <select id="listItem" resultMap="listItemResultMap">
         select
-        m.materiel_id, m.materiel_num, m.materiel_name, m.specification, m.need_torque, m.out_torque, m.price,
+        m.materiel_id, m.materiel_num, m.materiel_name, m.specification, m.need_torque, m.out_torque, m.price,m.max_price, m.min_price,
         c.category_id,c.category_num,c.category_name,
-        ( select url from sys_materiel_file where materiel_id=m.materiel_id order by create_time desc limit 1) url
+        ( select url from sys_materiel_file where materiel_id=m.materiel_id order by pk_id asc limit 1) url
         from sys_materiel m
         left join sys_category c on c.category_id=m.category_id and c.category='0'
         where m.del_flag='0' and m.status='0'
+        order by m.materiel_id desc
     </select>
 
-    <select id="detailItem" resultMap="detailResultMap">
+    <select id="detailItem" resultMap="oneItemResultMap">
         select
-        m.materiel_id, m.materiel_num, m.materiel_name, m.specification, m.need_torque, m.out_torque, m.price,
-        c.category_id,c.category_num,c.category_name
+        m.materiel_id, m.materiel_num, m.materiel_name, m.specification, m.need_torque, m.out_torque, m.price,m.max_price, m.min_price,
+        c.category_id,c.category_name
         from sys_materiel m
         left join sys_category c on c.category_id=m.category_id and c.category='0'
         where m.del_flag='0' and m.status='0'
         and m.materiel_id=#{id}
+        order by m.materiel_id desc
+    </select>
+    <select id="listItemByCategoryId" resultMap="listItemResultMap">
+        select
+        m.materiel_id, m.materiel_num, m.materiel_name, m.specification, m.need_torque, m.out_torque, m.price,m.max_price, m.min_price,
+        c.category_id,c.category_num,c.category_name,
+        ( select url from sys_materiel_file where materiel_id=m.materiel_id order by pk_id asc limit 1) url
+        from sys_materiel m
+        left join sys_category c on c.category_id=m.category_id and c.category='0'
+        where m.del_flag='0' and m.status='0'
+        and m.category_id=#{categoryId}
+        order by m.materiel_id desc
     </select>
 
 </mapper>

@@ -13,6 +13,6 @@ import java.util.List;
  */
 public interface SysMaterielModelDao extends BaseMapper<SysMaterielModel> {
 
-    List<String> findModelNames(Integer id);
+    List<SysMaterielModel> findModelNames(Integer id);
 
 }
