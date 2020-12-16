@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.project.purchase.dao.SysPurchaseReturnsSubDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.dc.project.purchase.entity.SysPurchaseReturnsSub">
+        <id column="returns_sub_id" property="returnsSubId"/>
+        <result column="returns_id" property="returnsId"/>
+        <result column="order_sub_id" property="orderSubId"/>
+        <result column="materiel_id" property="materielId"/>
+        <result column="materiel_num" property="materielNum"/>
+        <result column="materiel_name" property="materielName"/>
+        <result column="specification" property="specification"/>
+        <result column="model_name" property="modelName"/>
+        <result column="need_torque" property="needTorque"/>
+        <result column="out_torque" property="outTorque"/>
+        <result column="units_id" property="unitsId"/>
+        <result column="units_name" property="unitsName"/>
+        <result column="price" property="price"/>
+        <result column="number" property="number"/>
+        <result column="returns_num" property="returnsNum"/>
+        <result column="storage_num" property="storageNum"/>
+        <result column="has_returns_num" property="hasReturnsNum"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        returns_sub_id, returns_id, order_sub_id, materiel_id, materiel_num, materiel_name, specification, model_name, need_torque, out_torque, units_id, units_name, price, number, returns_num, storage_num, has_returns_num
+    </sql>
+
+</mapper>

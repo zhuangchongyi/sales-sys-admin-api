@@ -14,7 +14,8 @@ import com.dc.project.purchase.entity.SysPurchaseOrder;
 import com.dc.project.purchase.entity.SysPurchaseOrderSub;
 import com.dc.project.purchase.service.ISysPurchaseOrderService;
 import com.dc.project.purchase.service.ISysPurchaseOrderSubService;
-import com.dc.project.purchase.vo.PurchaseVo;
+import com.dc.common.vo.CommonVo;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,7 +50,7 @@ public class SysPurchaseOrderServiceImpl extends ServiceImpl<SysPurchaseOrderDao
 
     @Override
     public IPage<SysPurchaseOrder> list(Page<SysPurchaseOrder> page, SysPurchaseOrder order) {
-        return baseMapper.list(page,order);
+        return baseMapper.list(page, order);
     }
 
     @Override
@@ -59,72 +60,58 @@ public class SysPurchaseOrderServiceImpl extends ServiceImpl<SysPurchaseOrderDao
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public String add(PurchaseVo orderVo) {
-        if (orderVo != null) {
-            SysPurchaseOrder order = orderVo.getOrder();
-            List<SysPurchaseOrderSub> subs = orderVo.getOrderSubs();
-            if (null == order || null == subs || subs.isEmpty()) {
-                throw new ServiceException("参数丢失");
-            }
-            String orderNum = CodeUtil.getCode(SalesConstant.SALES_ORDER_NO);
-            order.setOrderNum(orderNum);
-            if (!this.save(order)) {
-                throw new ServiceException("新增失败");
-            }
-            for (SysPurchaseOrderSub sub : subs) {
-                sub.setOrderId(order.getOrderId());
-            }
-            if (!orderSubService.saveBatch(subs)) {
-                throw new ServiceException("产品新增失败");
-            }
-
-            return orderNum;
+    public String add(CommonVo<SysPurchaseOrder, SysPurchaseOrderSub> vo) {
+        SysPurchaseOrder order = vo.getHeader();
+        List<SysPurchaseOrderSub> subs = vo.getBodys();
+        String orderNum = CodeUtil.getCode(SalesConstant.SALES_ORDER_NO);
+        order.setOrderNum(orderNum);
+        if (!this.save(order)) {
+            throw new ServiceException("新增失败");
         }
-        throw new ServiceException("新增失败");
+        for (SysPurchaseOrderSub sub : subs) {
+            sub.setOrderId(order.getOrderId());
+        }
+        if (!orderSubService.saveBatch(subs)) {
+            throw new ServiceException("产品新增失败");
+        }
+        return orderNum;
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean edit(PurchaseVo orderVo) {
-        if (orderVo != null) {
-            SysPurchaseOrder order = orderVo.getOrder();
-            List<SysPurchaseOrderSub> subs = orderVo.getOrderSubs();
-            if (null == order || null == subs || subs.isEmpty()) {
-                throw new ServiceException("参数丢失");
-            }
-            if (!this.updateById(order)) {
-                throw new ServiceException("修改失败");
-            }
-            for (SysPurchaseOrderSub sub : subs) {
-                if (null != sub.getOrderSubId()) {
-                    if (orderSubService.updateById(sub)) {
-                        continue;
-                    }
-                } else {
-                    sub.setOrderId(order.getOrderId());
-                    if (orderSubService.save(sub)) {
-                        continue;
-                    }
-                }
-                throw new ServiceException("产品修改失败");
-            }
-            List<Long> delSubIds = orderVo.getDelSubIds();
-            if (null != delSubIds && !delSubIds.isEmpty()) {
-                if (!orderSubService.removeByIds(delSubIds)) {
-                    throw new ServiceException("修改失败");
-                }
-            }
-            return true;
+    public boolean edit(CommonVo<SysPurchaseOrder, SysPurchaseOrderSub> vo) {
+        SysPurchaseOrder order = vo.getHeader();
+        List<SysPurchaseOrderSub> subs = vo.getBodys();
+        if (!this.updateById(order)) {
+            throw new ServiceException("修改失败");
         }
-        throw new ServiceException("修改失败");
+        for (SysPurchaseOrderSub sub : subs) {
+            if (ObjectUtils.isNotEmpty(sub.getOrderSubId()) && orderSubService.updateById(sub)) {
+                continue;
+            } else {
+                sub.setOrderId(order.getOrderId());
+                if (orderSubService.save(sub)) {
+                    continue;
+                }
+            }
+            throw new ServiceException("产品修改失败");
+        }
+
+        List<Long> delSubIds = vo.getDelSubIds();
+        if (ObjectUtils.isNotEmpty(delSubIds) && !orderSubService.removeByIds(delSubIds)) {
+            throw new ServiceException("修改失败");
+        }
+        return true;
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean delete(Integer id) {
-        if (this.getById(id) == null) {
-            return false;
+        SysPurchaseOrder one = this.getById(id);
+        if (one == null) {
+            throw new ServiceException("已删除");
         }
+        SalesConstant.verifyDeleteStatus(one.getStatus());
         QueryWrapper<SysPurchaseOrderSub> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(SysPurchaseOrderSub::getOrderId, id);
         if (!orderSubService.remove(queryWrapper)) {
@@ -138,48 +125,43 @@ public class SysPurchaseOrderServiceImpl extends ServiceImpl<SysPurchaseOrderDao
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean submit(PurchaseVo orderVo) {
-        if (orderVo != null && null != orderVo.getOrder()) {
-            List<Integer> orderIds = orderVo.getIds();
-            String status = orderVo.getOrder().getStatus();
-            if (orderIds == null || orderIds.isEmpty() || StringUtils.isEmpty(status)) {
-                throw new ServiceException();
-            }
-            List<SysPurchaseOrder> orders = this.listByIds(orderIds);
-            List<Integer> ids = new ArrayList<>();
-            for (SysPurchaseOrder order : orders) {
-                SalesConstant.verifySubmitStatus(status, order.getOrderNum(), order.getStatus());
-                ids.add(order.getOrderId());
-            }
-            UpdateWrapper<SysPurchaseOrder> updateWrapper = new UpdateWrapper<>();
-            updateWrapper.lambda()
-                    .set(SysPurchaseOrder::getStatus, status)
-                    .in(SysPurchaseOrder::getOrderId, ids);
-            if (!this.update(updateWrapper)) {
-                throw new ServiceException();
-            }
-            return true;
+    public boolean submit(CommonVo<SysPurchaseOrder, SysPurchaseOrderSub> vo) {
+        List<Integer> orderIds = vo.getIds();
+        String status = vo.getStatus();
+        List<SysPurchaseOrder> orders = this.listByIds(orderIds);
+        List<Integer> ids = new ArrayList<>();
+        for (SysPurchaseOrder order : orders) {
+            SalesConstant.verifySubmitStatus(status, order.getOrderNum(), order.getStatus());
+            ids.add(order.getOrderId());
         }
-        throw new ServiceException();
+        UpdateWrapper<SysPurchaseOrder> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.lambda()
+                .set(SysPurchaseOrder::getStatus, status)
+                .in(SysPurchaseOrder::getOrderId, ids);
+        if (!this.update(updateWrapper)) {
+            throw new ServiceException();
+        }
+        return true;
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean audit(PurchaseVo orderVo) {
-        if (orderVo != null && null != orderVo.getOrder()) {
-            SysPurchaseOrder order = orderVo.getOrder();
-            SysPurchaseOrder one = this.getById(order.getOrderId());
-            if (null == one) {
-                throw new ServiceException("该订单不存在");
-            }
-            SalesConstant.verifyAuditStatus(order.getStatus(), one.getStatus());
-            order.setAuditBy(UserSecurityUtil.getNickname());
-            order.setAuditTime(new Date());
-            if (!this.updateById(order)) {
-                throw new ServiceException();
-            }
-            return true;
+    public boolean audit(CommonVo<SysPurchaseOrder, SysPurchaseOrderSub> vo) {
+        Integer id = vo.getId();
+        SysPurchaseOrder one = this.getById(id);
+        if (null == one) {
+            throw new ServiceException("该订单不存在");
         }
-        throw new ServiceException();
+        String status = vo.getStatus();
+        SalesConstant.verifyAuditStatus(status, one.getStatus());
+        SysPurchaseOrder order = new SysPurchaseOrder();
+        order.setOrderId(id);
+        order.setAuditBy(UserSecurityUtil.getNickname());
+        order.setAuditTime(new Date());
+        order.setStatus(status);
+        if (!this.updateById(order)) {
+            throw new ServiceException();
+        }
+        return true;
     }
 }

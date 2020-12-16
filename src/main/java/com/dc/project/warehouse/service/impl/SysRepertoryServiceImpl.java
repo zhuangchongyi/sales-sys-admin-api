@@ -40,8 +40,8 @@ public class SysRepertoryServiceImpl extends ServiceImpl<SysRepertoryDao, SysRep
         if (null == list || list.isEmpty())
             throw new SecurityException();
         for (SysRepertory repertory : list) {
-            if (null == repertory.getPkId()) { //新增
-                if (!this.save(repertory)) throw new ServiceException("修改库存失败");
+            if (null == repertory.getPkId() && !this.save(repertory)) {
+                throw new ServiceException("新增库存失败");
             } else { //修改
                 update(repertory);
             }

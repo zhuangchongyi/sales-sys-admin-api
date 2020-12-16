@@ -7,5 +7,5 @@ import javax.validation.groups.Default;
  * @date 2020/12/2
  * @description 删除校验组
  */
-public class DeleteGroup implements Default {
+public interface DeleteGroup extends Default {
 }

@@ -2,7 +2,6 @@ package com.dc.project.open.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.dc.common.exception.ServiceException;
 import com.dc.common.lang.annotation.RepeatSubmit;
 import com.dc.common.vo.OpenUser;
 import com.dc.common.vo.R;
@@ -51,11 +50,8 @@ public class CartItemController {
     @ApiOperation(value = "购物车产品生成订单")
     @RepeatSubmit
     @PostMapping("/order")
-    public R addOrder(@RequestBody CartOrderVo cartOrder) {
-        if (1 == 1) {
-            throw new ServiceException();
-        }
-        return R.success().data(cartItemService.addOrder(null));
+    public R addOrder(@RequestBody @Validated CartOrderVo cartOrder) {
+        return R.success().data(cartItemService.addOrder(cartOrder));
     }
 
 

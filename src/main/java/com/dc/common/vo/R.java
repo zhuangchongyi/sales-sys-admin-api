@@ -38,6 +38,10 @@ public class R implements Serializable {
      * 未授权code
      */
     public static final int UNAUTHORIZED = 403;
+    /**
+     * 错误提示信息
+     */
+    public static final String MESSAGE_ERROR = "(╥╯^╰╥) 系统出错了，请稍后处理！";
 
 
     private R(int code, boolean success, String message) {

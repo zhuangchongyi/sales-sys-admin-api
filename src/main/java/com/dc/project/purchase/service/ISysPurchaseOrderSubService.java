@@ -15,4 +15,7 @@ public interface ISysPurchaseOrderSubService extends IService<SysPurchaseOrderSu
 
     List<SysPurchaseOrderSub> list(SysPurchaseOrderSub orderSub);
 
+    List<SysPurchaseOrderSub> listOrderSubs(SysPurchaseOrderSub orderSub);
+
+    SysPurchaseOrderSub getOrderSub(Long orderSubId);
 }

@@ -27,5 +27,10 @@ public class SysPurchaseOrderSubController {
         return R.success().data(orderSubService.list(orderSub));
     }
 
+    @GetMapping
+    public R listOrderSubs(SysPurchaseOrderSub orderSub) {
+        return R.success().data(orderSubService.listOrderSubs(orderSub));
+    }
+
 }
 

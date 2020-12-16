@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.project.purchase.dao.SysPurchaseReturnsDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.dc.project.purchase.entity.SysPurchaseReturns">
+        <id column="returns_id" property="returnsId"/>
+        <result column="create_id" property="createId"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="returns_num" property="returnsNum"/>
+        <result column="returns_time" property="returnsTime"/>
+        <result column="order_id" property="orderId"/>
+        <result column="order_num" property="orderNum"/>
+        <result column="order_time" property="orderTime"/>
+        <result column="supplier_id" property="supplierId"/>
+        <result column="supplier_num" property="supplierNum"/>
+        <result column="supplier_name" property="supplierName"/>
+        <result column="personnel_id" property="personnelId"/>
+        <result column="personnel_name" property="personnelName"/>
+        <result column="status" property="status"/>
+        <result column="remark" property="remark"/>
+        <result column="leader" property="leader"/>
+        <result column="email" property="email"/>
+        <result column="phone" property="phone"/>
+        <result column="mobilephone" property="mobilephone"/>
+        <result column="address" property="address"/>
+        <result column="audit_by" property="auditBy"/>
+        <result column="audit_time" property="auditTime"/>
+        <result column="warehouse_id" property="warehouseId"/>
+        <result column="warehouse_num" property="warehouseNum"/>
+        <result column="warehouse_name" property="warehouseName"/>
+        <result column="outbound_time" property="outboundTime"/>
+        <result column="outbound_status" property="outboundStatus"/>
+        <result column="audit_status" property="auditStatus"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+            create_id,
+            create_by,
+            create_time,
+            update_by,
+            update_time,
+        returns_id, returns_num, returns_time, order_id, order_num, order_time, supplier_id, supplier_num, supplier_name, personnel_id, personnel_name, status, remark, leader, email, phone, mobilephone, address, audit_by, audit_time, warehouse_id, warehouse_num, warehouse_name, outbound_time, outbound_status, audit_status
+    </sql>
+
+</mapper>

@@ -62,9 +62,10 @@ public class CodeGenerator {
         StrategyConfig strategy = new StrategyConfig();
         strategy.setNaming(NamingStrategy.underline_to_camel);// 表名生成策略
         strategy.setColumnNaming(NamingStrategy.underline_to_camel);
-//        strategy.setEntityLombokModel(true);        // 加Lombok注解
+        strategy.setEntityLombokModel(true);        // 加Lombok注解
         strategy.setRestControllerStyle(true);      // 加@RestController注解
         strategy.setControllerMappingHyphenStyle(false);
+        strategy.setLogicDeleteFieldName("delFlag");//设置逻辑删除的名字
         strategy.setSuperEntityClass("com.dc.common.vo.BaseEntity");
         strategy.setInclude(scanner("表名, 多个英文逗号分割").split(","));// 需要生成的表
         strategy.setTablePrefix(pc.getModuleName() + "_");// 此处可以修改为的表前缀

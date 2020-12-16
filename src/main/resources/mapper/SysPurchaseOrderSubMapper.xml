@@ -27,5 +27,14 @@
     <sql id="Base_Column_List">
         order_sub_id, order_id, materiel_id, materiel_num, materiel_name, specification, model_name, need_torque, out_torque, units_id, units_name, price, number, total_price, has_sign_num, has_storage_num, has_return_num
     </sql>
+    <select id="listOrderSubs" resultType="com.dc.project.purchase.entity.SysPurchaseOrderSub">
+        select
+        order_sub_id, order_id, materiel_id, materiel_num, materiel_name, specification, model_name, need_torque,
+        out_torque, units_id, units_name, price, number, total_price,
+        (IFNULL(has_sign_num,0)+IFNULL(has_storage_num,0)) as has_sign_num, has_return_num
+        from sys_purchase_order_sub
+        where order_id = #{orderId} and IFNULL(number,0) > (IFNULL(has_sign_num,0)+IFNULL(has_storage_num,0))
+        order by order_sub_id asc
+    </select>
 
 </mapper>

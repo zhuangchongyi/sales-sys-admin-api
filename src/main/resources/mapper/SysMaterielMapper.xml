@@ -67,7 +67,7 @@
         from sys_materiel m
         left join sys_category c on c.category_id=m.category_id and c.category='0'
         left join sys_materiel_model mm on mm.m_id=m.materiel_id
-        where m.materiel_id=#{materielId} and del_flag='0'
+        where m.materiel_id=#{materielId} and m.del_flag='0'
         group by m.materiel_id
     </select>
     <select id="list" resultType="com.dc.common.vo.MaterielVo">

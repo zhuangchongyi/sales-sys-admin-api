@@ -23,7 +23,7 @@ public class SysPurchaseSignSubServiceImpl extends ServiceImpl<SysPurchaseSignSu
         QueryWrapper<SysPurchaseSignSub> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda()
                 .eq(SysPurchaseSignSub::getSignId, sub.getSignId())
-                .orderByDesc(SysPurchaseSignSub::getSignSubId);
+                .orderByAsc(SysPurchaseSignSub::getSignSubId);
         return this.list(queryWrapper);
     }
 }

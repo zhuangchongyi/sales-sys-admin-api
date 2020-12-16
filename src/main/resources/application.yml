@@ -41,7 +41,7 @@ mybatis-plus:
 logging:
   level:
     com.dc: debug
-    org.springfromework.web: info
+    org.springfromework: warn
     com.ulisesbocchio.jasyptspringboot: warn
 
 

@@ -7,5 +7,5 @@ import javax.validation.groups.Default;
  * @date 2020/12/2
  * @description 新增校验组
  */
-public class InsertGroup implements Default {
+public interface InsertGroup extends Default {
 }

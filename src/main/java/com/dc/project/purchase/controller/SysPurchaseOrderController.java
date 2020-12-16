@@ -3,12 +3,18 @@ package com.dc.project.purchase.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc.common.lang.annotation.RepeatSubmit;
+import com.dc.common.valid.AuditGroup;
+import com.dc.common.valid.InsertGroup;
+import com.dc.common.valid.SubmitGroup;
+import com.dc.common.valid.UpdateGroup;
 import com.dc.common.vo.R;
 import com.dc.project.purchase.entity.SysPurchaseOrder;
+import com.dc.project.purchase.entity.SysPurchaseOrderSub;
 import com.dc.project.purchase.service.ISysPurchaseOrderService;
-import com.dc.project.purchase.vo.PurchaseVo;
+import com.dc.common.vo.CommonVo;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -42,15 +48,15 @@ public class SysPurchaseOrderController {
     @RequiresPermissions("purchase:order:add")
     @RepeatSubmit
     @PostMapping
-    public R add(@RequestBody PurchaseVo orderVo) {
-        return R.success().data(purchaseOrderService.add(orderVo));
+    public R add(@RequestBody @Validated(InsertGroup.class) CommonVo<SysPurchaseOrder, SysPurchaseOrderSub> vo) {
+        return R.success().data(purchaseOrderService.add(vo));
     }
 
     @RequiresPermissions("purchase:order:edit")
     @RepeatSubmit
     @PutMapping
-    public R edit(@RequestBody PurchaseVo orderVo) {
-        return R.success().data(purchaseOrderService.edit(orderVo));
+    public R edit(@RequestBody @Validated(UpdateGroup.class) CommonVo<SysPurchaseOrder, SysPurchaseOrderSub> vo) {
+        return R.success().data(purchaseOrderService.edit(vo));
     }
 
     @RequiresPermissions("purchase:order:delete")
@@ -63,15 +69,15 @@ public class SysPurchaseOrderController {
     @RequiresPermissions("purchase:order:submit")
     @RepeatSubmit
     @PutMapping("/submit")
-    public R submit(@RequestBody PurchaseVo orderVo) {
-        return R.success().data(purchaseOrderService.submit(orderVo));
+    public R submit(@RequestBody @Validated(SubmitGroup.class) CommonVo<SysPurchaseOrder, SysPurchaseOrderSub> vo) {
+        return R.success().data(purchaseOrderService.submit(vo));
     }
 
     @RequiresPermissions("purchase:order:audit")
     @RepeatSubmit
     @PutMapping("/audit")
-    public R audit(@RequestBody PurchaseVo orderVo) {
-        return R.success().data(purchaseOrderService.audit(orderVo));
+    public R audit(@RequestBody @Validated(AuditGroup.class) CommonVo<SysPurchaseOrder, SysPurchaseOrderSub> vo) {
+        return R.success().data(purchaseOrderService.audit(vo));
     }
 }
 

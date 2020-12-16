@@ -4,7 +4,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.dc.project.purchase.entity.SysPurchaseSign;
-import com.dc.project.purchase.vo.PurchaseVo;
+import com.dc.project.purchase.entity.SysPurchaseSignSub;
+import com.dc.common.vo.CommonVo;
 
 /**
  * 采购到货主表 服务类
@@ -14,17 +15,19 @@ import com.dc.project.purchase.vo.PurchaseVo;
  */
 public interface ISysPurchaseSignService extends IService<SysPurchaseSign> {
 
-    IPage<SysPurchaseSign> page(Page<SysPurchaseSign> page,SysPurchaseSign purchaseSign);
+    IPage<SysPurchaseSign> page(Page<SysPurchaseSign> page, SysPurchaseSign purchaseSign);
 
     SysPurchaseSign get(Integer id);
 
-    boolean add(PurchaseVo signVo);
+    String add(CommonVo<SysPurchaseSign, SysPurchaseSignSub> vo);
 
-    boolean edit(PurchaseVo signVo);
+    boolean edit(CommonVo<SysPurchaseSign, SysPurchaseSignSub> vo);
 
     boolean delete(Integer id);
 
-    boolean submit(PurchaseVo signVo);
+    boolean submit(CommonVo<SysPurchaseSign, SysPurchaseSignSub> vo);
 
-    boolean audit(PurchaseVo signVo);
+    boolean audit(CommonVo<SysPurchaseSign, SysPurchaseSignSub> vo);
+
+    boolean auditStorage(CommonVo<SysPurchaseSign, SysPurchaseSignSub> vo);
 }

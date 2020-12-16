@@ -5,7 +5,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dc.common.exception.ServiceException;
 import com.dc.project.open.dao.CartItemDao;
 import com.dc.project.open.entity.CartItem;
+import com.dc.project.open.entity.OrderAddress;
 import com.dc.project.open.service.ICartItemService;
+import com.dc.project.open.service.IOrderAddressService;
+import com.dc.project.open.vo.CartOrderVo;
 import com.dc.project.sales.service.ISysOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +27,8 @@ import java.util.stream.Collectors;
 public class CartItemServiceImpl extends ServiceImpl<CartItemDao, CartItem> implements ICartItemService {
     @Autowired
     private ISysOrderService orderService;
+    @Autowired
+    private IOrderAddressService orderAddressService;
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -48,10 +53,12 @@ public class CartItemServiceImpl extends ServiceImpl<CartItemDao, CartItem> impl
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean addOrder(List<CartItem> cartItems) {
-        if (cartItems != null && !cartItems.isEmpty()) {
-            List<Long> ids = cartItems.stream().map(CartItem::getCartItemId).collect(Collectors.toList());
-            if (orderService.addOrder(cartItems) && this.removeByIds(ids)) {
+    public boolean addOrder(CartOrderVo cartItems) {
+        List<CartItem> items = cartItems.getItems();
+        OrderAddress orderAddress = cartItems.getAddress();
+        if (null != items && !items.isEmpty() && null != orderAddress) {
+            List<Long> ids = items.stream().map(CartItem::getCartItemId).collect(Collectors.toList());
+            if (orderService.addOrder(items,orderAddress) && this.removeByIds(ids)) {
                 return true;
             }
         }

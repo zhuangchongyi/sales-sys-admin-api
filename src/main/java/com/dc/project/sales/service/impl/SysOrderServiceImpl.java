@@ -88,6 +88,8 @@ public class SysOrderServiceImpl extends ServiceImpl<SysOrderDao, SysOrder> impl
     private void saveAndUpdateSub(SysOrder order, List<Map> materielList) throws InvocationTargetException, IllegalAccessException {
         if (null == materielList && materielList.isEmpty())
             throw new ServiceException("保存失败,未添加产品");
+        List<SysOrderSub> addOrderSubList = new ArrayList<>();
+        List<SysOrderSub> updateOrderSubList = new ArrayList<>();
         for (Map map : materielList) {
             SysOrderSub orderSub = new SysOrderSub();
             BeanUtils.populate(orderSub, map);
@@ -95,14 +97,16 @@ public class SysOrderServiceImpl extends ServiceImpl<SysOrderDao, SysOrder> impl
             // 校验产品是否可以使用
             materielService.verifyStatus(orderSub.getMaterielId());
             if (null == orderSub.getSubId()) {
-                if (!orderSubService.save(orderSub)) {
-                    throw new ServiceException("保存失败");
-                }
+                addOrderSubList.add(orderSub);
             } else {
-                if (!orderSubService.updateById(orderSub)) {
-                    throw new ServiceException("修改失败");
-                }
+                updateOrderSubList.add(orderSub);
             }
+        }
+        if (!addOrderSubList.isEmpty() && !orderSubService.saveBatch(addOrderSubList)) {
+            throw new ServiceException("保存失败");
+        }
+        if (!updateOrderSubList.isEmpty() && !orderSubService.updateBatchById(updateOrderSubList)) {
+            throw new ServiceException("修改失败");
         }
     }
 
@@ -117,17 +121,11 @@ public class SysOrderServiceImpl extends ServiceImpl<SysOrderDao, SysOrder> impl
         SysOrder order = this.getOne(new QueryWrapper<SysOrder>().select("status").eq("order_id", orderId));
         if (null == order) throw new ServiceException("已删除");
         String status = order.getStatus();
-        if (SalesConstant.AUDIT.equals(status)
-                || SalesConstant.RATIFY.equals(status)
-                || SalesConstant.NO_AUDIT.equals(status)
-                || SalesConstant.NO_RATIFY.equals(status)
-                || SalesConstant.SUBMIT.equals(status)) {
-            throw new ServiceException("请收回再进行删除");
-        }
+        SalesConstant.verifyDeleteStatus(status);
         if (!this.removeById(orderId))
             throw new ServiceException(String.format("%s,删除失败" + order.getOrderNum()));
         // 查询子表信息
-        if (!orderSubService.remove(new QueryWrapper<SysOrderSub>().eq("order_id", orderId)))
+        if (!orderSubService.remove(new QueryWrapper<SysOrderSub>().lambda().eq(SysOrderSub::getOrderId, orderId)))
             throw new ServiceException("删除失败");
 
         return true;
@@ -168,7 +166,9 @@ public class SysOrderServiceImpl extends ServiceImpl<SysOrderDao, SysOrder> impl
 
     @Override
     public boolean closeOrder(SysOrder order) {
-        return this.updateById(order);
+        UpdateWrapper<SysOrder> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.lambda().set(SysOrder::getStatus, SalesConstant.CLOSE).eq(SysOrder::getOrderId, order.getOrderId());
+        return this.update(updateWrapper);
     }
 
     @Override
@@ -202,20 +202,21 @@ public class SysOrderServiceImpl extends ServiceImpl<SysOrderDao, SysOrder> impl
     }
 
     @Override
-    public boolean addOrder(List<CartItem> cartItems) {
+    public boolean addOrder(List<CartItem> cartItems, OrderAddress orderAddress) {
         // 查询客户信息
-        SysClientele clientele = clienteleService.getById(cartItems.get(0).getClienteleId());
+        SysClientele clientele = clienteleService.getById(orderAddress.getClienteleId());
         if (null == clientele) {
             throw new ServiceException("客户不存在");
         }
         // 添加主表
         SysOrder order = new SysOrder();
         BeanUtil.copyBeanProp(order, clientele);
-        order.setOrderNum(CodeUtil.getCode(SalesConstant.SALES_ORDER_NO));
-        Date date = new Date();
+        String orderNum = CodeUtil.getCode(SalesConstant.SALES_ORDER_NO);
+        Date orderTime = new Date();
+        order.setOrderNum(orderNum);
         order.setPayCondition("移动端支付");
-        order.setOrderTime(date);
-        order.setDeliveryTime(date);
+        order.setOrderTime(orderTime);
+        order.setDeliveryTime(orderTime);
         order.setOrderType(SalesConstant.ORDER_TYPE_MOBILE);
         order.setStatus(SalesConstant.SUBMIT);
         BigDecimal total = BigDecimalUtil.ZERO;
@@ -231,17 +232,15 @@ public class SysOrderServiceImpl extends ServiceImpl<SysOrderDao, SysOrder> impl
         BeanUtil.copyBeanProp(orderSubs, cartItems);
         for (SysOrderSub sub : orderSubs) {
             sub.setOrderId(order.getOrderId());
-            // 校验产品库存(暂时不做校验)
-            if (!orderSubService.save(sub)) {
-                throw new ServiceException("订单明细保存失败");
-            }
+        }
+        // 校验产品库存(暂时不做校验)
+        if (!orderSubService.saveBatch(orderSubs)) {
+            throw new ServiceException("订单明细保存失败");
         }
         // 添加客户订单表地址
-        OrderAddress orderAddress = new OrderAddress();
-        orderAddress.setClienteleId(order.getClienteleId());
         orderAddress.setOrderId(order.getOrderId());
-        orderAddress.setOrderNum(order.getOrderNum());
-        orderAddress.setOrderTime(date);
+        orderAddress.setOrderNum(orderNum);
+        orderAddress.setOrderTime(orderTime);
         if (!orderAddressService.save(orderAddress)) {
             throw new ServiceException("订单地址保存失败");
         }

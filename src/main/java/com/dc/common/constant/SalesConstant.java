@@ -105,7 +105,8 @@ public class SalesConstant {
      * @param sourceStatus 当前状态
      */
     public static void verifyAuditStatus(String targetStatus, String sourceStatus) {
-        if (AUDIT.equals(targetStatus)) {//审核
+        //审核
+        if (AUDIT.equals(targetStatus)) {
             if (AUDIT.equals(sourceStatus))
                 throw new ServiceException("已审核，不允许重复操作");
             else if (CLOSE.equals(sourceStatus))
@@ -148,20 +149,21 @@ public class SalesConstant {
      * @param sourceStatus 原始状态
      */
     public static void verifySubmitStatus(String targetStatus, String number, String sourceStatus) {
-        if (SalesConstant.SUBMIT.equals(targetStatus)) {
-            if (SalesConstant.SUBMIT.equals(sourceStatus)) {
+        if (SUBMIT.equals(targetStatus)) {
+            if (SUBMIT.equals(sourceStatus)) {
                 throw new ServiceException(String.format("%s 已提交", number));
-            } else if (SalesConstant.AUDIT.equals(sourceStatus)) {
+            } else if (AUDIT.equals(sourceStatus) || NO_AUDIT.equals(sourceStatus) ||
+                    NO_RATIFY.equals(sourceStatus) || RATIFY.equals(sourceStatus)) {
                 throw new ServiceException(String.format("%s 已审核", number));
-            } else if (SalesConstant.CLOSE.equals(sourceStatus)) {
+            } else if (CLOSE.equals(sourceStatus)) {
                 throw new ServiceException(String.format("%s 已关闭", number));
             }
         } else {
-            if (SalesConstant.NO_SUBMIT.equals(sourceStatus)) {
+            if (NO_SUBMIT.equals(sourceStatus)) {
                 throw new ServiceException(String.format("%s 已收回", number));
-            } else if (SalesConstant.AUDIT.equals(sourceStatus)) {
+            } else if (AUDIT.equals(sourceStatus) || RATIFY.equals(sourceStatus)) {
                 throw new ServiceException(String.format("%s 已审核", number));
-            } else if (SalesConstant.CLOSE.equals(sourceStatus)) {
+            } else if (CLOSE.equals(sourceStatus)) {
                 throw new ServiceException(String.format("%s 已关闭", number));
             }
         }
@@ -173,7 +175,9 @@ public class SalesConstant {
      * @param status
      */
     public static void verifyDeleteStatus(String status) {
-        if (AUDIT.equals(status) || NO_AUDIT.equals(status) || SUBMIT.equals(status)) {
+        if (AUDIT.equals(status) || NO_AUDIT.equals(status) ||
+                SUBMIT.equals(status) || NO_RATIFY.equals(status) ||
+                RATIFY.equals(status)) {
             throw new ServiceException("请收回再进行删除");
         }
     }

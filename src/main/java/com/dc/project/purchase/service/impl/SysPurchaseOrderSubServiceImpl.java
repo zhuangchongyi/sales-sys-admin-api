@@ -23,7 +23,19 @@ public class SysPurchaseOrderSubServiceImpl extends ServiceImpl<SysPurchaseOrder
         QueryWrapper<SysPurchaseOrderSub> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda()
                 .eq(SysPurchaseOrderSub::getOrderId, orderSub.getOrderId())
-                .orderByDesc(SysPurchaseOrderSub::getOrderSubId);
+                .orderByAsc(SysPurchaseOrderSub::getOrderSubId);
         return this.list(queryWrapper);
+    }
+
+    @Override
+    public List<SysPurchaseOrderSub> listOrderSubs(SysPurchaseOrderSub orderSub) {
+        return baseMapper.listOrderSubs(orderSub);
+    }
+
+    @Override
+    public SysPurchaseOrderSub getOrderSub(Long orderSubId) {
+        return this.getOne(new QueryWrapper<SysPurchaseOrderSub>().lambda()
+                .select(SysPurchaseOrderSub::getOrderSubId, SysPurchaseOrderSub::getHasReturnNum, SysPurchaseOrderSub::getHasStorageNum, SysPurchaseOrderSub::getHasSignNum, SysPurchaseOrderSub::getNumber)
+                .eq(SysPurchaseOrderSub::getOrderSubId, orderSubId));
     }
 }

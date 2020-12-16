@@ -2,6 +2,8 @@ package com.dc.project.open.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Date;
 
@@ -11,6 +13,7 @@ import java.util.Date;
  * @author zhuangcy
  * @since 2020-11-28
  */
+@ApiModel("客户订单收货地址表")
 public class OrderAddress {
 
     /**
@@ -22,61 +25,73 @@ public class OrderAddress {
     /**
      * 客户id
      */
+    @ApiModelProperty("客户id")
     private Integer clienteleId;
 
     /**
      * 订单id
      */
+    @ApiModelProperty("订单id")
     private Integer orderId;
 
     /**
      * 订单号
      */
+    @ApiModelProperty("订单号")
     private String orderNum;
 
     /**
      * 订单日期
      */
+    @ApiModelProperty("订单日期")
     private Date orderTime;
 
     /**
      * 省份
      */
+    @ApiModelProperty("省份")
     private String province;
 
     /**
      * 市
      */
+    @ApiModelProperty("市")
     private String city;
 
     /**
      * 区、县
      */
+    @ApiModelProperty("区、县")
     private String district;
 
     /**
      * 详细地址
      */
+    @ApiModelProperty("详细地址")
     private String detail;
 
     /**
      * 地址
      */
+    @ApiModelProperty("地址")
     private String address;
 
     /**
      * 收件手机号
      */
+    @ApiModelProperty("收件手机号")
     private String phone;
 
     /**
      * 收件人
      */
+    @ApiModelProperty("收件人")
     private String recipient;
 
     /**
      * 邮政编码
      */
+    @ApiModelProperty("邮政编码")
     private String zipCode;
 
     public String getZipCode() {

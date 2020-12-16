@@ -2,7 +2,6 @@ package com.dc.framework.handler;
 
 import com.dc.common.exception.RepeatSubmitException;
 import com.dc.common.exception.ServiceException;
-import com.dc.common.exception.UtilException;
 import com.dc.common.vo.R;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.ShiroException;
@@ -20,10 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
 /**
  * @Author zhuangchongyi
@@ -58,7 +57,7 @@ public class GlobalExceptionHandler {
     public R exception(Exception e, HttpServletRequest request) {
         log.info("请求方式：{}, 请求路径：{}, 异常信息：{}", request.getMethod(), request.getServletPath(), e.getMessage());
         log.error("异常信息: ", e);
-        return R.error().code(R.ERROR_CODE).msg("(╥╯^╰╥) 系统出错了，请稍后处理！");
+        return R.error().msg(R.MESSAGE_ERROR);
     }
 
     @ExceptionHandler(ServiceException.class)
@@ -74,32 +73,26 @@ public class GlobalExceptionHandler {
         return R.error().code(R.FAIL_CODE).msg(e.getMessage());
     }
 
-    @ExceptionHandler(UtilException.class)
-    public R repeatSubmitException(UtilException e, HttpServletRequest request) {
-        log.info("请求方式：{}, 请求路径：{}, 异常信息：{}", request.getMethod(), request.getServletPath(), e.getMessage());
-        log.error("异常信息: ", e);
-        return R.error().code(R.ERROR_CODE).msg("(╥╯^╰╥) 系统出错了，请稍后处理！");
-    }
-
     @ExceptionHandler(NestedRuntimeException.class)
-    public R httpException(NestedRuntimeException e, HttpServletRequest request) {
+    public R nestedRuntimeException(NestedRuntimeException e, HttpServletRequest request) {
         log.info("请求方式：{}, 请求路径：{}, 异常信息：{}", request.getMethod(), request.getServletPath(), e.getMessage());
         if (e instanceof HttpMessageConversionException) {
-            return R.error().code(R.ERROR_CODE).msg("类型转换异常");
+            return R.error().msg("类型转换异常");
         } else {
             log.error("异常信息: ", e);
-            return R.error().code(R.ERROR_CODE).msg("(╥╯^╰╥) 系统出错了，请稍后处理！");
+            return R.error().msg(R.MESSAGE_ERROR);
         }
     }
 
     @ExceptionHandler(ServletException.class)
     public R servletException(ServletException e, HttpServletRequest request) {
         log.info("请求方式：{}, 请求路径：{}, 异常信息：{}", request.getMethod(), request.getServletPath(), e.getMessage());
-        if (e instanceof HttpRequestMethodNotSupportedException) { //请求方式处理异常
+        if (e instanceof HttpRequestMethodNotSupportedException) { 
+            //请求方式处理异常
             return R.error().code(R.REQUEST_FAIL_CODE).msg("请求方式错误");
         } else {
             log.error("异常信息: ", e);
-            return R.error().code(R.ERROR_CODE).msg("(╥╯^╰╥) 系统出错了，请稍后处理！");
+            return R.error().msg(R.MESSAGE_ERROR);
         }
     }
 
@@ -107,13 +100,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public R methodArgumentNotValidException(MethodArgumentNotValidException e, HttpServletRequest request) {
         log.info("请求方式：{}, 请求路径：{}, 异常信息：{}", request.getMethod(), request.getServletPath(), e.getMessage());
-        log.error("异常信息: ", e);
         BindingResult bindingResult = e.getBindingResult();
         StringBuilder sb = new StringBuilder("校验失败：");
         for (FieldError fieldError : bindingResult.getFieldErrors()) {
-            sb.append(fieldError.getField()).append("：").append(fieldError.getDefaultMessage()).append(", ");
+            sb.append(fieldError.getField()).append("：").append(fieldError.getDefaultMessage()).append("; ");
         }
         String msg = sb.toString();
+        log.error("异常信息: {}", msg);
         return R.error().msg(msg);
 
     }
@@ -121,12 +114,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ValidationException.class)
     public R validationException(ValidationException e, HttpServletRequest request) {
         log.info("请求方式：{}, 请求路径：{}, 异常信息：{}", request.getMethod(), request.getServletPath(), e.getMessage());
-        log.error("异常信息: ", e);
         if (e instanceof ConstraintViolationException) {
             ConstraintViolationException ex = (ConstraintViolationException) e;
-            String msg = Arrays.toString(ex.getConstraintViolations().stream().map(c -> c.getMessage()).collect(Collectors.toList()).toArray());
+            String msg = Arrays.toString(ex.getConstraintViolations().stream().map(ConstraintViolation::getMessage).toArray());
+            log.error("异常信息: {}", msg);
             return R.error().msg(msg);
         }
+        log.error("异常信息: ", e);
         return R.error().msg(e.getMessage());
 
     }

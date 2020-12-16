@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * 产品文件表 服务实现类
@@ -36,18 +37,18 @@ public class SysMaterielFileServiceImpl extends ServiceImpl<SysMaterielFileDao, 
     @Override
     public boolean upload(Integer materielId, MultipartFile file) {
         if (null != materielId && null != file) {
-            String name = file.getOriginalFilename();
-            String fileName = CodeUtil.randomUUIDNotRail() + name.substring(name.indexOf('.'));
-            String fileDir = DateUtil.getYYYYMMPathString(new Date());
-            String url = ftpProperties.getUrlPrefix() + fileDir + fileName;
-            String path = ftpProperties.getPath() + fileDir;
             FTPClient ftpClient = FTPUtil.loginFTP(ftpProperties.getHost(), ftpProperties.getPort(), ftpProperties.getUsername(), ftpProperties.getPassword());
             if (null != ftpClient) {
+                String name = file.getOriginalFilename();
+                String fileName = CodeUtil.randomUUIDNotRail() + Objects.requireNonNull(name).substring(name.indexOf('.'));
+                String fileDir = DateUtil.getYYYYMMPathString(new Date());
                 boolean success = false;
+                String url = ftpProperties.getUrlPrefix() + fileDir + fileName;
+                String path = ftpProperties.getPath() + fileDir;
                 try {
                     success = FTPUtil.uploadFile(ftpClient, path, fileName, file.getInputStream());
                 } catch (IOException e) {
-                    throw new ServiceException("上传失败");
+                    throw new ServiceException();
                 }
                 if (success) {
                     SysMaterielFile materielFile = new SysMaterielFile();
@@ -56,14 +57,11 @@ public class SysMaterielFileServiceImpl extends ServiceImpl<SysMaterielFileDao, 
                             .setName(name)
                             .setPath(path)
                             .setUrl(url);
-                    if (!this.save(materielFile)) {
-                        throw new ServiceException("上传失败");
+                    if (this.save(materielFile)) {
+                        return true;
                     }
-                    return true;
                 }
             }
-        } else {
-            throw new ServiceException("上传失败");
         }
         throw new ServiceException("上传失败");
     }

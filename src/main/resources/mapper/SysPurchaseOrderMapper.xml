@@ -39,7 +39,12 @@
         order_id, order_num, order_time, supplier_id, supplier_num, supplier_name, personnel_id, personnel_name, status, remark, total_price, leader, email, phone, mobilephone, address, audit_by, audit_time
     </sql>
     <select id="list" resultType="com.dc.project.purchase.entity.SysPurchaseOrder">
-
+        select
+        order_id, order_num, order_time, supplier_id, supplier_num, supplier_name, personnel_id, personnel_name, status,
+        remark, total_price, leader, email, phone, mobilephone, address
+        from sys_purchase_order
+        where status = '3'
+        order by order_id desc
     </select>
 
 </mapper>

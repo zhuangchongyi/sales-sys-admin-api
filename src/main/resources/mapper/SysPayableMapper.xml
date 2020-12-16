@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dc.project.finance.dao.SysPayableDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.dc.project.finance.entity.SysPayable">
+        <id column="payable_id" property="payableId"/>
+        <result column="create_id" property="createId"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="payable_num" property="payableNum"/>
+        <result column="clientele_id" property="clienteleId"/>
+        <result column="clientele_num" property="clienteleNum"/>
+        <result column="clientele_name" property="clienteleName"/>
+        <result column="status" property="status"/>
+        <result column="total_price" property="totalPrice"/>
+        <result column="finance_time" property="financeTime"/>
+        <result column="taxamount" property="taxamount"/>
+        <result column="taxrate" property="taxrate"/>
+        <result column="invoice" property="invoice"/>
+        <result column="order_num" property="orderNum"/>
+        <result column="order_time" property="orderTime"/>
+        <result column="returns_num" property="returnsNum"/>
+        <result column="returns_time" property="returnsTime"/>
+        <result column="audit_by" property="auditBy"/>
+        <result column="audit_time" property="auditTime"/>
+        <result column="source_type" property="sourceType"/>
+        <result column="has_verifica_price" property="hasVerificaPrice"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+            create_id,
+            create_by,
+            create_time,
+            update_by,
+            update_time,
+        payable_id, payable_num, clientele_id, clientele_num, clientele_name, status, total_price, finance_time, taxamount, taxrate, invoice, order_num, order_time, returns_num, returns_time, audit_by, audit_time, source_type, has_verifica_price
+    </sql>
+
+</mapper>

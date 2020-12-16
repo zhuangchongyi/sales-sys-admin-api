@@ -2,8 +2,7 @@ package com.dc.project.open.service;
 
 import com.dc.project.open.entity.CartItem;
 import com.baomidou.mybatisplus.extension.service.IService;
-
-import java.util.List;
+import com.dc.project.open.vo.CartOrderVo;
 
 /**
  * 购物车表 服务类
@@ -27,5 +26,5 @@ public interface ICartItemService extends IService<CartItem> {
      * @param cartItems
      * @return
      */
-    boolean addOrder(List<CartItem> cartItems);
+    boolean addOrder(CartOrderVo cartItems);
 }

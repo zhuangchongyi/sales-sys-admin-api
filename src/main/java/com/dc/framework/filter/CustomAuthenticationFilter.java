@@ -28,10 +28,10 @@ public class CustomAuthenticationFilter extends FormAuthenticationFilter {
         if (request instanceof HttpServletRequest) {
             HttpServletRequest req = WebUtils.toHttp(request);
             log.info("请求方式：{}, 请求路径：{}", req.getMethod(), req.getServletPath());
-            if (req.getMethod().toUpperCase().equals("OPTIONS")) {
-                log.info("如果请求的方法是OPTIONS，总是返回true");
-                return true;
-            }
+//            if (req.getMethod().equals(HttpMethod.OPTIONS)) {
+//                log.info("如果请求的方法是OPTIONS，总是返回true");
+//                return true;
+//            }
         }
         return super.isAccessAllowed(request, response, mappedValue);
     }

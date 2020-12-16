@@ -19,11 +19,13 @@
         <result column="price" property="price"/>
         <result column="number" property="number"/>
         <result column="sign_num" property="signNum"/>
+        <result column="storage_num" property="storageNum"/>
+        <result column="has_sign_num" property="hasSignNum"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        sign_sub_id, sign_id, order_sub_id, materiel_id, materiel_num, materiel_name, specification, model_name, need_torque, out_torque, units_id, units_name, price, number, sign_num
+        sign_sub_id, sign_id, order_sub_id, materiel_id, materiel_num, materiel_name, specification, model_name, need_torque, out_torque, units_id, units_name, price, number, sign_num, storage_num, has_sign_num
     </sql>
 
 </mapper>

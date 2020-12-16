@@ -3,12 +3,18 @@ package com.dc.project.purchase.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc.common.lang.annotation.RepeatSubmit;
+import com.dc.common.valid.AuditGroup;
+import com.dc.common.valid.InsertGroup;
+import com.dc.common.valid.SubmitGroup;
+import com.dc.common.valid.UpdateGroup;
 import com.dc.common.vo.R;
 import com.dc.project.purchase.entity.SysPurchaseSign;
+import com.dc.project.purchase.entity.SysPurchaseSignSub;
 import com.dc.project.purchase.service.ISysPurchaseSignService;
-import com.dc.project.purchase.vo.PurchaseVo;
+import com.dc.common.vo.CommonVo;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -43,15 +49,15 @@ public class SysPurchaseSignController {
     @RequiresPermissions("purchase:sign:add")
     @RepeatSubmit
     @PostMapping
-    public R add(@RequestBody PurchaseVo signVo) {
-        return R.success().data(purchaseSignService.add(signVo));
+    public R add(@RequestBody @Validated(InsertGroup.class) CommonVo<SysPurchaseSign, SysPurchaseSignSub> vo) {
+        return R.success().data(purchaseSignService.add(vo));
     }
 
     @RequiresPermissions("purchase:sign:edit")
     @RepeatSubmit
     @PutMapping
-    public R edit(@RequestBody PurchaseVo signVo) {
-        return R.success().data(purchaseSignService.edit(signVo));
+    public R edit(@RequestBody @Validated(UpdateGroup.class) CommonVo<SysPurchaseSign, SysPurchaseSignSub> vo) {
+        return R.success().data(purchaseSignService.edit(vo));
     }
 
     @RequiresPermissions("purchase:sign:delete")
@@ -64,15 +70,15 @@ public class SysPurchaseSignController {
     @RequiresPermissions("purchase:sign:submit")
     @RepeatSubmit
     @PutMapping("/submit")
-    public R submit(@RequestBody PurchaseVo signVo) {
-        return R.success().data(purchaseSignService.submit(signVo));
+    public R submit(@RequestBody @Validated(SubmitGroup.class) CommonVo<SysPurchaseSign, SysPurchaseSignSub> vo) {
+        return R.success().data(purchaseSignService.submit(vo));
     }
 
     @RequiresPermissions("purchase:sign:audit")
     @RepeatSubmit
     @PutMapping("/audit")
-    public R audit(@RequestBody PurchaseVo signVo) {
-        return R.success().data(purchaseSignService.audit(signVo));
+    public R audit(@RequestBody @Validated(AuditGroup.class) CommonVo<SysPurchaseSign, SysPurchaseSignSub> vo) {
+        return R.success().data(purchaseSignService.audit(vo));
     }
 
 }

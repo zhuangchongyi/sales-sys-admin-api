@@ -12,6 +12,7 @@
         <result column="update_time" property="updateTime"/>
         <result column="sign_num" property="signNum"/>
         <result column="sign_time" property="signTime"/>
+        <result column="order_id" property="orderId"/>
         <result column="order_num" property="orderNum"/>
         <result column="order_time" property="orderTime"/>
         <result column="supplier_id" property="supplierId"/>
@@ -28,6 +29,12 @@
         <result column="address" property="address"/>
         <result column="audit_by" property="auditBy"/>
         <result column="audit_time" property="auditTime"/>
+        <result column="warehouse_id" property="warehouseId"/>
+        <result column="warehouse_num" property="warehouseNum"/>
+        <result column="warehouse_name" property="warehouseName"/>
+        <result column="storage_time" property="storageTime"/>
+        <result column="storage_status" property="storageStatus"/>
+        <result column="audit_status" property="auditStatus"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -37,7 +44,7 @@
             create_time,
             update_by,
             update_time,
-        sign_id, sign_num, sign_time, order_num, order_time, supplier_id, supplier_num, supplier_name, personnel_id, personnel_name, status, remark, leader, email, phone, mobilephone, address, audit_by, audit_time
+        sign_id, sign_num, sign_time, order_id, order_num, order_time, supplier_id, supplier_num, supplier_name, personnel_id, personnel_name, status, remark, leader, email, phone, mobilephone, address, audit_by, audit_time, warehouse_id, warehouse_num, warehouse_name, storage_time, storage_status, audit_status
     </sql>
 
 </mapper>
